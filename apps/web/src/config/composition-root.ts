@@ -7,16 +7,20 @@
  */
 
 import { CheckApiHealth } from "../application/use-cases/check-api-health";
+import { GetSection } from "../application/use-cases/get-section";
 import { HttpHealthAdapter } from "../infrastructure/http/http-health.adapter";
+import { HttpContentAdapter } from "../infrastructure/http/http-content.adapter";
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 
 // --- Adaptadores de salida ---
 const healthAdapter = new HttpHealthAdapter(apiUrl);
+const contentAdapter = new HttpContentAdapter(apiUrl);
 
 // --- Casos de uso (reciben los adaptadores por inyección) ---
 export const container = {
   checkApiHealth: new CheckApiHealth(healthAdapter),
+  getSection: new GetSection(contentAdapter),
 } as const;
 
 export type Container = typeof container;

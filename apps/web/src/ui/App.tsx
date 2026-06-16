@@ -1,63 +1,55 @@
 /**
- * Componente raíz de la UI. De momento solo comprueba la conexión con la API
- * (front <-> back de punta a punta). El juego en sí llegará en los próximos pasos.
+ * Pantalla principal del juego: muestra la sección actual y permite navegar por
+ * el libro pulsando las opciones. El número de sección actual es el único estado
+ * por ahora (la ficha del personaje y el guardado llegarán en pasos siguientes).
  */
 
-import { API_CONTRACT_VERSION } from "@lone-wolf/shared";
+import { useState } from "react";
+import { useSection } from "./hooks/useSection";
 import { useApiHealth } from "./hooks/useApiHealth";
+import { SectionView } from "./components/SectionView";
+
+const FIRST_SECTION = 1;
 
 export function App() {
+  const [sectionNumber, setSectionNumber] = useState(FIRST_SECTION);
+  const section = useSection(sectionNumber);
   const health = useApiHealth();
 
   return (
-    <main className="card">
-      <h1>🐺 Lobo Solitario</h1>
-      <p className="muted">Libro 1 — Huida de la Oscuridad</p>
+    <main className="game">
+      <header className="game-header">
+        <div>
+          <h1>🐺 Lobo Solitario</h1>
+          <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
+        </div>
+        <span className="section-badge" data-testid="section-number">
+          {sectionNumber}
+        </span>
+      </header>
 
-      <h2>Estado de la API</h2>
-
-      {health.status === "loading" && <p className="muted">Comprobando conexión…</p>}
-
-      {health.status === "error" && (
-        <p className="status-bad">❌ Sin conexión con la API: {health.message}</p>
+      {section.status === "loading" && <p className="muted">Cargando sección…</p>}
+      {section.status === "error" && (
+        <p className="status-bad">⚠️ {section.message}</p>
+      )}
+      {section.status === "ok" && (
+        <SectionView section={section.data} onNavigate={setSectionNumber} />
       )}
 
-      {health.status === "ok" && (
-        <>
-          <ul className="kv">
-            <li>
-              <span>Servidor</span>
-              <span className="status-ok">{health.data.status}</span>
-            </li>
-            <li>
-              <span>Base de datos</span>
-              <span>{health.data.db}</span>
-            </li>
-            <li>
-              <span>Versión del contrato (API)</span>
-              <span>{health.data.apiContractVersion}</span>
-            </li>
-            <li>
-              <span>Versión del contrato (esperada)</span>
-              <span>{API_CONTRACT_VERSION}</span>
-            </li>
-            <li>
-              <span>¿Contratos compatibles?</span>
-              <span
-                className={
-                  health.data.apiContractVersion === API_CONTRACT_VERSION
-                    ? "status-ok"
-                    : "status-bad"
-                }
-              >
-                {health.data.apiContractVersion === API_CONTRACT_VERSION
-                  ? "sí ✓"
-                  : "no ✗"}
-              </span>
-            </li>
-          </ul>
-        </>
-      )}
+      <footer className="game-footer">
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => setSectionNumber(FIRST_SECTION)}
+        >
+          ↺ Reiniciar
+        </button>
+        {health.status === "ok" && (
+          <span className="muted small">
+            API: {health.data.status} · BD: {health.data.db}
+          </span>
+        )}
+      </footer>
     </main>
   );
 }

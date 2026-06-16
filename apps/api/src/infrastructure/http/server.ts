@@ -6,7 +6,13 @@
  * de dependencias está en un único sitio.
  */
 
-import express, { type Express, type Router } from "express";
+import express, {
+  type Express,
+  type NextFunction,
+  type Request,
+  type Response,
+  type Router,
+} from "express";
 import cors from "cors";
 import { env } from "../../config/env";
 
@@ -27,6 +33,15 @@ export function createHttpServer(routers: Router[]): Express {
   app.use((_req, res) => {
     res.status(404).json({ error: "Ruta no encontrada" });
   });
+
+  // Manejador de errores: cualquier excepción no controlada -> 500 en JSON.
+  // (En Express 5, las promesas rechazadas de los handlers llegan aquí.)
+  app.use(
+    (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+      console.error("[http] Error no controlado:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    },
+  );
 
   return app;
 }
