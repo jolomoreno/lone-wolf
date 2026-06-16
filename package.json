@@ -1,0 +1,16 @@
+{
+  "name": "lone-wolf",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Lobo Solitario, libro 1 (Huida de la Oscuridad), como webapp interactiva",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  }
+}
