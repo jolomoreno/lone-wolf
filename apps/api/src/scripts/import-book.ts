@@ -20,6 +20,21 @@ const DEFAULT_XML = fileURLToPath(
   new URL("../../../../data/01hdlo.xml", import.meta.url),
 );
 
+/**
+ * Lee el XML respetando su codificación declarada. Los ficheros en español de
+ * Project Aon son ISO-8859-1 (Latin-1); leerlos como utf-8 corrompe acentos y
+ * eñes. Detectamos la codificación en la cabecera <?xml ... encoding="..."?>.
+ */
+function readXmlFile(path: string): string {
+  const buffer = readFileSync(path);
+  const header = buffer.toString("latin1", 0, 200).toLowerCase();
+  const encoding: BufferEncoding =
+    header.includes("iso-8859-1") || header.includes("latin1")
+      ? "latin1"
+      : "utf-8";
+  return buffer.toString(encoding);
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const dryRun = args.includes("--dry-run");
@@ -27,7 +42,7 @@ async function main(): Promise<void> {
   const xmlPath = fileArg ?? DEFAULT_XML;
 
   console.log(`[import] Leyendo ${xmlPath}`);
-  const xml = readFileSync(xmlPath, "utf-8");
+  const xml = readXmlFile(xmlPath);
   const sections = parseGamebook(xml);
 
   const numbered = sections.filter((s) => s.number !== null).length;
