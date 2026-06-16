@@ -1,13 +1,15 @@
 /**
- * Conexión a MongoDB mediante Mongoose.
+ * Adaptador de salida: conexión a MongoDB con Mongoose.
  *
- * De momento es tolerante a fallos: si no hay MONGODB_URI o falla la conexión,
- * el servidor sigue arrancando (sin BD). Más adelante, cuando montemos Atlas,
- * la conexión será obligatoria.
+ * Es infraestructura pura (conoce el detalle técnico de la BD). El dominio no
+ * sabe que esto existe; los repositorios concretos vivirán también aquí.
+ *
+ * De momento la conexión es tolerante a fallos: sin MONGODB_URI el servidor
+ * arranca igual (sin BD). Cuando montemos Atlas, será obligatoria.
  */
 
 import mongoose from "mongoose";
-import { env } from "../config/env";
+import { env } from "../../config/env";
 
 export async function connectToDatabase(): Promise<void> {
   if (!env.mongodbUri) {
