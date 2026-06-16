@@ -29,3 +29,6 @@ coverage/
 
 # Configuración local de Claude Code (específica de la máquina)
 .claude/settings.local.json
+
+# Contenido del libro (Project Aon): no se redistribuye en el repo
+data/*.xml

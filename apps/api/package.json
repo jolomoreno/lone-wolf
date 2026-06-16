@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "start": "tsx src/main.ts",
+    "import:book": "tsx src/scripts/import-book.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -13,6 +14,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.0",
     "express": "^5.0.0",
+    "fast-xml-parser": "^4.5.0",
     "mongoose": "^8.0.0"
   },
   "devDependencies": {
