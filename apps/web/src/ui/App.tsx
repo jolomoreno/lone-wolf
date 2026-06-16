@@ -1,20 +1,39 @@
 /**
- * Pantalla principal del juego: muestra la sección actual y permite navegar por
- * el libro pulsando las opciones. El número de sección actual es el único estado
- * por ahora (la ficha del personaje y el guardado llegarán en pasos siguientes).
+ * Orquesta las dos fases del juego:
+ *  - Sin personaje  → pantalla de creación.
+ *  - Con personaje  → la aventura (sección actual + ficha del personaje).
+ *
+ * El personaje vive en estado de React (se perderá al recargar hasta que
+ * implementemos el guardado en localStorage, paso 9).
  */
 
 import { useState } from "react";
-import { useSection } from "./hooks/useSection";
-import { useApiHealth } from "./hooks/useApiHealth";
+import type { Character } from "../domain/character/character";
+import { CharacterCreation } from "./components/CharacterCreation";
+import { CharacterSheet } from "./components/CharacterSheet";
 import { SectionView } from "./components/SectionView";
+import { useSection } from "./hooks/useSection";
 
 const FIRST_SECTION = 1;
 
 export function App() {
+  const [character, setCharacter] = useState<Character | null>(null);
+
+  if (!character) {
+    return <CharacterCreation onCreate={setCharacter} />;
+  }
+
+  return <Adventure character={character} onRestart={() => setCharacter(null)} />;
+}
+
+interface AdventureProps {
+  character: Character;
+  onRestart: () => void;
+}
+
+function Adventure({ character, onRestart }: AdventureProps) {
   const [sectionNumber, setSectionNumber] = useState(FIRST_SECTION);
   const section = useSection(sectionNumber);
-  const health = useApiHealth();
 
   return (
     <main className="game">
@@ -28,27 +47,26 @@ export function App() {
         </span>
       </header>
 
-      {section.status === "loading" && <p className="muted">Cargando sección…</p>}
-      {section.status === "error" && (
-        <p className="status-bad">⚠️ {section.message}</p>
-      )}
-      {section.status === "ok" && (
-        <SectionView section={section.data} onNavigate={setSectionNumber} />
-      )}
+      <div className="layout">
+        <CharacterSheet character={character} />
+
+        <div className="reader">
+          {section.status === "loading" && (
+            <p className="muted">Cargando sección…</p>
+          )}
+          {section.status === "error" && (
+            <p className="status-bad">⚠️ {section.message}</p>
+          )}
+          {section.status === "ok" && (
+            <SectionView section={section.data} onNavigate={setSectionNumber} />
+          )}
+        </div>
+      </div>
 
       <footer className="game-footer">
-        <button
-          type="button"
-          className="ghost"
-          onClick={() => setSectionNumber(FIRST_SECTION)}
-        >
-          ↺ Reiniciar
+        <button type="button" className="ghost" onClick={onRestart}>
+          ↺ Nueva partida
         </button>
-        {health.status === "ok" && (
-          <span className="muted small">
-            API: {health.data.status} · BD: {health.data.db}
-          </span>
-        )}
       </footer>
     </main>
   );

@@ -19,9 +19,9 @@ const disciplines: KaiDiscipline[] = [
   "healing",
 ];
 
-/** Personaje base con Resistencia 25 (número fijo 5). */
+/** Personaje base con Resistencia máxima 25. */
 function baseCharacter(): Character {
-  return createCharacter({ disciplines, random: () => 5 });
+  return createCharacter({ combatSkill: 15, enduranceMax: 25, disciplines });
 }
 
 describe("Resistencia", () => {

@@ -3,17 +3,14 @@ import {
   createCharacter,
   rollCombatSkill,
   rollEndurance,
+  rollWeaponskillWeapon,
 } from "./create-character";
 import type { KaiDiscipline } from "./kai-discipline";
+import { WEAPON_NAMES } from "./weapon";
 import type { RandomNumber } from "../random/random-number";
 
 /** RandomNumber que siempre devuelve el mismo número. */
 const fixed = (n: number): RandomNumber => () => n;
-/** RandomNumber que recorre una secuencia (para tiradas distintas). */
-const sequence = (...numbers: number[]): RandomNumber => {
-  let i = 0;
-  return () => numbers[i++ % numbers.length];
-};
 
 const fiveDisciplines: KaiDiscipline[] = [
   "camouflage",
@@ -33,13 +30,19 @@ describe("tiradas de creación", () => {
     expect(rollEndurance(fixed(0))).toBe(20);
     expect(rollEndurance(fixed(9))).toBe(29);
   });
+
+  it("rollWeaponskillWeapon devuelve un arma válida", () => {
+    expect(WEAPON_NAMES[rollWeaponskillWeapon(fixed(0))]).toBeDefined();
+    expect(WEAPON_NAMES[rollWeaponskillWeapon(fixed(5))]).toBeDefined();
+  });
 });
 
 describe("createCharacter", () => {
-  it("crea con stats tirados y la Resistencia actual al máximo", () => {
+  it("usa las stats dadas y pone la Resistencia actual al máximo", () => {
     const character = createCharacter({
+      combatSkill: 13,
+      enduranceMax: 28,
       disciplines: fiveDisciplines,
-      random: sequence(3, 8), // 1ª tirada Destreza, 2ª Resistencia
     });
     expect(character.stats.combatSkill).toBe(13);
     expect(character.stats.enduranceMax).toBe(28);
@@ -49,7 +52,11 @@ describe("createCharacter", () => {
 
   it("exige exactamente 5 disciplinas", () => {
     expect(() =>
-      createCharacter({ disciplines: fiveDisciplines.slice(0, 4) }),
+      createCharacter({
+        combatSkill: 15,
+        enduranceMax: 25,
+        disciplines: fiveDisciplines.slice(0, 4),
+      }),
     ).toThrow(/5 disciplinas/);
   });
 
@@ -61,7 +68,9 @@ describe("createCharacter", () => {
       "tracking",
       "healing",
     ];
-    expect(() => createCharacter({ disciplines: repeated })).toThrow(/repetir/);
+    expect(() =>
+      createCharacter({ combatSkill: 15, enduranceMax: 25, disciplines: repeated }),
+    ).toThrow(/repetir/);
   });
 
   it('"Dominio de las Armas" requiere un arma', () => {
@@ -73,26 +82,40 @@ describe("createCharacter", () => {
       "healing",
     ];
     expect(() =>
-      createCharacter({ disciplines: withWeaponskill, random: fixed(0) }),
+      createCharacter({
+        combatSkill: 15,
+        enduranceMax: 25,
+        disciplines: withWeaponskill,
+      }),
     ).toThrow(/arma/);
 
     const character = createCharacter({
+      combatSkill: 15,
+      enduranceMax: 25,
       disciplines: withWeaponskill,
       weaponskillWeapon: "sword",
-      random: fixed(0),
     });
     expect(character.weaponskillWeapon).toBe("sword");
   });
 
   it("no deja exceder el oro máximo", () => {
     expect(() =>
-      createCharacter({ disciplines: fiveDisciplines, gold: 999 }),
+      createCharacter({
+        combatSkill: 15,
+        enduranceMax: 25,
+        disciplines: fiveDisciplines,
+        gold: 999,
+      }),
     ).toThrow(/oro/);
   });
 
   it("no muta los arrays de entrada (copias defensivas)", () => {
     const disciplines = [...fiveDisciplines];
-    const character = createCharacter({ disciplines });
+    const character = createCharacter({
+      combatSkill: 15,
+      enduranceMax: 25,
+      disciplines,
+    });
     expect(character.disciplines).not.toBe(disciplines);
   });
 });

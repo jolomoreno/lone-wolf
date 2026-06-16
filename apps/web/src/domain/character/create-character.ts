@@ -4,6 +4,10 @@
  * - Resistencia = 20 + número aleatorio (0-9)  (la actual empieza al máximo)
  * - 5 Disciplinas del Kai elegidas
  * - Equipo inicial
+ *
+ * Diseño: la TIRADA (aleatoriedad) está separada del ENSAMBLADO. La UI tira
+ * primero las stats, las muestra, y al confirmar llama a `createCharacter` con
+ * esos valores ya fijados.
  */
 
 import {
@@ -16,7 +20,7 @@ import {
   MAX_WEAPONS,
 } from "./character";
 import { KAI_DISCIPLINES_TO_CHOOSE, type KaiDiscipline } from "./kai-discipline";
-import type { WeaponType } from "./weapon";
+import { WEAPON_NAMES, type WeaponType } from "./weapon";
 import { defaultRandomNumber, type RandomNumber } from "../random/random-number";
 
 export function rollCombatSkill(random: RandomNumber = defaultRandomNumber): number {
@@ -27,7 +31,24 @@ export function rollEndurance(random: RandomNumber = defaultRandomNumber): numbe
   return BASE_ENDURANCE + random();
 }
 
+const WEAPONSKILL_WEAPONS = Object.keys(WEAPON_NAMES) as WeaponType[];
+
+/**
+ * Decide el arma de "Dominio de las Armas" con una tirada.
+ * NOTA: usamos un reparto uniforme sobre las armas; la tabla exacta 0-9 del
+ * libro se afinará en el paso 8 (cuando el arma dé bonus en combate).
+ */
+export function rollWeaponskillWeapon(
+  random: RandomNumber = defaultRandomNumber,
+): WeaponType {
+  return WEAPONSKILL_WEAPONS[random() % WEAPONSKILL_WEAPONS.length];
+}
+
 export interface CreateCharacterParams {
+  /** Destreza ya tirada (10-19). */
+  combatSkill: number;
+  /** Resistencia máxima ya tirada (20-29). */
+  enduranceMax: number;
   /** Las 5 disciplinas elegidas. */
   disciplines: KaiDiscipline[];
   /** Arma de "Dominio de las Armas" (obligatoria si se eligió esa disciplina). */
@@ -37,12 +58,12 @@ export interface CreateCharacterParams {
   specialItems?: InventoryItem[];
   gold?: number;
   meals?: number;
-  /** Fuente de aleatoriedad (inyectable para tests). */
-  random?: RandomNumber;
 }
 
 export function createCharacter(params: CreateCharacterParams): Character {
   const {
+    combatSkill,
+    enduranceMax,
     disciplines,
     weaponskillWeapon,
     weapons = [],
@@ -50,7 +71,6 @@ export function createCharacter(params: CreateCharacterParams): Character {
     specialItems = [],
     gold = 0,
     meals = 0,
-    random = defaultRandomNumber,
   } = params;
 
   if (disciplines.length !== KAI_DISCIPLINES_TO_CHOOSE) {
@@ -73,9 +93,6 @@ export function createCharacter(params: CreateCharacterParams): Character {
   if (gold < 0 || gold > MAX_GOLD) {
     throw new Error(`El oro debe estar entre 0 y ${MAX_GOLD} coronas.`);
   }
-
-  const combatSkill = rollCombatSkill(random);
-  const enduranceMax = rollEndurance(random);
 
   return {
     stats: { combatSkill, enduranceMax, enduranceCurrent: enduranceMax },

@@ -32,7 +32,7 @@ body {
 
 .game {
   width: 100%;
-  max-width: 42rem;
+  max-width: 54rem;
 }
 
 .game-header {
@@ -172,4 +172,146 @@ body {
 
 .status-bad {
   color: var(--bad);
+}
+
+/* ---------- Creación del personaje ---------- */
+
+.creation {
+  width: 100%;
+  max-width: 42rem;
+}
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stat-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  background: var(--panel);
+}
+
+.stat-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.discipline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.discipline-toggle {
+  font-family: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+}
+
+.discipline-toggle.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.discipline-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.primary {
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #1a1612;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- Partida: ficha + lector ---------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 760px) {
+  .layout {
+    grid-template-columns: 15rem 1fr;
+    align-items: start;
+  }
+}
+
+.sheet {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+@media (min-width: 760px) {
+  .sheet {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.sheet h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.sheet h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 1rem 0 0.35rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+
+.sheet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sheet-list li {
+  padding: 0.15rem 0;
+  font-size: 0.95rem;
 }
