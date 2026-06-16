@@ -9,9 +9,10 @@
 - [ ] **10. Despliegue** (Atlas + Render + Vercel).
 
 ## Refactors / deuda técnica (detectados)
-- [ ] **Tests (vitest) — no hay ninguno.** Prioridad alta: es el sentido del hexagonal.
-      Empezar por lo puro: `parse-gamebook-xml.ts`, `section.mapper.ts`, y los casos de
-      uso `GetSection` (back y front, este último con un `ContentPort` falso).
+- [~] **Tests (vitest).** Configurado en `apps/web` (15 tests del dominio del personaje:
+      creación, Resistencia, inventario). Falta cubrir el backend y los adaptadores:
+      `parse-gamebook-xml.ts`, `section.mapper.ts`, y los casos de uso `GetSection`
+      (back y front con un `ContentPort` falso).
 - [ ] **Navegación por id, no por número.** Hoy la API es `GET /sections/:number` y el
       front parsea `"sectNNN" → número` ([SectionView.tsx](apps/web/src/ui/components/SectionView.tsx)).
       Las secciones especiales (`number = null`) y los `choices` que apunten a ellas quedan
