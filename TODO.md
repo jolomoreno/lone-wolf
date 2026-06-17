@@ -8,7 +8,8 @@
       5 Disciplinas del Kai, equipo inicial y ficha en partida.
 - [x] **8. Combate** — Tabla de Resultados canónica + combate por asaltos (UI) que
       usa y modifica la Resistencia real del personaje.
-- [ ] **9. Guardado** de la partida en localStorage.
+- [x] **9. Guardado** — GameState (sección + personaje + historial + flags) con
+      autoguardado en localStorage y pantalla "Continuar / Nueva partida".
 - [ ] **10. Despliegue** (Atlas + Render + Vercel).
 
 ## Hecho desde la última revisión
@@ -37,11 +38,11 @@
       reglas/Disciplinas/tabla siguen importadas pero inalcanzables (depende de navegar por id).
 
 ## Fidelidad del juego (detectado en esta revisión)
-- [ ] **Opciones condicionales + estado de juego.** Hoy se muestran TODAS las opciones
-      siempre. El libro condiciona muchas a disciplinas/objetos/eventos
-      ("si tienes X, pasa al Y"). Falta un **GameState** en el dominio del front
-      (sección actual + personaje + historial + flags) sobre el que evaluar condiciones.
-      (Hoy el personaje vive suelto en `App` y la sección en `Adventure`.)
+- [~] **Opciones condicionales.** El `GameState` (sección + personaje + historial +
+      **flags**) ya existe (paso 9), así que la base está. Falta: (a) evaluar
+      condiciones sobre él para mostrar/ocultar opciones, y (b) tener esos datos de
+      condición por sección (el XML no los trae estructurados). Hoy se muestran TODAS
+      las opciones siempre.
 - [ ] **Bonus de "Dominio de las Armas".** Dos vocabularios de armas conviven: `WeaponType`
       (de la disciplina) e ids de objetos ("axe", "sword", "mace", "spear", **"stake"**).
       `hasWeaponskillBonus` casa por `id === weaponskillWeapon`, así que p.ej. "Estaca"
