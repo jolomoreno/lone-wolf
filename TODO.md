@@ -163,7 +163,7 @@
 - [ ] No hay ESLint/Prettier/Biome; `pnpm lint` (raíz) no hace nada.
 
 ### API en producción
-- [ ] `isProduction` en [env.ts](apps/api/src/config/env.ts) sigue sin usar;
+- [x] `isProduction` en [env.ts](apps/api/src/config/env.ts) sigue sin usar;
       activarlo para fallar rápido sin `MONGODB_URI` en prod.
 - [ ] Dev y `start` usan `tsx`; decidir estrategia para Render (`tsx` en prod o
       compilar; `@lone-wolf/shared` exporta `.ts`).
@@ -174,7 +174,7 @@
       "Nueva partida" añadido en secciones sin choices. Pendiente: transiciones,
       estado que persiste/se limpia al volver al menú, casos límite (terminar y
       recargar, muerte en combate en secciones con roll-table, etc.).
-- [ ] **Ficha — Comidas y Oro aparecen bajo "Objetos Especiales"** en lugar de
+- [x] **Ficha — Comidas y Oro aparecen bajo "Objetos Especiales"** en lugar de
       bajo "Mochila". Son stats globales del personaje, no ítems, así que deben
       mostrarse en la sección correcta de `CharacterSheet`. Revisar el orden del
       JSX y/o la agrupación de secciones en el componente.
@@ -185,7 +185,7 @@
 - [x] **CORS en desarrollo:** la API acepta cualquier `localhost:*` en `development`
       (el puerto del frontend varía según la herramienta); en producción usa
       `CORS_ORIGIN` estrictamente. Fix en `server.ts`.
-- [ ] Claves de lista por índice en `SectionView` (bloques) — usar claves estables.
+- [x] Claves de lista por índice en `SectionView` (bloques) — usar claves estables.
 - [ ] Mantener sincronizados `Section` (dominio API) ↔ `SectionDTO` (el mapper
       es la frontera).
 
