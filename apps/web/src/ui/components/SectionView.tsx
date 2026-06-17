@@ -60,12 +60,12 @@ export function SectionView({
   return (
     <article>
       <div className="section-content">
-        {section.blocks.map((block, index) => {
+        {section.blocks.map((block, i) => {
           switch (block.type) {
             case "paragraph":
-              return <p key={index}>{block.text}</p>;
+              return <p key={`p-${i}`}>{block.text}</p>;
             case "illustration":
-              return <Illustration key={index} src={block.src} alt={block.alt} />;
+              return <Illustration key={block.src} src={block.src} alt={block.alt} />;
             case "combat":
               return null;
             default:
@@ -76,13 +76,13 @@ export function SectionView({
 
       {showChoices && section.choices.length > 0 && (
         <nav className="choices">
-          {section.choices.map((choice, index) => {
+          {section.choices.map((choice) => {
             const available = isChoiceAvailable
               ? (isChoiceAvailable(choice.target) ?? true)
               : true;
             return (
               <button
-                key={index}
+                key={choice.target}
                 type="button"
                 className={`choice${!available ? " choice-locked" : ""}`}
                 disabled={!available}

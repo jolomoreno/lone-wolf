@@ -56,6 +56,14 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
           {stats.enduranceCurrent}/{stats.enduranceMax}
         </strong>
       </div>
+      <div className="stat-row">
+        <span>Comidas</span>
+        <strong>{countMeals(character)}</strong>
+      </div>
+      <div className="stat-row">
+        <span>Oro</span>
+        <strong>{character.gold}</strong>
+      </div>
 
       <h3>Disciplinas</h3>
       <ul className="sheet-list">
@@ -142,15 +150,6 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
           </ul>
         </>
       )}
-
-      <div className="stat-row">
-        <span>Comidas</span>
-        <strong>{countMeals(character)}</strong>
-      </div>
-      <div className="stat-row">
-        <span>Oro</span>
-        <strong>{character.gold}</strong>
-      </div>
     </aside>
   );
 }

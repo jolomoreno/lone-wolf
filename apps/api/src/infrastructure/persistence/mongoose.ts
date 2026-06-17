@@ -9,10 +9,13 @@
  */
 
 import mongoose from "mongoose";
-import { env } from "../../config/env";
+import { env, isProduction } from "../../config/env";
 
 export async function connectToDatabase(): Promise<void> {
   if (!env.mongodbUri) {
+    if (isProduction) {
+      throw new Error("[db] MONGODB_URI es obligatoria en producción");
+    }
     console.warn(
       "[db] MONGODB_URI no está definida; el servidor arranca sin base de datos.",
     );
