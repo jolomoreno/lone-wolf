@@ -2,8 +2,8 @@
  * Pinta una sección del libro: sus bloques de contenido (párrafos, ilustraciones
  * y combates) y los botones de navegación a las siguientes secciones.
  *
- * Las ilustraciones se muestran como marcador de posición (las imágenes de
- * Project Aon no se cargan aquí). El combate es gestionado por CombatPanel.
+ * Las opciones condicionales (requieren disciplina, objeto o stats) se muestran
+ * atenuadas y deshabilitadas si la condición no se cumple.
  */
 
 import type { SectionDTO } from "@lone-wolf/shared";
@@ -13,9 +13,20 @@ interface Props {
   onNavigate: (sectionId: string) => void;
   /** Si es false, se ocultan las opciones (p.ej. durante un combate sin resolver). */
   showChoices?: boolean;
+  /**
+   * Función que indica si un choice (por target) está disponible para el jugador.
+   * Si devuelve `false`, el botón se deshabilita (condición no cumplida).
+   * Si devuelve `undefined` o no se pasa, el choice se considera disponible.
+   */
+  isChoiceAvailable?: (target: string) => boolean | undefined;
 }
 
-export function SectionView({ section, onNavigate, showChoices = true }: Props) {
+export function SectionView({
+  section,
+  onNavigate,
+  showChoices = true,
+  isChoiceAvailable,
+}: Props) {
   return (
     <article>
       <div className="section-content">
@@ -40,16 +51,24 @@ export function SectionView({ section, onNavigate, showChoices = true }: Props) 
 
       {showChoices && section.choices.length > 0 && (
         <nav className="choices">
-          {section.choices.map((choice, index) => (
-            <button
-              key={index}
-              type="button"
-              className="choice"
-              onClick={() => onNavigate(choice.target)}
-            >
-              {choice.text}
-            </button>
-          ))}
+          {section.choices.map((choice, index) => {
+            const available = isChoiceAvailable
+              ? (isChoiceAvailable(choice.target) ?? true)
+              : true;
+            return (
+              <button
+                key={index}
+                type="button"
+                className={`choice${!available ? " choice-locked" : ""}`}
+                disabled={!available}
+                title={!available ? "Condición no cumplida" : undefined}
+                onClick={() => available && onNavigate(choice.target)}
+              >
+                {choice.text}
+                {!available && <span aria-hidden> 🔒</span>}
+              </button>
+            );
+          })}
         </nav>
       )}
     </article>

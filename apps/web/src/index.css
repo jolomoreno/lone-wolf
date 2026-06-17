@@ -208,8 +208,50 @@ body {
 }
 
 .choice:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
+}
+
+.choice-locked {
+  border-style: dashed;
+}
+
+.combat-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sheet-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.use-item-btn {
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.use-item-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.use-item-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--muted);
 }
 
 .game-footer {

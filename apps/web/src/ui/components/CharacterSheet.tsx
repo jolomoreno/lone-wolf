@@ -1,6 +1,6 @@
 /**
  * Ficha del personaje mostrada durante la partida: stats, disciplinas y equipo.
- * Es de solo lectura (los cambios vendrán de la lógica del juego).
+ * Permite usar la Poción Curativa (+4 Resistencia) directamente desde la mochila.
  */
 
 import {
@@ -8,12 +8,27 @@ import {
   countMeals,
   MAX_BACKPACK_ITEMS,
 } from "../../domain/character/character";
+import { heal, removeFromBackpack } from "../../domain/character/character-operations";
 import { KAI_DISCIPLINE_NAMES } from "../../domain/character/kai-discipline";
 import { WEAPON_NAMES } from "../../domain/character/weapon";
 
-export function CharacterSheet({ character }: { character: Character }) {
+interface Props {
+  character: Character;
+  onCharacterChange?: (character: Character) => void;
+}
+
+const POTION_HEAL = 4;
+
+export function CharacterSheet({ character, onCharacterChange }: Props) {
   const { stats } = character;
   const backpackItems = character.backpack.filter((i) => i.kind !== "meal");
+
+  function usePotion(potionId: string) {
+    if (!onCharacterChange) return;
+    const healed = heal(character, POTION_HEAL);
+    const withoutPotion = removeFromBackpack(healed, potionId);
+    onCharacterChange(withoutPotion);
+  }
 
   return (
     <aside className="sheet">
@@ -56,7 +71,22 @@ export function CharacterSheet({ character }: { character: Character }) {
       </h3>
       <ul className="sheet-list">
         {backpackItems.length > 0 ? (
-          backpackItems.map((i) => <li key={i.id}>{i.name}</li>)
+          backpackItems.map((item) => (
+            <li key={item.id} className="sheet-item-row">
+              {item.name}
+              {item.kind === "potion" && onCharacterChange && (
+                <button
+                  type="button"
+                  className="use-item-btn"
+                  title={`Usar (+${POTION_HEAL} Resistencia)`}
+                  disabled={stats.enduranceCurrent >= stats.enduranceMax}
+                  onClick={() => usePotion(item.id)}
+                >
+                  Usar
+                </button>
+              )}
+            </li>
+          ))
         ) : (
           <li className="muted">—</li>
         )}

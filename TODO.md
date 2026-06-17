@@ -70,17 +70,25 @@
 - [x] **Victoria** — llegar a "sect350" muestra la pantalla de fin del Libro 1.
 - [x] **Muerte fuera de combate** — si `isDead(character)` y no hay enemigo en
       la sección actual, se muestra la pantalla de fin de aventura.
+- [x] **Opciones condicionales** — `section-rules.ts` contiene las condiciones
+      curadas de 35+ secciones (disciplinas, oro, Resistencia). `SectionView`
+      deshabilita y marca con 🔒 los choices cuya condición no se cumple.
+- [x] **Inmunidad al Ataque Psíquico** — datos curados para sect133, sect170,
+      sect255 y sect342; el `CombatPanel` omite el +2 de Mindblast al computar
+      el ratio si el enemigo es inmune.
+- [x] **Modificador de CS por ataque mental del enemigo** — Vordak (−2 DC, salvo
+      Defensa Psíquica), Kraan (−1 DC); aplicado al inicio del combate.
+- [x] **Eludir combate** — botón "Eludir" disponible en sect169 (tras asalto 1),
+      sect180, sect191, sect220 y sect339; navega a la sección correcta.
+- [x] **Poción Curativa** — botón "Usar" en la ficha cuando hay pociones en la
+      mochila; aplica +4 Resistencia y elimina la poción del inventario.
 
-### Pendiente (requiere datos estructurados por sección)
+### Pendiente
 
-- [ ] **Opciones condicionales** — mostrar/ocultar choices según flags, objetos o
-      disciplinas. El XML no trae esos datos; hay que curarlos a mano.
-- [ ] **Inmunidad a Ataque Psíquico** — algunos enemigos son inmunes al +2 de
-      Mindblast; dato específico por sección.
-- [ ] **Eludir / huir del combate** — opción contextual de sección; requiere datos.
 - [ ] **Cambios de stats desde el texto** — "Pierdes 2 de Resistencia", "recibes X"
-      no se aplican; no hay datos estructurados en el contenido para ello.
-- [ ] **Poción Curativa y Comidas** — uso activo de objetos (requiere UI de inventario).
+      no se aplican; no hay datos estructurados en el XML para ello.
+- [ ] **Comidas cuando el libro lo exige** — algunas secciones requieren comer
+      (penalización si no tienes); requiere datos curados adicionales.
 - [ ] **Ilustraciones** — placeholder actual. Decidir licencia Project Aon.
 
 ---

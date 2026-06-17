@@ -2,8 +2,10 @@
  * Panel de combate: enfrenta a Lobo Solitario con el enemigo de la sección,
  * asalto a asalto, usando la Destreza y la Resistencia reales del personaje.
  *
- * En cada asalto avisa al padre de la nueva Resistencia de Lobo Solitario
- * (para que la ficha se actualice en vivo) y, al terminar, del resultado.
+ * Aplica las reglas curadas por sección (SectionCombatRules):
+ *  - Inmunidad al Ataque Psíquico del enemigo.
+ *  - Modificador de Destreza al jugador (p.ej. ataque mental del Vordak).
+ *  - Opción de eludir el combate cuando la sección lo permite.
  */
 
 import { useState } from "react";
@@ -15,12 +17,15 @@ import {
   fightRound,
   startCombat,
 } from "../../domain/combat/combat";
+import type { SectionCombatRules } from "../../domain/game/section-rules";
 
 interface Props {
   character: Character;
   enemy: Enemy;
+  rules?: SectionCombatRules;
   onEnduranceChange: (loneWolfEndurance: number) => void;
   onEnd: (status: "won" | "lost") => void;
+  onEvade?: (targetId: string) => void;
 }
 
 /** +2 si el personaje lucha con el arma de "Dominio de las Armas". */
@@ -35,18 +40,47 @@ function formatLoss(loss: Damage): string {
   return loss === "K" ? "¡muerte!" : `−${loss}`;
 }
 
-export function CombatPanel({ character, enemy, onEnduranceChange, onEnd }: Props) {
-  // Modificadores fijados al empezar el combate.
-  const [modifiers] = useState(() => ({
-    weaponskill: hasWeaponskillBonus(character),
-    mindblast: character.disciplines.includes("mindblast"),
-  }));
+export function CombatPanel({
+  character,
+  enemy,
+  rules,
+  onEnduranceChange,
+  onEnd,
+  onEvade,
+}: Props) {
+  const [modifiers] = useState(() => {
+    const mindblastImmune = rules?.mindblastImmune ?? false;
+
+    // Modificador de CS por ataque psíquico del enemigo (p.ej. Vordak −2).
+    // Si mindshieldProtects y el jugador tiene Defensa Psíquica, se anula.
+    let csBonus = rules?.playerCSModifier ?? 0;
+    if (rules?.mindshieldProtects && character.disciplines.includes("mindshield")) {
+      csBonus = 0;
+    }
+
+    return {
+      weaponskill: hasWeaponskillBonus(character),
+      mindblast: !mindblastImmune && character.disciplines.includes("mindblast"),
+      bonus: csBonus,
+      mindblastImmune,
+      mindshieldActive:
+        (rules?.playerCSModifier ?? 0) < 0 &&
+        rules?.mindshieldProtects === true &&
+        character.disciplines.includes("mindshield"),
+      rawCSPenalty: rules?.playerCSModifier ?? 0,
+    };
+  });
+
   const [combat, setCombat] = useState<CombatState>(() =>
     startCombat(
       character.stats.combatSkill,
       character.stats.enduranceCurrent,
       enemy,
-      modifiers,
+      {
+        weaponskill: modifiers.weaponskill,
+        mindblast: modifiers.mindblast,
+        bonus: modifiers.bonus,
+      },
     ),
   );
 
@@ -56,6 +90,16 @@ export function CombatPanel({ character, enemy, onEnduranceChange, onEnd }: Prop
     onEnduranceChange(next.loneWolfEndurance);
     if (next.status !== "ongoing") onEnd(next.status);
   }
+
+  function handleEvade() {
+    if (onEvade && rules?.evasion) onEvade(rules.evasion.target);
+  }
+
+  const canEvade =
+    onEvade != null &&
+    rules?.evasion != null &&
+    combat.rounds.length >= rules.evasion.afterRound &&
+    combat.status === "ongoing";
 
   const lwPct = Math.round(
     (combat.loneWolfEndurance / Math.max(1, character.stats.enduranceMax)) * 100,
@@ -95,18 +139,42 @@ export function CombatPanel({ character, enemy, onEnduranceChange, onEnd }: Prop
         Ratio de combate: {ratioLabel}
         {modifiers.weaponskill ? " · Dominio de las Armas (+2)" : ""}
         {modifiers.mindblast ? " · Ataque Psíquico (+2)" : ""}
+        {modifiers.mindblastImmune ? " · Inmune al Ataque Psíquico" : ""}
+        {modifiers.rawCSPenalty < 0 && !modifiers.mindshieldActive
+          ? ` · Ataque mental (${modifiers.rawCSPenalty} DC)`
+          : ""}
+        {modifiers.mindshieldActive ? " · Defensa Psíquica activa" : ""}
       </p>
 
-      {combat.status === "ongoing" ? (
-        <button
-          type="button"
-          className="primary"
-          data-testid="next-round"
-          onClick={nextRound}
-        >
-          Siguiente asalto
-        </button>
-      ) : (
+      {combat.status === "ongoing" && (
+        <div className="combat-actions">
+          <button
+            type="button"
+            className="primary"
+            data-testid="next-round"
+            onClick={nextRound}
+          >
+            Siguiente asalto
+          </button>
+          {canEvade && (
+            <button
+              type="button"
+              className="ghost"
+              data-testid="evade-combat"
+              onClick={handleEvade}
+            >
+              Eludir combate
+            </button>
+          )}
+          {rules?.evasion && !canEvade && combat.status === "ongoing" && rules.evasion.afterRound > 0 && (
+            <button type="button" className="ghost" disabled>
+              Eludir (desde asalto {rules.evasion.afterRound + 1})
+            </button>
+          )}
+        </div>
+      )}
+
+      {combat.status !== "ongoing" && (
         <p
           className={combat.status === "won" ? "status-ok" : "status-bad"}
           data-testid="combat-result"

@@ -21,6 +21,11 @@ import {
   goToSection,
   updateCharacter,
 } from "../domain/game/game-state";
+import {
+  evaluateCondition,
+  SECTION_CHOICE_CONDITIONS,
+  SECTION_COMBAT_RULES,
+} from "../domain/game/section-rules";
 import { CharacterCreation } from "./components/CharacterCreation";
 import { CharacterSheet } from "./components/CharacterSheet";
 import { CombatPanel } from "./components/CombatPanel";
@@ -190,6 +195,17 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
 
   const showChoices = !enemy || combatOutcome === "won";
 
+  // Reglas curadas para la sección actual.
+  const combatRules = SECTION_COMBAT_RULES[sectionId];
+  const choiceConditions = SECTION_CHOICE_CONDITIONS[sectionId] ?? [];
+
+  /** Devuelve si un choice (por target) está disponible para el personaje actual. */
+  function isChoiceAvailable(target: string): boolean {
+    const rule = choiceConditions.find((r) => r.target === target);
+    if (!rule) return true;
+    return evaluateCondition(rule.condition, character);
+  }
+
   /**
    * Al navegar a una sección: si la actual no tiene combate y el personaje
    * tiene Curación, aplica +1 Resistencia antes de moverse.
@@ -256,7 +272,10 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
       </header>
 
       <div className="layout">
-        <CharacterSheet character={character} />
+        <CharacterSheet
+          character={character}
+          onCharacterChange={(updated) => onChange(updateCharacter(game, updated))}
+        />
 
         <div className="reader">
           {section.status === "loading" && (
@@ -271,6 +290,7 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
                 section={section.data}
                 onNavigate={handleNavigate}
                 showChoices={showChoices}
+                isChoiceAvailable={isChoiceAvailable}
               />
 
               {enemy && (
@@ -278,12 +298,14 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
                   key={sectionId}
                   character={character}
                   enemy={enemy}
+                  rules={combatRules}
                   onEnduranceChange={(endurance) =>
                     onChange(
                       updateCharacter(game, setEnduranceCurrent(character, endurance)),
                     )
                   }
                   onEnd={(status) => setCombatOutcome(status)}
+                  onEvade={handleNavigate}
                 />
               )}
 
