@@ -6,6 +6,18 @@
 import type { KaiDiscipline } from "./kai-discipline";
 import type { WeaponType } from "./weapon";
 
+/** Categoría de un objeto, para lógica especial (comidas, pociones). */
+export type ItemKind = "meal" | "potion";
+
+/** Un objeto del inventario. */
+export interface InventoryItem {
+  /** Identificador único de la instancia (para añadir/quitar). */
+  id: string;
+  name: string;
+  /** Categoría opcional (p.ej. "meal" para que cuente como Comida). */
+  kind?: ItemKind;
+}
+
 /** Atributos numéricos. */
 export interface CharacterStats {
   /** Destreza en el Combate. Se fija al crear y no cambia durante la aventura. */
@@ -16,12 +28,6 @@ export interface CharacterStats {
   enduranceCurrent: number;
 }
 
-/** Un objeto del inventario. */
-export interface InventoryItem {
-  id: string;
-  name: string;
-}
-
 /** La ficha completa. */
 export interface Character {
   stats: CharacterStats;
@@ -29,11 +35,14 @@ export interface Character {
   disciplines: KaiDiscipline[];
   /** Arma de "Dominio de las Armas", si se eligió esa disciplina. */
   weaponskillWeapon?: WeaponType;
+  /** Armas que lleva (máx. 2). */
   weapons: InventoryItem[];
+  /** Mochila (máx. 8 objetos; las Comidas cuentan como objetos de mochila). */
   backpack: InventoryItem[];
+  /** Objetos Especiales (sin límite fijo). */
   specialItems: InventoryItem[];
+  /** Coronas de Oro (máx. 50 en la bolsa). */
   gold: number;
-  meals: number;
 }
 
 /** Constantes de las reglas de creación e inventario del Libro 1. */
@@ -46,4 +55,9 @@ export const MAX_GOLD = 50;
 /** ¿Lobo Solitario ha muerto (Resistencia a 0)? */
 export function isDead(character: Character): boolean {
   return character.stats.enduranceCurrent <= 0;
+}
+
+/** Número de Comidas en la mochila. */
+export function countMeals(character: Character): number {
+  return character.backpack.filter((item) => item.kind === "meal").length;
 }

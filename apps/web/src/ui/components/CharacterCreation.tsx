@@ -1,20 +1,24 @@
 /**
- * Pantalla de creación del personaje. Usa el dominio (`createCharacter` y las
- * tiradas) directamente: crear un personaje es lógica pura, sin E/S, así que no
- * necesita pasar por un puerto/adaptador.
- *
- * La Destreza y la Resistencia se tiran UNA vez al entrar (como elegir un número
- * de la Tabla de Números Aleatorios). El jugador elige 5 Disciplinas del Kai.
+ * Pantalla de creación del personaje (Libro 1). Usa el dominio directamente:
+ * - Tira Destreza, Resistencia, Oro y el objeto del almacén (Tabla de la Suerte).
+ * - El jugador elige 5 Disciplinas del Kai (y el arma si coge "Dominio de las Armas").
+ * Al confirmar, `createStartingCharacter` ensambla el equipo fijo + lo tirado.
  */
 
 import { useState } from "react";
 import type { Character } from "../../domain/character/character";
 import {
-  createCharacter,
   rollCombatSkill,
   rollEndurance,
+  rollStartingGold,
   rollWeaponskillWeapon,
 } from "../../domain/character/create-character";
+import {
+  createStartingCharacter,
+  rollStoreroomChoiceId,
+  STOREROOM,
+  type StoreroomGrant,
+} from "../../domain/character/equipment";
 import {
   ALL_KAI_DISCIPLINES,
   KAI_DISCIPLINE_NAMES,
@@ -27,10 +31,29 @@ interface Props {
   onCreate: (character: Character) => void;
 }
 
+function storeroomHint(grant: StoreroomGrant): string {
+  switch (grant.kind) {
+    case "weapon":
+      return "Arma";
+    case "special":
+      return grant.enduranceBonus
+        ? `Especial · +${grant.enduranceBonus} Resistencia`
+        : "Especial";
+    case "meals":
+      return `${grant.amount} Comidas`;
+    case "backpackItem":
+      return "Mochila";
+    case "gold":
+      return `+${grant.amount} Coronas`;
+  }
+}
+
 export function CharacterCreation({ onCreate }: Props) {
-  // Tirada única al montar (la "elección" de la tabla de números aleatorios).
+  // Tiradas únicas al montar (la "elección" en la Tabla de la Suerte).
   const [combatSkill] = useState(() => rollCombatSkill());
   const [enduranceMax] = useState(() => rollEndurance());
+  const [gold] = useState(() => rollStartingGold());
+  const [storeroomId] = useState(() => rollStoreroomChoiceId());
 
   const [selected, setSelected] = useState<KaiDiscipline[]>([]);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
@@ -38,24 +61,28 @@ export function CharacterCreation({ onCreate }: Props) {
   const isFull = selected.length >= KAI_DISCIPLINES_TO_CHOOSE;
   const ready = selected.length === KAI_DISCIPLINES_TO_CHOOSE;
 
+  const storeroomItem = STOREROOM.find((c) => c.id === storeroomId);
+
   function toggle(discipline: KaiDiscipline) {
     if (selected.includes(discipline)) {
       setSelected(selected.filter((d) => d !== discipline));
       if (discipline === "weaponskill") setWeapon(null);
       return;
     }
-    if (isFull) return; // ya hay 5
+    if (isFull) return;
     setSelected([...selected, discipline]);
     if (discipline === "weaponskill") setWeapon(rollWeaponskillWeapon());
   }
 
   function start() {
     onCreate(
-      createCharacter({
+      createStartingCharacter({
         combatSkill,
         enduranceMax,
+        gold,
         disciplines: selected,
         ...(weapon ? { weaponskillWeapon: weapon } : {}),
+        storeroomChoiceId: storeroomId,
       }),
     );
   }
@@ -78,7 +105,27 @@ export function CharacterCreation({ onCreate }: Props) {
             {enduranceMax}
           </span>
         </div>
+        <div className="stat-card">
+          <span className="stat-label">Oro (Tabla de la Suerte)</span>
+          <span className="stat-value" data-testid="stat-gold">
+            {gold}
+          </span>
+        </div>
       </section>
+
+      <p className="muted small">
+        Equipo fijo: Hacha, 1 Comida y Mapa de Sommerlund.
+      </p>
+
+      {storeroomItem && (
+        <div className="rolled-item" data-testid="storeroom-item" data-store={storeroomId}>
+          <span className="muted small">Objeto del almacén (tirada {storeroomId})</span>
+          <span>
+            <strong>{storeroomItem.name}</strong> ·{" "}
+            <span className="muted small">{storeroomHint(storeroomItem.grant)}</span>
+          </span>
+        </div>
+      )}
 
       <h2>
         Disciplinas del Kai{" "}

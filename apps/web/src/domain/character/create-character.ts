@@ -31,6 +31,11 @@ export function rollEndurance(random: RandomNumber = defaultRandomNumber): numbe
   return BASE_ENDURANCE + random();
 }
 
+/** Tira las Coronas de Oro iniciales (0-9) en la Tabla de la Suerte. */
+export function rollStartingGold(random: RandomNumber = defaultRandomNumber): number {
+  return random();
+}
+
 const WEAPONSKILL_WEAPONS = Object.keys(WEAPON_NAMES) as WeaponType[];
 
 /**
@@ -57,7 +62,6 @@ export interface CreateCharacterParams {
   backpack?: InventoryItem[];
   specialItems?: InventoryItem[];
   gold?: number;
-  meals?: number;
 }
 
 export function createCharacter(params: CreateCharacterParams): Character {
@@ -70,7 +74,6 @@ export function createCharacter(params: CreateCharacterParams): Character {
     backpack = [],
     specialItems = [],
     gold = 0,
-    meals = 0,
   } = params;
 
   if (disciplines.length !== KAI_DISCIPLINES_TO_CHOOSE) {
@@ -102,6 +105,5 @@ export function createCharacter(params: CreateCharacterParams): Character {
     backpack: [...backpack],
     specialItems: [...specialItems],
     gold,
-    meals,
   };
 }

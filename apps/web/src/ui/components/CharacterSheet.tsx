@@ -3,16 +3,17 @@
  * Es de solo lectura (los cambios vendrán de la lógica del juego).
  */
 
-import type { Character } from "../../domain/character/character";
+import {
+  type Character,
+  countMeals,
+  MAX_BACKPACK_ITEMS,
+} from "../../domain/character/character";
 import { KAI_DISCIPLINE_NAMES } from "../../domain/character/kai-discipline";
 import { WEAPON_NAMES } from "../../domain/character/weapon";
 
 export function CharacterSheet({ character }: { character: Character }) {
   const { stats } = character;
-  const hasEquipment =
-    character.weapons.length > 0 ||
-    character.backpack.length > 0 ||
-    character.specialItems.length > 0;
+  const backpackItems = character.backpack.filter((i) => i.kind !== "meal");
 
   return (
     <aside className="sheet">
@@ -41,28 +42,44 @@ export function CharacterSheet({ character }: { character: Character }) {
         ))}
       </ul>
 
-      {hasEquipment && (
+      <h3>Armas</h3>
+      <ul className="sheet-list">
+        {character.weapons.length > 0 ? (
+          character.weapons.map((w) => <li key={w.id}>{w.name}</li>)
+        ) : (
+          <li className="muted">—</li>
+        )}
+      </ul>
+
+      <h3>
+        Mochila ({character.backpack.length}/{MAX_BACKPACK_ITEMS})
+      </h3>
+      <ul className="sheet-list">
+        {backpackItems.length > 0 ? (
+          backpackItems.map((i) => <li key={i.id}>{i.name}</li>)
+        ) : (
+          <li className="muted">—</li>
+        )}
+      </ul>
+
+      {character.specialItems.length > 0 && (
         <>
-          <h3>Equipo</h3>
+          <h3>Objetos especiales</h3>
           <ul className="sheet-list">
-            {[
-              ...character.weapons,
-              ...character.specialItems,
-              ...character.backpack,
-            ].map((item) => (
-              <li key={item.id}>{item.name}</li>
+            {character.specialItems.map((i) => (
+              <li key={i.id}>{i.name}</li>
             ))}
           </ul>
         </>
       )}
 
       <div className="stat-row">
-        <span>Oro</span>
-        <strong>{character.gold}</strong>
+        <span>Comidas</span>
+        <strong>{countMeals(character)}</strong>
       </div>
       <div className="stat-row">
-        <span>Comidas</span>
-        <strong>{character.meals}</strong>
+        <span>Oro</span>
+        <strong>{character.gold}</strong>
       </div>
     </aside>
   );
