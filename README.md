@@ -11,7 +11,7 @@ inventario y guardado de la partida.
 | 1-9 | Base · Personaje · Combate · Guardado automático | ✅ Hecho |
 | 10 | Experiencia de juego — guardado manual, control consciente del jugador | ✅ Hecho |
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
-| 12 | Tiradas animadas — dado 3D CSS, revelación progresiva en la creación | ✅ Hecho |
+| 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
 | **13** | **Refactors / deuda técnica** — lint, tests backend, build prod | ⬜ Siguiente |
 | 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
 
@@ -54,13 +54,14 @@ apps/web/src/
     ├── App.tsx            # Orquestador: inicio / creación / aventura; autoguardado
     ├── DependencyProvider # Contexto React que expone los adaptadores inyectados
     ├── components/
-    │   ├── CharacterCreation  # Tiradas de stats, selección de 5 disciplinas, equipo inicial
+    │   ├── CharacterCreation  # Tiradas de stats (revelación progresiva), selección de 5 disciplinas, equipo inicial
     │   ├── CharacterSheet     # Ficha en partida: stats, disciplinas, inventario,
     │   │                      #   botones Usar (poción) y Soltar (arma/mochila)
     │   ├── SectionView        # Texto + ilustración (hotlink Project Aon) + opciones;
     │   │                      #   deshabilita con 🔒 las opciones cuya condición no se cumple
     │   ├── CombatPanel        # Barras de Resistencia, ratio efectivo, modificadores CS,
     │   │                      #   botón Eludir (si la sección lo permite), log de asaltos
+    │   ├── DiceRoll           # Dado animado (CSS @keyframes); API: roll(value, onDone) / reset()
     │   ├── RollPanel          # Tirada en Tabla de la Suerte: muestra dado, aplica rama y navega
     │   └── LootPanel          # Objetos cogibles por sección; respeta límites de inventario
     └── hooks/

@@ -1,7 +1,7 @@
 # TODO / Backlog — Lobo Solitario
 
-> Estado a 2026-06-17. Roadmap + deuda técnica + huecos de fidelidad detectados
-> en una revisión de toda la app. Pasos 1-11 completados.
+> Última actualización: 2026-06-17. Roadmap + deuda técnica + huecos de fidelidad detectados
+> en una revisión de toda la app. Pasos 1-12 completados.
 
 ## Roadmap principal
 
@@ -131,6 +131,21 @@
 - [x] **RollPanel animado** — la Tabla de la Suerte usa un dado `lg` centrado;
       el botón "Tirar" dispara la animación y solo muestra el resultado al terminar.
 
+### Pulido adicional (sesión 2026-06-17)
+
+- [x] **Bloqueo del botón "Tirar" durante la animación** — `CharacterCreation` añade
+      estado `rolling` que deshabilita el botón activo mientras el dado anima, evitando
+      tiradas dobles accidentales.
+- [x] **Label "Destreza"** — acortado de "Destreza en el Combate" para que no salte
+      a dos líneas en la tarjeta de creación.
+- [x] **Fin de partida simplificado** — eliminado el botón "Volver al inicio" de las
+      tres pantallas de fin (victoria sect350, muerte fuera de combate, muerte en
+      combate). Ambas acciones eran equivalentes; queda solo "Nueva partida".
+- [x] **"Nueva partida" en secciones del libro sin choices** — secciones de muerte
+      propias del gamebook (p.ej. sect292) tienen `choices: []` y dejaban al jugador
+      sin salida. Ahora `Adventure` detecta cuando no hay choices, tabla de tirada ni
+      combate activo, y muestra el botón "Nueva partida".
+
 ---
 
 ## Paso 13 — Refactors / deuda técnica
@@ -155,11 +170,10 @@
 - [ ] Endurecer la API: `helmet`, quizá rate-limit; validación de variables de entorno.
 
 ### Bugs visuales / UI
-- [ ] **Flujo de fin de partida sin pulir** — las pantallas de fin de juego
-      (victoria sect350, muerte fuera de combate, derrota en combate) y el reinicio
-      tras terminar no terminan de estar finos. Dar un repaso: transiciones,
-      mensajes, estado que persiste/se limpia al volver al menú o empezar de nuevo,
-      y casos límite (terminar y recargar, etc.).
+- [~] **Flujo de fin de partida** — parcialmente mejorado: botón redundante eliminado,
+      "Nueva partida" añadido en secciones sin choices. Pendiente: transiciones,
+      estado que persiste/se limpia al volver al menú, casos límite (terminar y
+      recargar, muerte en combate en secciones con roll-table, etc.).
 - [ ] **Ficha — Comidas y Oro aparecen bajo "Objetos Especiales"** en lugar de
       bajo "Mochila". Son stats globales del personaje, no ítems, así que deben
       mostrarse en la sección correcta de `CharacterSheet`. Revisar el orden del
