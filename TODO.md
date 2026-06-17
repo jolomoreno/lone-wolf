@@ -1,7 +1,7 @@
 # TODO / Backlog — Lobo Solitario
 
 > Estado a 2026-06-17. Roadmap + deuda técnica + huecos de fidelidad detectados
-> en una revisión de toda la app.
+> en una revisión de toda la app. Pasos 1-11 completados.
 
 ## Roadmap principal
 
@@ -17,9 +17,9 @@
 - [x] **10. Experiencia de juego** — guardado manual, carga explícita y demás
       acciones de partida bajo control consciente del jugador.
 - [x] **11. Fidelidad del juego** — refactor navegación por id, tabla weaponskill
-      exacta, curación (Healing) por sección, victoria (sect350) y muerte fuera
-      de combate. Pendiente: opciones condicionales y uso activo de objetos
-      (requieren datos estructurados por sección).
+      exacta, curación (Healing) por sección, victoria (sect350), muerte fuera de
+      combate, reglas curadas por sección (condiciones, CS modifiers, Mindblast,
+      elusión, daño narrativo, comidas, tiradas, botín), ilustraciones Project Aon.
 - [ ] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
 - [ ] **13. Refactors / deuda técnica** — lint, tests del backend, build en
@@ -131,9 +131,10 @@ El jugador lanzará cada tirada pulsando un botón, con animación de dado:
 > la fidelidad. El resto de deuda técnica se liquida aquí antes del despliegue.
 
 ### Tests
-- [~] Dominio del front cubierto (69 tests, incl. reglas por sección). Falta el
-      **backend y adaptadores**: `parse-gamebook-xml.ts`, `section.mapper.ts`,
-      casos de uso `GetSection` (back y front con un `ContentPort` falso).
+- [~] Dominio del front cubierto (80 tests, incl. reglas por sección y tablas
+      de tirada). Falta el **backend y adaptadores**: `parse-gamebook-xml.ts`,
+      `section.mapper.ts`, casos de uso `GetSection` (back y front con un
+      `ContentPort` falso).
 
 ### Lint y formato
 - [ ] No hay ESLint/Prettier/Biome; `pnpm lint` (raíz) no hace nada.
@@ -148,6 +149,9 @@ El jugador lanzará cada tirada pulsando un botón, con animación de dado:
 ### Limpiezas de código
 - [x] **CSS muerto:** `.combat-box` y `.combat-title` eliminados de
       [index.css](apps/web/src/index.css) (el combate lo pinta `CombatPanel`).
+- [x] **CORS en desarrollo:** la API acepta cualquier `localhost:*` en `development`
+      (el puerto del frontend varía según la herramienta); en producción usa
+      `CORS_ORIGIN` estrictamente. Fix en `server.ts`.
 - [ ] Claves de lista por índice en `SectionView` (bloques) — usar claves estables.
 - [ ] Mantener sincronizados `Section` (dominio API) ↔ `SectionDTO` (el mapper
       es la frontera).
