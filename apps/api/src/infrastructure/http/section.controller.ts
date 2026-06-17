@@ -13,16 +13,16 @@ import { toSectionDTO } from "./section.mapper";
 export function createSectionRouter(getSection: GetSection): Router {
   const router = Router();
 
-  router.get("/sections/:number", async (req, res) => {
-    const number = Number(req.params.number);
-    if (!Number.isInteger(number) || number < 1) {
-      res.status(400).json({ error: "Número de sección inválido" });
+  router.get("/sections/:id", async (req, res) => {
+    const { id } = req.params;
+    if (!id || !/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(id)) {
+      res.status(400).json({ error: "ID de sección inválido" });
       return;
     }
 
-    const section = await getSection.execute(number);
+    const section = await getSection.execute(id);
     if (!section) {
-      res.status(404).json({ error: `No existe la sección ${number}` });
+      res.status(404).json({ error: `No existe la sección ${id}` });
       return;
     }
 

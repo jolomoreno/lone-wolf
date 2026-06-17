@@ -32,7 +32,7 @@ const disciplines: KaiDiscipline[] = [
 function newState() {
   return createGameState(
     createCharacter({ combatSkill: 15, enduranceMax: 25, disciplines }),
-    1,
+    "sect1",
   );
 }
 

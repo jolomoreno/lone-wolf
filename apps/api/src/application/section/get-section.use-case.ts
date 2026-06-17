@@ -11,7 +11,7 @@ import type { SectionRepository } from "../../domain/section/section-repository"
 export class GetSection {
   constructor(private readonly sections: SectionRepository) {}
 
-  execute(number: number): Promise<Section | null> {
-    return this.sections.findByNumber(number);
+  execute(id: string): Promise<Section | null> {
+    return this.sections.findById(id);
   }
 }

@@ -12,7 +12,7 @@ export type SectionState =
   | { status: "ok"; data: SectionDTO }
   | { status: "error"; message: string };
 
-export function useSection(number: number): SectionState {
+export function useSection(id: string): SectionState {
   const { getSection } = useContainer();
   const [state, setState] = useState<SectionState>({ status: "loading" });
 
@@ -21,7 +21,7 @@ export function useSection(number: number): SectionState {
     setState({ status: "loading" });
 
     getSection
-      .execute(number)
+      .execute(id)
       .then((data) => {
         if (active) setState({ status: "ok", data });
       })
@@ -36,7 +36,7 @@ export function useSection(number: number): SectionState {
     return () => {
       active = false;
     };
-  }, [getSection, number]);
+  }, [getSection, id]);
 
   return state;
 }

@@ -20,7 +20,7 @@ import {
   MAX_WEAPONS,
 } from "./character";
 import { KAI_DISCIPLINES_TO_CHOOSE, type KaiDiscipline } from "./kai-discipline";
-import { WEAPON_NAMES, type WeaponType } from "./weapon";
+import type { WeaponType } from "./weapon";
 import { defaultRandomNumber, type RandomNumber } from "../random/random-number";
 
 export function rollCombatSkill(random: RandomNumber = defaultRandomNumber): number {
@@ -36,17 +36,27 @@ export function rollStartingGold(random: RandomNumber = defaultRandomNumber): nu
   return random();
 }
 
-const WEAPONSKILL_WEAPONS = Object.keys(WEAPON_NAMES) as WeaponType[];
-
 /**
- * Decide el arma de "Dominio de las Armas" con una tirada.
- * NOTA: usamos un reparto uniforme sobre las armas; la tabla exacta 0-9 del
- * libro se afinará en el paso 8 (cuando el arma dé bonus en combate).
+ * Tabla exacta del Libro 1: tirada 0-9 → arma de "Dominio de las Armas".
+ * El 0 y el 9 dan Daga (igual que en las reglas impresas).
  */
+const WEAPONSKILL_TABLE: WeaponType[] = [
+  "dagger",       // 0
+  "spear",        // 1
+  "mace",         // 2
+  "shortSword",   // 3
+  "warhammer",    // 4
+  "sword",        // 5
+  "axe",          // 6
+  "quarterstaff", // 7
+  "broadsword",   // 8
+  "dagger",       // 9
+];
+
 export function rollWeaponskillWeapon(
   random: RandomNumber = defaultRandomNumber,
 ): WeaponType {
-  return WEAPONSKILL_WEAPONS[random() % WEAPONSKILL_WEAPONS.length];
+  return WEAPONSKILL_TABLE[random()];
 }
 
 export interface CreateCharacterParams {

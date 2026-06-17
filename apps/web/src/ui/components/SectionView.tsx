@@ -3,23 +3,16 @@
  * y combates) y los botones de navegación a las siguientes secciones.
  *
  * Las ilustraciones se muestran como marcador de posición (las imágenes de
- * Project Aon no se cargan aquí). El combate, de momento, solo se muestra; la
- * mecánica llegará en el paso 8.
+ * Project Aon no se cargan aquí). El combate es gestionado por CombatPanel.
  */
 
 import type { SectionDTO } from "@lone-wolf/shared";
 
 interface Props {
   section: SectionDTO;
-  onNavigate: (sectionNumber: number) => void;
+  onNavigate: (sectionId: string) => void;
   /** Si es false, se ocultan las opciones (p.ej. durante un combate sin resolver). */
   showChoices?: boolean;
-}
-
-/** Extrae el número de un id de sección ("sect85" -> 85), o null si no aplica. */
-function targetNumber(target: string): number | null {
-  const value = Number(target.replace(/^sect/, ""));
-  return Number.isInteger(value) && value > 0 ? value : null;
 }
 
 export function SectionView({ section, onNavigate, showChoices = true }: Props) {
@@ -38,7 +31,6 @@ export function SectionView({ section, onNavigate, showChoices = true }: Props) 
                 </figure>
               );
             case "combat":
-              // El combate lo gestiona el CombatPanel (interactivo), no aquí.
               return null;
             default:
               return null;
@@ -48,21 +40,16 @@ export function SectionView({ section, onNavigate, showChoices = true }: Props) 
 
       {showChoices && section.choices.length > 0 && (
         <nav className="choices">
-          {section.choices.map((choice, index) => {
-            const target = targetNumber(choice.target);
-            return (
-              <button
-                key={index}
-                type="button"
-                className="choice"
-                data-target={target ?? ""}
-                disabled={target === null}
-                onClick={() => target !== null && onNavigate(target)}
-              >
-                {choice.text}
-              </button>
-            );
-          })}
+          {section.choices.map((choice, index) => (
+            <button
+              key={index}
+              type="button"
+              className="choice"
+              onClick={() => onNavigate(choice.target)}
+            >
+              {choice.text}
+            </button>
+          ))}
         </nav>
       )}
     </article>

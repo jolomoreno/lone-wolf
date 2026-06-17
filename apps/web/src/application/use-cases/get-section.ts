@@ -12,7 +12,7 @@ import type { ContentPort } from "../ports/content.port";
 export class GetSection {
   constructor(private readonly content: ContentPort) {}
 
-  execute(number: number): Promise<SectionDTO> {
-    return this.content.getSection(number);
+  execute(id: string): Promise<SectionDTO> {
+    return this.content.getSection(id);
   }
 }

@@ -9,5 +9,5 @@
 import type { SectionDTO } from "@lone-wolf/shared";
 
 export interface ContentPort {
-  getSection(number: number): Promise<SectionDTO>;
+  getSection(id: string): Promise<SectionDTO>;
 }

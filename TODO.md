@@ -16,9 +16,10 @@
       autoguardado en localStorage y pantalla "Continuar / Nueva partida".
 - [x] **10. Experiencia de juego** — guardado manual, carga explícita y demás
       acciones de partida bajo control consciente del jugador.
-- [ ] **11. Fidelidad del juego** — opciones condicionales, bonuses de arma,
-      curación, comidas, eludir combate y estados finales. Arranca con el
-      refactor de navegación por id (prerequisito técnico).
+- [x] **11. Fidelidad del juego** — refactor navegación por id, tabla weaponskill
+      exacta, curación (Healing) por sección, victoria (sect350) y muerte fuera
+      de combate. Pendiente: opciones condicionales y uso activo de objetos
+      (requieren datos estructurados por sección).
 - [ ] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
 - [ ] **13. Refactors / deuda técnica** — lint, tests del backend, build en
@@ -50,54 +51,37 @@
 
 ---
 
-## Paso 11 — Fidelidad del juego
+## Paso 11 — Fidelidad del juego ✓
 
-> **Prerequisito técnico (primer subpaso):** refactor de navegación por id antes
-> de abordar opciones condicionales y frontmatter.
->
-> El motivo: la API es `GET /sections/:number` y las secciones especiales
-> (`number = null`) son inalcanzables. Sin este refactor, el paso 11 queda
-> incompleto: no se pueden navegar las secciones de reglas/Disciplinas ni las
-> que tienen condiciones basadas en id.
-> Refactor concreto: `GET /sections/:id` (el repo ya tiene `findById`) y navegar
-> con `choice.target` directo en lugar de parsear `"sectNNN" → número`.
+### Hecho en este paso
 
-### Opciones condicionales
-- [ ] Evaluar condiciones del `GameState` (flags, objetos, disciplinas) para
-      mostrar u ocultar opciones. El `GameState` ya tiene la estructura necesaria;
-      falta (a) la lógica de evaluación y (b) los datos de condición por sección
-      (el XML no los trae estructurados — habrá que curar esos datos a mano).
+- [x] **Refactor navegación por id** — API pasa a `GET /sections/:id`; `GetSection`
+      usa `findById`; `GameState.currentSection` e `history` son `string[]`; el
+      frontend navega con `choice.target` directo (sin parsear "sectNNN" → número).
+      Secciones especiales (`number = null`) ya son alcanzables.
+- [x] **Formato de guardado v2** — `SAVE_FORMAT_VERSION` bumpeado a 2; el adaptador
+      descarta automáticamente partidas antiguas (v1 usaba números).
+- [x] **Tabla exacta de Weaponskill** — `rollWeaponskillWeapon` usa la tabla 0-9
+      del Libro 1 (Daga/Lanza/Maza/EspadaCorta/MartilloGuerra/Espada/Hacha/Bastón/
+      Espadón/Daga) en lugar del reparto uniforme anterior.
+- [x] **Curación (Healing)** — al navegar desde una sección sin combate, si el
+      personaje tiene la disciplina "Curación", gana +1 Resistencia (acotado al
+      máximo).
+- [x] **Victoria** — llegar a "sect350" muestra la pantalla de fin del Libro 1.
+- [x] **Muerte fuera de combate** — si `isDead(character)` y no hay enemigo en
+      la sección actual, se muestra la pantalla de fin de aventura.
 
-### Bonus de "Dominio de las Armas"
-- [ ] Unificar los dos vocabularios de armas: `WeaponType` (de la disciplina) e ids
-      de objetos (`"axe"`, `"sword"`, `"mace"`, `"spear"`, `"stake"`).
-      `hasWeaponskillBonus` casa por `id === weaponskillWeapon`, por lo que p.ej.
-      `"Estaca"` (id `stake`) nunca casa con `quarterstaff`. Afinar también la
-      tirada exacta 0-9 del arma (hoy es uniforme en vez de usar la tirada real).
+### Pendiente (requiere datos estructurados por sección)
 
-### Inmunidad a Ataque Psíquico
-- [ ] El +2 de Mindblast se aplica siempre; algunos enemigos son inmunes (dato
-      específico de la sección que no modelamos). Requiere datos por sección.
-
-### Eludir / huir del combate
-- [ ] No implementado. Es una opción contextual de la sección (también requiere datos).
-
-### Curación / Comidas / Poción
-- [ ] Poción Curativa (+4 Resistencia tras combate), disciplina Curación (+1
-      Resistencia por sección sin combate) y comer Comidas cuando el libro lo
-      exige no afectan todavía a la partida.
-
-### Cambios desde el texto de la sección
-- [ ] "Pierdes 2 de Resistencia", "consigues X"... no se aplican. No hay mecanismo
-      ni datos estructurados en el contenido para ello.
-
-### Estados finales
-- [ ] Ganar el libro (sección final) y morir fuera de combate (Resistencia a 0 por
-      causas ajenas al combate) no tienen tratamiento especial.
-
-### Ilustraciones
-- [ ] Placeholder actual. Decidir manejo de las imágenes de Project Aon y su
-      licencia de distribución.
+- [ ] **Opciones condicionales** — mostrar/ocultar choices según flags, objetos o
+      disciplinas. El XML no trae esos datos; hay que curarlos a mano.
+- [ ] **Inmunidad a Ataque Psíquico** — algunos enemigos son inmunes al +2 de
+      Mindblast; dato específico por sección.
+- [ ] **Eludir / huir del combate** — opción contextual de sección; requiere datos.
+- [ ] **Cambios de stats desde el texto** — "Pierdes 2 de Resistencia", "recibes X"
+      no se aplican; no hay datos estructurados en el contenido para ello.
+- [ ] **Poción Curativa y Comidas** — uso activo de objetos (requiere UI de inventario).
+- [ ] **Ilustraciones** — placeholder actual. Decidir licencia Project Aon.
 
 ---
 

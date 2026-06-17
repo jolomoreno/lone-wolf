@@ -12,7 +12,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { ContentBlockDTO } from "@lone-wolf/shared";
 import type { Character } from "../domain/character/character";
-import { setEnduranceCurrent } from "../domain/character/character-operations";
+import { isDead } from "../domain/character/character";
+import { heal, setEnduranceCurrent } from "../domain/character/character-operations";
 import type { CombatStatus, Enemy } from "../domain/combat/combat";
 import {
   createGameState,
@@ -27,11 +28,19 @@ import { SectionView } from "./components/SectionView";
 import { useContainer } from "./DependencyProvider";
 import { useSection } from "./hooks/useSection";
 
-const FIRST_SECTION = 1;
+const FIRST_SECTION = "sect1";
+/** Id de la sección final del Libro 1 (sección 350). */
+const FINAL_SECTION = "sect350";
 
 function formatSavedAt(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+}
+
+/** Extrae el número de un id de sección ("sect85" → "85"), o el id completo si no aplica. */
+function sectionLabel(sectionId: string): string {
+  const match = sectionId.match(/^sect(\d+)$/);
+  return match ? match[1] : sectionId;
 }
 
 export function App() {
@@ -110,7 +119,7 @@ function StartScreen({
           Partida guardada · {formatSavedAt(saved.updatedAt)}
         </span>
         <span>
-          Sección <strong>{saved.currentSection}</strong> · Resistencia{" "}
+          Sección <strong>{sectionLabel(saved.currentSection)}</strong> · Resistencia{" "}
           {saved.character.stats.enduranceCurrent}/{saved.character.stats.enduranceMax}
         </span>
       </div>
@@ -138,16 +147,16 @@ type CombatBlock = Extract<ContentBlockDTO, { type: "combat" }>;
 
 function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: AdventureProps) {
   const character: Character = game.character;
-  const sectionNumber = game.currentSection;
+  const sectionId = game.currentSection;
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const savedAtTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const section = useSection(sectionNumber);
+  const section = useSection(sectionId);
 
   // Al cambiar de sección, se reinicia el resultado del combate.
   useEffect(() => {
     setCombatOutcome(null);
-  }, [sectionNumber]);
+  }, [sectionId]);
 
   // Limpia el timer al desmontar para evitar fugas.
   useEffect(() => {
@@ -181,6 +190,59 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
 
   const showChoices = !enemy || combatOutcome === "won";
 
+  /**
+   * Al navegar a una sección: si la actual no tiene combate y el personaje
+   * tiene Curación, aplica +1 Resistencia antes de moverse.
+   */
+  function handleNavigate(targetId: string) {
+    let currentGame = game;
+    if (
+      !enemy &&
+      character.disciplines.includes("healing") &&
+      character.stats.enduranceCurrent < character.stats.enduranceMax
+    ) {
+      currentGame = updateCharacter(currentGame, heal(character, 1));
+    }
+    onChange(goToSection(currentGame, targetId));
+  }
+
+  // Pantalla de victoria al llegar a la sección final.
+  if (sectionId === FINAL_SECTION) {
+    return (
+      <main className="creation">
+        <h1>🐺 ¡Victoria!</h1>
+        <p>Has completado el Libro 1 — Huida de la Oscuridad.</p>
+        <p className="muted small">
+          Lobo Solitario ha escapado con el Libro de Plenitud del Kai.
+          El Maestro de las Tinieblas conocerá su nombre.
+        </p>
+        <button type="button" className="primary" onClick={onNewGame}>
+          Nueva partida
+        </button>
+      </main>
+    );
+  }
+
+  // Muerte fuera de combate (Resistencia a 0 por causas no relacionadas con el combate).
+  if (isDead(character) && !enemy) {
+    return (
+      <main className="creation">
+        <h1>🐺 Fin de la aventura</h1>
+        <p className="status-bad">
+          Las heridas y el agotamiento han acabado con Lobo Solitario.
+        </p>
+        <button type="button" className="primary" onClick={onNewGame}>
+          Nueva partida
+        </button>
+      </main>
+    );
+  }
+
+  const displayNumber =
+    section.status === "ok" && section.data.number != null
+      ? section.data.number
+      : sectionLabel(sectionId);
+
   return (
     <main className="game">
       <header className="game-header">
@@ -189,7 +251,7 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
           <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
         </div>
         <span className="section-badge" data-testid="section-number">
-          {sectionNumber}
+          {displayNumber}
         </span>
       </header>
 
@@ -207,13 +269,13 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
             <>
               <SectionView
                 section={section.data}
-                onNavigate={(n) => onChange(goToSection(game, n))}
+                onNavigate={handleNavigate}
                 showChoices={showChoices}
               />
 
               {enemy && (
                 <CombatPanel
-                  key={sectionNumber}
+                  key={sectionId}
                   character={character}
                   enemy={enemy}
                   onEnduranceChange={(endurance) =>
