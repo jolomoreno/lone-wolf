@@ -12,6 +12,8 @@ import type { SectionDTO } from "@lone-wolf/shared";
 interface Props {
   section: SectionDTO;
   onNavigate: (sectionNumber: number) => void;
+  /** Si es false, se ocultan las opciones (p.ej. durante un combate sin resolver). */
+  showChoices?: boolean;
 }
 
 /** Extrae el número de un id de sección ("sect85" -> 85), o null si no aplica. */
@@ -20,7 +22,7 @@ function targetNumber(target: string): number | null {
   return Number.isInteger(value) && value > 0 ? value : null;
 }
 
-export function SectionView({ section, onNavigate }: Props) {
+export function SectionView({ section, onNavigate, showChoices = true }: Props) {
   return (
     <article>
       <div className="section-content">
@@ -36,22 +38,15 @@ export function SectionView({ section, onNavigate }: Props) {
                 </figure>
               );
             case "combat":
-              return (
-                <div key={index} className="combat-box">
-                  <span className="combat-title">⚔️ {block.combat.enemy}</span>
-                  <span className="muted small">
-                    Destreza {block.combat.combatSkill} · Resistencia{" "}
-                    {block.combat.endurance}
-                  </span>
-                </div>
-              );
+              // El combate lo gestiona el CombatPanel (interactivo), no aquí.
+              return null;
             default:
               return null;
           }
         })}
       </div>
 
-      {section.choices.length > 0 && (
+      {showChoices && section.choices.length > 0 && (
         <nav className="choices">
           {section.choices.map((choice, index) => {
             const target = targetNumber(choice.target);

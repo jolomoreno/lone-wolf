@@ -63,3 +63,12 @@ export function changeGold(character: Character, delta: number): Character {
   const gold = Math.min(MAX_GOLD, Math.max(0, character.gold + delta));
   return { ...character, gold };
 }
+
+/** Fija la Resistencia actual a un valor (acotado entre 0 y el máximo). */
+export function setEnduranceCurrent(character: Character, value: number): Character {
+  const enduranceCurrent = Math.max(
+    0,
+    Math.min(character.stats.enduranceMax, value),
+  );
+  return { ...character, stats: { ...character.stats, enduranceCurrent } };
+}

@@ -7,6 +7,7 @@ import {
   changeGold,
   heal,
   removeFromBackpack,
+  setEnduranceCurrent,
 } from "./character-operations";
 import { type Character, isDead, MAX_BACKPACK_ITEMS } from "./character";
 import type { KaiDiscipline } from "./kai-discipline";
@@ -42,6 +43,13 @@ describe("Resistencia", () => {
     const character = baseCharacter();
     applyDamage(character, 10);
     expect(character.stats.enduranceCurrent).toBe(25);
+  });
+
+  it("setEnduranceCurrent acota entre 0 y el máximo", () => {
+    const character = baseCharacter(); // max 25
+    expect(setEnduranceCurrent(character, 12).stats.enduranceCurrent).toBe(12);
+    expect(setEnduranceCurrent(character, -5).stats.enduranceCurrent).toBe(0);
+    expect(setEnduranceCurrent(character, 999).stats.enduranceCurrent).toBe(25);
   });
 });
 
