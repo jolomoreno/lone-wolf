@@ -447,6 +447,14 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
                 <RollPanel key={sectionId} table={rollTable} onResolve={handleRoll} />
               )}
 
+              {section.data.choices.length === 0 && !rollTable && !enemy && (
+                <div className="start-actions" style={{ marginTop: "1.5rem" }}>
+                  <button type="button" className="primary" onClick={onGameOver}>
+                    Nueva partida
+                  </button>
+                </div>
+              )}
+
             </>
           )}
         </div>
