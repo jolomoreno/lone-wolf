@@ -146,6 +146,12 @@ El jugador lanzará cada tirada pulsando un botón, con animación de dado:
       compilar; `@lone-wolf/shared` exporta `.ts`).
 - [ ] Endurecer la API: `helmet`, quizá rate-limit; validación de variables de entorno.
 
+### Bugs visuales / UI
+- [ ] **Ficha — Comidas y Oro aparecen bajo "Objetos Especiales"** en lugar de
+      bajo "Mochila". Son stats globales del personaje, no ítems, así que deben
+      mostrarse en la sección correcta de `CharacterSheet`. Revisar el orden del
+      JSX y/o la agrupación de secciones en el componente.
+
 ### Limpiezas de código
 - [x] **CSS muerto:** `.combat-box` y `.combat-title` eliminados de
       [index.css](apps/web/src/index.css) (el combate lo pinta `CombatPanel`).
