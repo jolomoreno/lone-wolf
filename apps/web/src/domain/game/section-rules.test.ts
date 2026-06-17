@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   applyEntryEffect,
+  applyRollOutcome,
+  collectGold,
   evaluateCondition,
+  resolveRoll,
   SECTION_CHOICE_CONDITIONS,
   SECTION_COMBAT_RULES,
   SECTION_ENTRY_EFFECTS,
+  SECTION_LOOT,
+  SECTION_ROLL_TABLES,
 } from "./section-rules";
 import { createCharacter } from "../character/create-character";
 import type { KaiDiscipline } from "../character/kai-discipline";
@@ -133,6 +138,79 @@ describe("tablas de datos curados", () => {
   it("hay efectos de entrada para las secciones de comida conocidas", () => {
     for (const id of ["sect130", "sect147", "sect168", "sect184", "sect235", "sect300"]) {
       expect(SECTION_ENTRY_EFFECTS[id]?.requiresMeal).toBe(true);
+    }
+  });
+});
+
+describe("resolveRoll", () => {
+  it("elige la rama según el número de tirada", () => {
+    const table = SECTION_ROLL_TABLES.sect294; // [0-2], [3-6], [7-9]
+    expect(resolveRoll(table, 0)?.target).toBe("sect230");
+    expect(resolveRoll(table, 2)?.target).toBe("sect230");
+    expect(resolveRoll(table, 5)?.target).toBe("sect190");
+    expect(resolveRoll(table, 9)?.target).toBe("sect321");
+  });
+
+  it("toda tabla cubre los 10 resultados (0-9) sin huecos ni solapes", () => {
+    for (const [id, table] of Object.entries(SECTION_ROLL_TABLES)) {
+      for (let n = 0; n <= 9; n++) {
+        const matches = table.filter((o) => n >= o.min && n <= o.max);
+        expect(matches.length, `${id} con tirada ${n}`).toBe(1);
+      }
+    }
+  });
+
+  it("las ramas apuntan a secciones reales", () => {
+    for (const table of Object.values(SECTION_ROLL_TABLES)) {
+      for (const o of table) expect(o.target).toMatch(/^sect\d+$/);
+    }
+  });
+});
+
+describe("applyRollOutcome", () => {
+  it("aplica el daño de la rama (sect36, 0-4)", () => {
+    const out = resolveRoll(SECTION_ROLL_TABLES.sect36, 3)!;
+    const { character: c, messages } = applyRollOutcome(character(), out);
+    expect(c.stats.enduranceCurrent).toBe(23);
+    expect(messages[0]).toMatch(/pierdes 2/i);
+  });
+
+  it("la rama segura no cambia nada (sect36, 5-9)", () => {
+    const out = resolveRoll(SECTION_ROLL_TABLES.sect36, 8)!;
+    const { character: c } = applyRollOutcome(character(), out);
+    expect(c.stats.enduranceCurrent).toBe(25);
+  });
+
+  it("pierde todo el equipo (sect188, 0-6) conservando especiales", () => {
+    const c0 = character({
+      weapons: [{ id: "axe", name: "Hacha" }],
+      backpack: [{ id: "meal-0", name: "Comida", kind: "meal" }],
+      specialItems: [{ id: "map", name: "Mapa de Sommerlund" }],
+      gold: 12,
+    });
+    const out = resolveRoll(SECTION_ROLL_TABLES.sect188, 3)!;
+    const { character: c } = applyRollOutcome(c0, out);
+    expect(c.weapons).toHaveLength(0);
+    expect(c.backpack).toHaveLength(0);
+    expect(c.gold).toBe(0);
+    expect(c.specialItems).toHaveLength(1);
+  });
+});
+
+describe("collectGold", () => {
+  it("suma el oro acotado al máximo de la bolsa", () => {
+    const { character: c, messages } = collectGold(character({ gold: 45 }), 28);
+    expect(c.gold).toBe(50);
+    expect(messages[0]).toMatch(/recoges 5/);
+  });
+});
+
+describe("SECTION_LOOT", () => {
+  it("los objetos de botín declaran ranura válida", () => {
+    for (const entry of Object.values(SECTION_LOOT)) {
+      for (const item of entry.items ?? []) {
+        expect(["weapon", "backpack", "special"]).toContain(item.slot);
+      }
     }
   });
 });

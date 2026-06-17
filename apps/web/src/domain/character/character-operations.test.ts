@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { createCharacter } from "./create-character";
 import {
+  addSpecialItem,
   addToBackpack,
   addWeapon,
   applyDamage,
   changeGold,
   heal,
+  loseAllEquipment,
   removeFromBackpack,
+  removeWeapon,
   setEnduranceCurrent,
 } from "./character-operations";
 import { type Character, isDead, MAX_BACKPACK_ITEMS } from "./character";
@@ -83,5 +86,30 @@ describe("inventario", () => {
     const character = baseCharacter();
     expect(changeGold(character, -10).gold).toBe(0);
     expect(changeGold(character, 999).gold).toBe(50);
+  });
+
+  it("suelta un arma por id", () => {
+    let character = addWeapon(baseCharacter(), { id: "sword", name: "Espada" });
+    character = addWeapon(character, { id: "axe", name: "Hacha" });
+    const without = removeWeapon(character, "sword");
+    expect(without.weapons.map((w) => w.id)).toEqual(["axe"]);
+  });
+
+  it("añade Objetos Especiales sin límite", () => {
+    let character = addSpecialItem(baseCharacter(), { id: "key", name: "Llave" });
+    character = addSpecialItem(character, { id: "soap", name: "Jabón" });
+    expect(character.specialItems).toHaveLength(2);
+  });
+
+  it("pierde todo el equipo portable conservando especiales", () => {
+    let character = addWeapon(baseCharacter(), { id: "axe", name: "Hacha" });
+    character = addToBackpack(character, { id: "meal", name: "Comida", kind: "meal" });
+    character = addSpecialItem(character, { id: "map", name: "Mapa" });
+    character = changeGold(character, 20);
+    const stripped = loseAllEquipment(character);
+    expect(stripped.weapons).toHaveLength(0);
+    expect(stripped.backpack).toHaveLength(0);
+    expect(stripped.gold).toBe(0);
+    expect(stripped.specialItems).toHaveLength(1);
   });
 });

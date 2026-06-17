@@ -13,20 +13,35 @@ import { useEffect, useRef, useState } from "react";
 import type { ContentBlockDTO } from "@lone-wolf/shared";
 import type { Character } from "../domain/character/character";
 import { isDead } from "../domain/character/character";
-import { heal, setEnduranceCurrent } from "../domain/character/character-operations";
+import {
+  addSpecialItem,
+  addToBackpack,
+  addWeapon,
+  heal,
+  setEnduranceCurrent,
+} from "../domain/character/character-operations";
 import type { CombatStatus, Enemy } from "../domain/combat/combat";
 import {
   createGameState,
   type GameState,
+  getFlag,
   goToSection,
+  setFlag,
   updateCharacter,
 } from "../domain/game/game-state";
 import {
   applyEntryEffect,
+  applyRollOutcome,
+  collectGold,
   evaluateCondition,
+  type LootItem,
+  lootToInventoryItem,
+  resolveRoll,
   SECTION_CHOICE_CONDITIONS,
   SECTION_COMBAT_RULES,
   SECTION_ENTRY_EFFECTS,
+  SECTION_LOOT,
+  SECTION_ROLL_TABLES,
 } from "../domain/game/section-rules";
 import {
   PROJECT_AON_ATTRIBUTION,
@@ -35,6 +50,8 @@ import {
 import { CharacterCreation } from "./components/CharacterCreation";
 import { CharacterSheet } from "./components/CharacterSheet";
 import { CombatPanel } from "./components/CombatPanel";
+import { LootPanel } from "./components/LootPanel";
+import { RollPanel } from "./components/RollPanel";
 import { SectionView } from "./components/SectionView";
 import { useContainer } from "./DependencyProvider";
 import { useSection } from "./hooks/useSection";
@@ -205,6 +222,8 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
   // Reglas curadas para la sección actual.
   const combatRules = SECTION_COMBAT_RULES[sectionId];
   const choiceConditions = SECTION_CHOICE_CONDITIONS[sectionId] ?? [];
+  const rollTable = SECTION_ROLL_TABLES[sectionId];
+  const loot = SECTION_LOOT[sectionId];
 
   /** Devuelve si un choice (por target) está disponible para el personaje actual. */
   function isChoiceAvailable(target: string): boolean {
@@ -214,17 +233,23 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
   }
 
   /**
-   * Al navegar a una sección:
-   *  1. Si la actual no tiene combate y el personaje tiene Curación, +1 Resistencia.
+   * Resuelve la transición a una sección destino (núcleo compartido por la
+   * navegación normal y la tirada):
+   *  1. Si la sección actual no tiene combate y hay Curación, +1 Resistencia.
    *  2. Mueve a la sección destino.
-   *  3. Aplica los efectos de entrada de la sección destino (daño narrativo,
-   *     comidas obligatorias) UNA sola vez y muestra qué ha pasado.
+   *  3. Aplica sus efectos de entrada (daño narrativo, comidas) una sola vez.
+   *  4. Cobra el oro del botín de la sección destino (una sola vez, anti-farmeo).
    */
-  function handleNavigate(targetId: string) {
-    let next = game;
+  function navigateTo(fromGame: GameState, targetId: string): {
+    game: GameState;
+    messages: string[];
+  } {
+    let next = fromGame;
+    const messages: string[] = [];
+
     if (
       !enemy &&
-      character.disciplines.includes("healing") &&
+      next.character.disciplines.includes("healing") &&
       next.character.stats.enduranceCurrent < next.character.stats.enduranceMax
     ) {
       next = updateCharacter(next, heal(next.character, 1));
@@ -234,14 +259,51 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
 
     const effect = SECTION_ENTRY_EFFECTS[targetId];
     if (effect) {
-      const { character: updated, messages } = applyEntryEffect(next.character, effect);
-      next = updateCharacter(next, updated);
-      setEntryMessages(messages);
-    } else {
-      setEntryMessages([]);
+      const result = applyEntryEffect(next.character, effect);
+      next = updateCharacter(next, result.character);
+      messages.push(...result.messages);
     }
 
+    const targetLoot = SECTION_LOOT[targetId];
+    const goldFlag = `gold:${targetId}`;
+    if (targetLoot?.gold && !getFlag(next, goldFlag)) {
+      const result = collectGold(next.character, targetLoot.gold);
+      next = updateCharacter(next, result.character);
+      next = setFlag(next, goldFlag, true);
+      messages.push(...result.messages);
+    }
+
+    return { game: next, messages };
+  }
+
+  function handleNavigate(targetId: string) {
+    const { game: next, messages } = navigateTo(game, targetId);
+    setEntryMessages(messages);
     onChange(next);
+  }
+
+  /** Resuelve una tirada: aplica el efecto de la rama y navega a su destino. */
+  function handleRoll(roll: number) {
+    if (!rollTable) return;
+    const outcome = resolveRoll(rollTable, roll);
+    if (!outcome) return;
+
+    const applied = applyRollOutcome(game.character, outcome);
+    const fromGame = updateCharacter(game, applied.character);
+    const { game: next, messages } = navigateTo(fromGame, outcome.target);
+
+    setEntryMessages([`🎲 Sacas un ${roll}.`, ...applied.messages, ...messages]);
+    onChange(next);
+  }
+
+  /** Coge un objeto del botín, respetando la ranura de inventario. */
+  function handleTakeLoot(item: LootItem) {
+    const inv = lootToInventoryItem(item);
+    let updated = character;
+    if (item.slot === "weapon") updated = addWeapon(character, inv);
+    else if (item.slot === "backpack") updated = addToBackpack(character, inv);
+    else updated = addSpecialItem(character, inv);
+    onChange(updateCharacter(game, updated));
   }
 
   // Pantalla de victoria al llegar a la sección final.
@@ -319,7 +381,7 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
               <SectionView
                 section={section.data}
                 onNavigate={handleNavigate}
-                showChoices={showChoices}
+                showChoices={showChoices && !rollTable}
                 isChoiceAvailable={isChoiceAvailable}
               />
 
@@ -337,6 +399,18 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
                   onEnd={(status) => setCombatOutcome(status)}
                   onEvade={handleNavigate}
                 />
+              )}
+
+              {showChoices && loot?.items && (
+                <LootPanel
+                  character={character}
+                  items={loot.items}
+                  onTake={handleTakeLoot}
+                />
+              )}
+
+              {showChoices && rollTable && (
+                <RollPanel key={sectionId} table={rollTable} onResolve={handleRoll} />
               )}
 
               {combatOutcome === "lost" && (

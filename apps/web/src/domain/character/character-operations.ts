@@ -58,6 +58,31 @@ export function addWeapon(character: Character, weapon: InventoryItem): Characte
   return { ...character, weapons: [...character.weapons, weapon] };
 }
 
+/** Suelta un arma por id. */
+export function removeWeapon(character: Character, weaponId: string): Character {
+  return {
+    ...character,
+    weapons: character.weapons.filter((w) => w.id !== weaponId),
+  };
+}
+
+/** Añade un Objeto Especial (sin límite fijo). */
+export function addSpecialItem(
+  character: Character,
+  item: InventoryItem,
+): Character {
+  return { ...character, specialItems: [...character.specialItems, item] };
+}
+
+/**
+ * Pierde todo el equipo portable (armas, mochila y oro). Los Objetos Especiales
+ * (p.ej. el Mapa) se conservan, igual que en el libro cuando el Kraan arrebata
+ * la mochila.
+ */
+export function loseAllEquipment(character: Character): Character {
+  return { ...character, weapons: [], backpack: [], gold: 0 };
+}
+
 /** Cambia el oro en `delta` (se mantiene entre 0 y el máximo de la bolsa). */
 export function changeGold(character: Character, delta: number): Character {
   const gold = Math.min(MAX_GOLD, Math.max(0, character.gold + delta));

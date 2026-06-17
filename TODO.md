@@ -93,13 +93,20 @@
       sin redistribuir → cumple la licencia) con fallback a placeholder si una
       imagen no carga. Atribución + enlace a projectaon.org en el pie. Verificado:
       las imágenes cargan en el navegador (sin bloqueo por referer/CORS).
+- [x] **Tiradas en la Tabla de la Suerte** — 20 secciones con tirada obligatoria
+      (`SECTION_ROLL_TABLES`): el `RollPanel` fuerza tirar el dado (0-9), el azar
+      elige la rama y aplica su efecto (daño, o pérdida de equipo en sect188).
+      Test valida que cada tabla cubre 0-9 sin huecos ni solapes. De paso se
+      corrigió un bug: sect188 aplicaba −3 incondicional en vez de según la tirada.
+- [x] **Botín por sección** — oro automático al entrar (sect33, sect62, sect94,
+      sect269…) acotado a 50 y anti-farmeo (flag por sección); objetos cogibles
+      con `LootPanel` (sect124, sect197, sect291, sect315) respetando los límites
+      de inventario. Botones de **soltar** arma/objeto en la ficha para hacer hueco.
 
 ### Pendiente
 
-- [ ] **Cambios condicionales desde texto** — pérdidas/ganancias que dependen de
-      una tirada descrita en el propio texto (p.ej. sect36) o ganancias de oro/
-      objetos al registrar cadáveres. Requieren modelar la interacción, no solo
-      un efecto automático al entrar.
+- [ ] **sect21** — tirada encadenada (cascada con muerte); excluida de
+      `SECTION_ROLL_TABLES`, sigue como elección libre. Modelar tiradas múltiples.
 - [ ] **`tssf.png`** (1 ilustración de portada, edición Alvarez) no se localiza en
       el servidor de Project Aon; cae al placeholder. Buscar su ruta exacta.
 

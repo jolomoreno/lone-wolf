@@ -273,6 +273,62 @@ body {
   color: var(--muted);
 }
 
+.item-actions {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.drop-item-btn {
+  font-family: inherit;
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.drop-item-btn:hover {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+/* ---------- Paneles de tirada y botín ---------- */
+
+.roll-panel,
+.loot-panel {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.roll-panel h3,
+.loot-panel h3 {
+  margin-top: 0;
+}
+
+.loot-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loot-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .game-footer {
   display: flex;
   align-items: center;

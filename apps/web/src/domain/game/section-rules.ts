@@ -9,8 +9,14 @@
  * Fuente: texto completo de la edición Project Aon Español (01hdlo.xml).
  */
 
-import type { Character } from "../character/character";
-import { applyDamage, heal, removeFromBackpack } from "../character/character-operations";
+import type { Character, InventoryItem, ItemKind } from "../character/character";
+import {
+  applyDamage,
+  changeGold,
+  heal,
+  loseAllEquipment,
+  removeFromBackpack,
+} from "../character/character-operations";
 import type { KaiDiscipline } from "../character/kai-discipline";
 
 // ---------------------------------------------------------------------------
@@ -178,9 +184,9 @@ export const SECTION_ENTRY_EFFECTS: Record<string, SectionEntryEffect> = {
   sect119: { enduranceDelta: -2 },  // resta 2 de los que tengas
   sect144: { enduranceDelta: -2 },  // quedas aturdido
   sect146: { enduranceDelta: -3 },  // proyectil
-  sect158: { enduranceDelta: -6 },  // bastón en el pecho
+  sect158: { enduranceDelta: -6 },  // primer rayo (el 2º depende de tirada → SECTION_ROLL_TABLES)
   sect166: { enduranceDelta: -4 },
-  sect188: { enduranceDelta: -3 },  // herido en ambos brazos
+  // sect188: el daño depende de una tirada (0-6 pierdes equipo, 7-9 -3) → SECTION_ROLL_TABLES
   sect203: { enduranceDelta: -10 }, // explosión de chispas
   sect236: { enduranceDelta: -6 },  // gema vordak (la pérdida de DC es aparte)
   sect276: { enduranceDelta: -1 },
@@ -241,5 +247,244 @@ export function applyEntryEffect(
     }
   }
 
+  return { character: result, messages };
+}
+
+// ---------------------------------------------------------------------------
+// Tiradas en la Tabla de la Suerte (rama según el número 0-9)
+// ---------------------------------------------------------------------------
+
+export interface RollOutcome {
+  /** Límite inferior del rango (0-9, inclusive). */
+  min: number;
+  /** Límite superior del rango (0-9, inclusive). */
+  max: number;
+  /** Sección a la que se va con este resultado. */
+  target: string;
+  /** Cambio de Resistencia aplicado en esta rama (negativo = daño). */
+  enduranceDelta?: number;
+  /** Si true, pierdes todo el equipo portable (armas, mochila, oro). */
+  losesAllEquipment?: boolean;
+  /** Descripción de lo que ocurre en esta rama. */
+  message?: string;
+}
+
+/**
+ * Secciones con tirada obligatoria en la Tabla de la Suerte. El número (0-9)
+ * decide la rama; el jugador NO elige. Fuente: texto de Project Aon (01hdlo.xml).
+ *
+ * Excluida sect21 (cascada de tiradas encadenadas con muerte): se deja como
+ * elección libre por ahora.
+ */
+export const SECTION_ROLL_TABLES: Record<string, RollOutcome[]> = {
+  sect2: [
+    { min: 0, max: 4, target: "sect343" },
+    { min: 5, max: 9, target: "sect276" },
+  ],
+  sect7: [
+    { min: 0, max: 2, target: "sect108" },
+    { min: 3, max: 9, target: "sect25" },
+  ],
+  sect17: [
+    { min: 0, max: 0, target: "sect53" },
+    { min: 1, max: 2, target: "sect274" },
+    { min: 3, max: 9, target: "sect316" },
+  ],
+  sect22: [
+    { min: 0, max: 4, target: "sect181" },
+    { min: 5, max: 9, target: "sect145" },
+  ],
+  sect36: [
+    {
+      min: 0,
+      max: 4,
+      target: "sect140",
+      enduranceDelta: -2,
+      message: "Caes al suelo: pierdes 2 de Resistencia.",
+    },
+    { min: 5, max: 9, target: "sect323", message: "No te caes." },
+  ],
+  sect44: [
+    { min: 0, max: 4, target: "sect277" },
+    { min: 5, max: 9, target: "sect338" },
+  ],
+  sect49: [
+    { min: 0, max: 4, target: "sect339" },
+    { min: 5, max: 9, target: "sect60" },
+  ],
+  sect89: [
+    { min: 0, max: 1, target: "sect53" },
+    { min: 2, max: 4, target: "sect274" },
+    { min: 5, max: 9, target: "sect316" },
+  ],
+  // Segundo rayo del druida: misma salida (106), distinto daño.
+  sect158: [
+    { min: 0, max: 5, target: "sect106", message: "El rayo falla y se estrella en la pared." },
+    {
+      min: 6,
+      max: 9,
+      target: "sect106",
+      enduranceDelta: -4,
+      message: "El rayo te alcanza en la espalda: pierdes 4 de Resistencia.",
+    },
+  ],
+  sect160: [
+    { min: 0, max: 4, target: "sect286", message: "Eres descubierto." },
+    { min: 5, max: 9, target: "sect10", message: "No te descubren." },
+  ],
+  // El Kraan te derriba: la tirada decide el efecto (misma salida, 303).
+  sect188: [
+    {
+      min: 0,
+      max: 6,
+      target: "sect303",
+      losesAllEquipment: true,
+      message: "El Kraan te arrebata la mochila: pierdes todo tu equipo.",
+    },
+    {
+      min: 7,
+      max: 9,
+      target: "sect303",
+      enduranceDelta: -3,
+      message: "Resultas herido en ambos brazos: pierdes 3 de Resistencia.",
+    },
+  ],
+  sect205: [
+    { min: 0, max: 4, target: "sect181" },
+    { min: 5, max: 9, target: "sect145" },
+  ],
+  sect226: [
+    { min: 0, max: 4, target: "sect277" },
+    { min: 5, max: 9, target: "sect338" },
+  ],
+  sect237: [
+    { min: 0, max: 4, target: "sect265", message: "No eres descubierto." },
+    { min: 5, max: 9, target: "sect72", message: "Te descubren." },
+  ],
+  sect275: [
+    { min: 0, max: 4, target: "sect345" },
+    { min: 5, max: 9, target: "sect74" },
+  ],
+  sect279: [
+    { min: 0, max: 6, target: "sect112" },
+    { min: 7, max: 9, target: "sect96" },
+  ],
+  sect294: [
+    { min: 0, max: 2, target: "sect230" },
+    { min: 3, max: 6, target: "sect190" },
+    { min: 7, max: 9, target: "sect321" },
+  ],
+  sect302: [
+    { min: 0, max: 2, target: "sect110" },
+    { min: 3, max: 9, target: "sect285" },
+  ],
+  sect314: [
+    { min: 0, max: 6, target: "sect341" },
+    { min: 7, max: 9, target: "sect98" },
+  ],
+  sect337: [
+    { min: 0, max: 4, target: "sect219" },
+    { min: 5, max: 9, target: "sect317" },
+  ],
+};
+
+/** Devuelve la rama que corresponde a un número de tirada (0-9), o undefined. */
+export function resolveRoll(
+  table: RollOutcome[],
+  roll: number,
+): RollOutcome | undefined {
+  return table.find((o) => roll >= o.min && roll <= o.max);
+}
+
+/** Aplica el efecto de una rama de tirada al personaje. Puro e inmutable. */
+export function applyRollOutcome(
+  character: Character,
+  outcome: RollOutcome,
+): EntryEffectResult {
+  let result = character;
+  const messages: string[] = [];
+
+  if (outcome.message) messages.push(outcome.message);
+
+  if (outcome.losesAllEquipment) {
+    result = loseAllEquipment(result);
+  }
+  if (outcome.enduranceDelta) {
+    result =
+      outcome.enduranceDelta < 0
+        ? applyDamage(result, -outcome.enduranceDelta)
+        : heal(result, outcome.enduranceDelta);
+  }
+
+  return { character: result, messages };
+}
+
+// ---------------------------------------------------------------------------
+// Botín por sección (oro automático + objetos que el jugador puede coger)
+// ---------------------------------------------------------------------------
+
+/** Un objeto que se puede recoger, con su ranura de inventario. */
+export interface LootItem {
+  id: string;
+  name: string;
+  slot: "weapon" | "backpack" | "special";
+  kind?: ItemKind;
+}
+
+export interface SectionLoot {
+  /** Coronas de oro que se cobran automáticamente al entrar (una sola vez). */
+  gold?: number;
+  /** Objetos ofrecidos para coger (panel interactivo, sujeto a límites). */
+  items?: LootItem[];
+}
+
+/**
+ * Botín al registrar cadáveres / cofres. Oro extraído del texto de Project Aon
+ * (01hdlo.xml); los objetos se ofrecen y el jugador decide si los coge.
+ */
+export const SECTION_LOOT: Record<string, SectionLoot> = {
+  sect33: { gold: 3 },
+  sect62: { gold: 28 },
+  sect94: { gold: 16 },
+  sect269: { gold: 10 },
+  sect124: {
+    gold: 15,
+    items: [{ id: "silver-key", name: "Llave de plata", slot: "special" }],
+  },
+  sect197: {
+    gold: 6,
+    items: [{ id: "short-sword", name: "Espada corta", slot: "weapon" }],
+  },
+  sect291: {
+    gold: 6,
+    items: [
+      { id: "loot-dagger", name: "Daga", slot: "weapon" },
+      { id: "loot-spear", name: "Lanza", slot: "weapon" },
+    ],
+  },
+  sect315: {
+    gold: 6,
+    items: [
+      { id: "soap", name: "Pastilla de jabón perfumado", slot: "special" },
+    ],
+  },
+};
+
+/** Convierte un LootItem en el InventoryItem que se guarda en la ficha. */
+export function lootToInventoryItem(item: LootItem): InventoryItem {
+  return item.kind
+    ? { id: item.id, name: item.name, kind: item.kind }
+    : { id: item.id, name: item.name };
+}
+
+/** Cobra el oro de una sección (acotado al máximo de la bolsa). */
+export function collectGold(character: Character, gold: number): EntryEffectResult {
+  const before = character.gold;
+  const result = changeGold(character, gold);
+  const gained = result.gold - before;
+  const messages =
+    gained > 0
+      ? [`Encuentras ${gold} Coronas de oro (recoges ${gained}).`]
+      : ["Tu bolsa está llena: no puedes llevar más oro."];
   return { character: result, messages };
 }
