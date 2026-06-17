@@ -22,8 +22,8 @@
       elusión, daño narrativo, comidas, tiradas, botín), ilustraciones Project Aon.
 - [x] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
-- [ ] **13. Refactors / deuda técnica** — lint, tests del backend, build en
-      producción y limpieza general de código.
+- [~] **13. Refactors / deuda técnica** — 13.1 completado (helmet, contratos,
+      UI fixes, CORS, claves estables). 13.2 pendiente: tests backend, lint, build prod.
 - [ ] **14. Despliegue + CI/CD** — Atlas + Render + Vercel + GitHub Actions.
 
 ---
@@ -153,47 +153,35 @@
 > Nota: la "navegación por id" se adelanta al paso 11 porque es prerequisito de
 > la fidelidad. El resto de deuda técnica se liquida aquí antes del despliegue.
 
-### Tests
-- [x] Dominio del front cubierto (80 tests, incl. reglas por sección y tablas
-      de tirada). Falta el **backend y adaptadores**: `parse-gamebook-xml.ts`,
-      `section.mapper.ts`, casos de uso `GetSection` (back y front con un
-      `ContentPort` falso).
+### 13.1 — Tareas realizadas ✓
 
-### Lint y formato
-- [ ] No hay ESLint/Prettier/Biome; `pnpm lint` (raíz) no hace nada.
+- [x] **`isProduction`** en [env.ts](apps/api/src/config/env.ts) activado: lanza error
+      explícito si falta `MONGODB_URI` en producción.
+- [x] **`helmet`** añadido como primer middleware en `server.ts` (cabeceras HTTP seguras).
+- [x] **Contrato Section↔SectionDTO** — aserción de tipo `_MapperContract` en
+      `section.mapper.ts`; `tsc` falla si los tipos divergen sin actualizar el mapper.
+- [x] **Ficha del personaje** — Comidas al pie de Mochila, Oro como stat-row independiente.
+- [x] **Claves estables en `SectionView`** — `key={choice.target}` en choices,
+      `key={block.src}` en ilustraciones; elimina warnings de React.
+- [x] **CSS muerto** — `.combat-box` y `.combat-title` eliminados de `index.css`.
+- [x] **CORS en desarrollo** — la API acepta cualquier `localhost:*` en `development`;
+      en producción usa `CORS_ORIGIN` estrictamente.
+- [x] **Dominio del front cubierto** — 80 tests (personaje, equipo, combate, GameState,
+      reglas por sección, tablas de tirada, adaptador localStorage).
+- [x] **Frontmatter** — equipo resuelto en creación; navegación por id resuelta en paso 11.
+- [x] **Flujo de fin de partida** — botón redundante eliminado; "Nueva partida" en
+      secciones sin choices.
 
-### API en producción
-- [x] `isProduction` en [env.ts](apps/api/src/config/env.ts) sigue sin usar;
-      activarlo para fallar rápido sin `MONGODB_URI` en prod.
-- [ ] Dev y `start` usan `tsx`; decidir estrategia para Render (`tsx` en prod o
-      compilar; `@lone-wolf/shared` exporta `.ts`).
-- [~] Endurecer la API: `helmet` ✓ (cabeceras de seguridad HTTP); rate-limit y validación de env pendientes.
+### 13.2 — Tareas pendientes
 
-### Bugs visuales / UI
-- [x] **Flujo de fin de partida** — parcialmente mejorado: botón redundante eliminado,
-      "Nueva partida" añadido en secciones sin choices. Pendiente: transiciones,
-      estado que persiste/se limpia al volver al menú, casos límite (terminar y
-      recargar, muerte en combate en secciones con roll-table, etc.).
-- [x] **Ficha — Comidas y Oro aparecen bajo "Objetos Especiales"** en lugar de
-      bajo "Mochila". Son stats globales del personaje, no ítems, así que deben
-      mostrarse en la sección correcta de `CharacterSheet`. Revisar el orden del
-      JSX y/o la agrupación de secciones en el componente.
-
-### Limpiezas de código
-- [x] **CSS muerto:** `.combat-box` y `.combat-title` eliminados de
-      [index.css](apps/web/src/index.css) (el combate lo pinta `CombatPanel`).
-- [x] **CORS en desarrollo:** la API acepta cualquier `localhost:*` en `development`
-      (el puerto del frontend varía según la herramienta); en producción usa
-      `CORS_ORIGIN` estrictamente. Fix en `server.ts`.
-- [x] Claves de lista por índice en `SectionView` (bloques) — usar claves estables.
-- [x] Mantener sincronizados `Section` (dominio API) ↔ `SectionDTO` (el mapper
-      es la frontera). Aserción de tipo `_MapperContract` en `section.mapper.ts`
-      falla en compilación si los tipos divergen.
-
-### Frontmatter
-- [x] El equipo ya se resuelve en la creación; las secciones de
-      reglas/Disciplinas/tabla siguen importadas pero inalcanzables. Depende de
-      la navegación por id (resuelta en paso 11).
+- [ ] **Tests del backend** — `parse-gamebook-xml.ts`, `section.mapper.ts`, caso de uso
+      `GetSection` (back y front con un `ContentPort` falso). (~3-4 h)
+- [ ] **Lint y formato** — no hay ESLint/Prettier/Biome; `pnpm lint` (raíz) no hace nada.
+      (~1-1.5 h)
+- [ ] **Estrategia build para Render** — dev y `start` usan `tsx`; decidir si compilar o
+      usar `tsx` en prod; `@lone-wolf/shared` exporta `.ts`. Bloquea el Paso 14. (~1 h)
+- [ ] **Endurecer API** — rate-limit y validación explícita de variables de entorno al
+      arrancar (helmet ya hecho). (~30 min)
 
 ---
 
