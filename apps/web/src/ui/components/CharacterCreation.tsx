@@ -46,6 +46,7 @@ function storeroomHint(grant: StoreroomGrant): string {
 
 export function CharacterCreation({ onCreate }: Props) {
   const [step, setStep] = useState<Step>("cs");
+  const [rolling, setRolling] = useState(false);
   const [combatSkill, setCombatSkill] = useState<number | null>(null);
   const [enduranceMax, setEnduranceMax] = useState<number | null>(null);
   const [gold, setGold] = useState<number | null>(null);
@@ -65,34 +66,42 @@ export function CharacterCreation({ onCreate }: Props) {
 
   function rollCs() {
     const raw = Math.floor(Math.random() * 10);
+    setRolling(true);
     dieCs.current?.roll(raw, () => {
       setCombatSkill(10 + raw);
       setStep("end");
+      setRolling(false);
     });
   }
 
   function rollEnd() {
     const raw = Math.floor(Math.random() * 10);
+    setRolling(true);
     dieEnd.current?.roll(raw, () => {
       setEnduranceMax(20 + raw);
       setStep("gold");
+      setRolling(false);
     });
   }
 
   function rollGold() {
     const raw = Math.floor(Math.random() * 10);
+    setRolling(true);
     dieGold.current?.roll(raw, () => {
       setGold(raw);
       setStep("store");
+      setRolling(false);
     });
   }
 
   function rollStore() {
     const raw = Math.floor(Math.random() * 10);
     const id = (raw % STOREROOM.length) + 1;
+    setRolling(true);
     dieStore.current?.roll(raw, () => {
       setStoreroomId(id);
       setStep("done");
+      setRolling(false);
     });
   }
 
@@ -142,7 +151,7 @@ export function CharacterCreation({ onCreate }: Props) {
           <button
             type="button"
             className="primary die-roll-btn"
-            disabled={step !== "cs"}
+            disabled={step !== "cs" || rolling}
             onClick={rollCs}
           >
             Tirar
@@ -158,7 +167,7 @@ export function CharacterCreation({ onCreate }: Props) {
           <button
             type="button"
             className="primary die-roll-btn"
-            disabled={step !== "end"}
+            disabled={step !== "end" || rolling}
             onClick={rollEnd}
           >
             Tirar
@@ -174,7 +183,7 @@ export function CharacterCreation({ onCreate }: Props) {
           <button
             type="button"
             className="primary die-roll-btn"
-            disabled={step !== "gold"}
+            disabled={step !== "gold" || rolling}
             onClick={rollGold}
           >
             Tirar
@@ -199,7 +208,7 @@ export function CharacterCreation({ onCreate }: Props) {
           <button
             type="button"
             className="primary die-roll-btn"
-            disabled={step !== "store"}
+            disabled={step !== "store" || rolling}
             onClick={rollStore}
           >
             Tirar

@@ -335,9 +335,6 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
           <button type="button" className="primary" onClick={onGameOver}>
             Nueva partida
           </button>
-          <button type="button" className="ghost" onClick={onReturnToMenu}>
-            Volver al inicio
-          </button>
         </div>
       </main>
     );
@@ -355,9 +352,6 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
           <button type="button" className="primary" onClick={onGameOver}>
             Nueva partida
           </button>
-          <button type="button" className="ghost" onClick={onReturnToMenu}>
-            Volver al inicio
-          </button>
         </div>
       </main>
     );
@@ -372,9 +366,6 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
         <div className="start-actions">
           <button type="button" className="primary" onClick={onGameOver}>
             Nueva partida
-          </button>
-          <button type="button" className="ghost" onClick={onReturnToMenu}>
-            Volver al inicio
           </button>
         </div>
       </main>
