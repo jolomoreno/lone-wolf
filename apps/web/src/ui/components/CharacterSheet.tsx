@@ -6,7 +6,6 @@
 import {
   type Character,
   countMeals,
-  MAX_BACKPACK_ITEMS,
 } from "../../domain/character/character";
 import {
   heal,
@@ -70,78 +69,65 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
 
       <h3>Armas</h3>
       <ul className="sheet-list">
-        {character.weapons.length > 0 ? (
-          character.weapons.map((w) => (
-            <li key={w.id} className="sheet-item-row">
-              {w.name}
+        {character.weapons.map((w) => (
+          <li key={w.id} className="sheet-item-row">
+            {w.name}
+            {onCharacterChange && (
+              <button
+                type="button"
+                className="drop-item-btn"
+                title="Soltar"
+                aria-label={`Soltar ${w.name}`}
+                onClick={() => dropWeapon(w.id)}
+              >
+                ✕
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      <h3>Mochila</h3>
+      <ul className="sheet-list">
+        {backpackItems.map((item) => (
+          <li key={item.id} className="sheet-item-row">
+            {item.name}
+            <span className="item-actions">
+              {item.kind === "potion" && onCharacterChange && (
+                <button
+                  type="button"
+                  className="use-item-btn"
+                  title={`Usar (+${POTION_HEAL} Resistencia)`}
+                  disabled={stats.enduranceCurrent >= stats.enduranceMax}
+                  onClick={() => usePotion(item.id)}
+                >
+                  Usar
+                </button>
+              )}
               {onCharacterChange && (
                 <button
                   type="button"
                   className="drop-item-btn"
                   title="Soltar"
-                  aria-label={`Soltar ${w.name}`}
-                  onClick={() => dropWeapon(w.id)}
+                  aria-label={`Soltar ${item.name}`}
+                  onClick={() => dropBackpackItem(item.id)}
                 >
                   ✕
                 </button>
               )}
-            </li>
-          ))
-        ) : (
-          <li className="muted">—</li>
-        )}
-      </ul>
-
-      <h3>
-        Mochila ({character.backpack.length}/{MAX_BACKPACK_ITEMS})
-      </h3>
-      <ul className="sheet-list">
-        {backpackItems.length > 0 ? (
-          backpackItems.map((item) => (
-            <li key={item.id} className="sheet-item-row">
-              {item.name}
-              <span className="item-actions">
-                {item.kind === "potion" && onCharacterChange && (
-                  <button
-                    type="button"
-                    className="use-item-btn"
-                    title={`Usar (+${POTION_HEAL} Resistencia)`}
-                    disabled={stats.enduranceCurrent >= stats.enduranceMax}
-                    onClick={() => usePotion(item.id)}
-                  >
-                    Usar
-                  </button>
-                )}
-                {onCharacterChange && (
-                  <button
-                    type="button"
-                    className="drop-item-btn"
-                    title="Soltar"
-                    aria-label={`Soltar ${item.name}`}
-                    onClick={() => dropBackpackItem(item.id)}
-                  >
-                    ✕
-                  </button>
-                )}
-              </span>
-            </li>
-          ))
-        ) : (
-          <li className="muted">—</li>
-        )}
+            </span>
+          </li>
+        ))}
         <li className="sheet-item-row">
           <span>Comidas</span>
           <strong>{countMeals(character)}</strong>
         </li>
       </ul>
 
-      <h3>Bolsa de Oro</h3>
-      <ul className="sheet-list">
-        <li className="sheet-item-row">
-          <span>Monedas</span>
-          <strong>{character.gold}</strong>
-        </li>
-      </ul>
+      <div className="stat-row">
+        <span>Oro</span>
+        <strong>{character.gold}</strong>
+      </div>
 
       {character.specialItems.length > 0 && (
         <>
