@@ -171,6 +171,9 @@
 - [x] **Frontmatter** — equipo resuelto en creación; navegación por id resuelta en paso 11.
 - [x] **Flujo de fin de partida** — botón redundante eliminado; "Nueva partida" en
       secciones sin choices.
+- [x] **Textos preliminares** — `IntroScreen` ("El Principio de la Historia", `tssf`)
+      antes de la creación del personaje; `KaiWisdomScreen` ("La Sabiduría del Kai",
+      `kaiwisdm`) entre la creación y sect1.
 
 ### 13.2 — Tareas pendientes
 
@@ -182,13 +185,18 @@
       usar `tsx` en prod; `@lone-wolf/shared` exporta `.ts`. Bloquea el Paso 14. (~1 h)
 - [ ] **Endurecer API** — rate-limit y validación explícita de variables de entorno al
       arrancar (helmet ya hecho). (~30 min)
-- [x] **Añadir textos con info preliminar del juego** — `IntroScreen` ("El Principio de
-      la Historia", sección `tssf`) antes de la creación del personaje; `KaiWisdomScreen`
-      ("La Sabiduría del Kai", sección `kaiwisdm`) entre la creación y sect1. Flujo:
-      IntroScreen → CharacterCreation → KaiWisdomScreen → Aventura. Muerte/victoria
-      van directo a creación; "Nueva partida" desde el menú relanza la intro.
 - [ ] **Revisar imágenes del juego** — auditar qué ilustraciones cargan correctamente
       desde Project Aon y cuáles caen al placeholder; corregir rutas o buscar alternativas.
+- [ ] **Textos de disciplinas del Kai** — mostrar la descripción completa de cada
+      disciplina (secciones `camflage`, `hunting`, `sixthsns`, `tracking`, `healing`,
+      `wepnskll`, `mindshld`, `mndblst`, `anmlknsp`, `mindomtr` del XML) durante la
+      selección en `CharacterCreation` y/o como referencia en partida.
+- [ ] **Textos del equipo** — mostrar las reglas de cómo llevar el equipo (`howcarry`,
+      `howmuch`, `howuse`) antes o durante la selección del almacén.
+- [ ] **Niveles de entrenamiento Kai** — mostrar la tabla de rangos (`kaiwisdm` o
+      sección equivalente) como referencia al jugador.
+- [ ] **Reglas de combate** — mostrar las reglas del sistema de combate (tabla de
+      resultados, elusión, etc.) como pantalla de referencia accesible durante la partida.
 
 ---
 
