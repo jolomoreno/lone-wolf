@@ -4,6 +4,21 @@ Adaptación interactiva del libro-juego **Lobo Solitario, Libro 1: Huida de la O
 para poder jugar sin lápiz ni papel: gestión de Resistencia/Destreza, combates,
 inventario y guardado de la partida.
 
+## Estado del proyecto
+
+Pasos completados: 1-9 (base, personaje, combate, guardado automático).
+
+| Paso | Qué | Estado |
+|------|-----|--------|
+| 1-9 | Base · Personaje · Combate · Guardado automático | ✅ Hecho |
+| **10** | **Experiencia de juego** — guardado manual bajo control del jugador | ⬜ Siguiente |
+| 11 | Fidelidad del juego — opciones condicionales, bonus, curación, estados finales | ⬜ |
+| 12 | Tiradas animadas — dados en la creación del personaje | ⬜ |
+| 13 | Refactors / deuda técnica — lint, tests backend, build prod | ⬜ |
+| 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
+
+> Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
+
 ## Estructura (monorepo con pnpm workspaces)
 
 ```
