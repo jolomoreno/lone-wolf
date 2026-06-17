@@ -1,11 +1,11 @@
 /**
- * Orquesta las dos fases del juego:
- *  - Sin personaje  → pantalla de creación.
- *  - Con personaje  → la aventura (sección actual + ficha + combate).
+ * Orquesta el juego sobre un GameState persistente:
+ *  - Sin partida y con guardado → pantalla de inicio (Continuar / Nueva).
+ *  - Sin partida y sin guardado → creación de personaje.
+ *  - Con partida → la aventura (sección + ficha + combate).
  *
- * El personaje vive en estado de React (se perderá al recargar hasta que
- * implementemos el guardado en localStorage, paso 9). El combate de una sección
- * usa y modifica la Resistencia real del personaje.
+ * El GameState se autoguarda en cada cambio (navegar, daño de combate) a través
+ * del SavePort.
  */
 
 import { useEffect, useState } from "react";
@@ -13,40 +13,101 @@ import type { ContentBlockDTO } from "@lone-wolf/shared";
 import type { Character } from "../domain/character/character";
 import { setEnduranceCurrent } from "../domain/character/character-operations";
 import type { CombatStatus, Enemy } from "../domain/combat/combat";
+import {
+  createGameState,
+  type GameState,
+  goToSection,
+  updateCharacter,
+} from "../domain/game/game-state";
 import { CharacterCreation } from "./components/CharacterCreation";
 import { CharacterSheet } from "./components/CharacterSheet";
 import { CombatPanel } from "./components/CombatPanel";
 import { SectionView } from "./components/SectionView";
+import { useContainer } from "./DependencyProvider";
 import { useSection } from "./hooks/useSection";
 
 const FIRST_SECTION = 1;
 
 export function App() {
-  const [character, setCharacter] = useState<Character | null>(null);
+  const { save } = useContainer();
+  const [savedState, setSavedState] = useState<GameState | null>(() => save.load());
+  const [game, setGame] = useState<GameState | null>(null);
 
-  if (!character) {
-    return <CharacterCreation onCreate={setCharacter} />;
+  // Autoguardado en cada cambio del estado de partida.
+  useEffect(() => {
+    if (game) save.save(game);
+  }, [game, save]);
+
+  function exitToStart() {
+    save.clear();
+    setGame(null);
+    setSavedState(null);
+  }
+
+  if (game) {
+    return <Adventure game={game} onChange={setGame} onExit={exitToStart} />;
+  }
+
+  if (savedState) {
+    return (
+      <StartScreen
+        saved={savedState}
+        onContinue={() => setGame(savedState)}
+        onNew={() => setSavedState(null)}
+      />
+    );
   }
 
   return (
-    <Adventure
-      character={character}
-      onCharacterChange={setCharacter}
-      onRestart={() => setCharacter(null)}
+    <CharacterCreation
+      onCreate={(character) => setGame(createGameState(character, FIRST_SECTION))}
     />
   );
 }
 
+function StartScreen({
+  saved,
+  onContinue,
+  onNew,
+}: {
+  saved: GameState;
+  onContinue: () => void;
+  onNew: () => void;
+}) {
+  return (
+    <main className="creation">
+      <h1>🐺 Lobo Solitario</h1>
+      <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
+      <div className="rolled-item">
+        <span className="muted small">Tienes una partida guardada</span>
+        <span>
+          Sección <strong>{saved.currentSection}</strong> · Resistencia{" "}
+          {saved.character.stats.enduranceCurrent}/{saved.character.stats.enduranceMax}
+        </span>
+      </div>
+      <div className="start-actions">
+        <button type="button" className="primary" onClick={onContinue}>
+          Continuar partida
+        </button>
+        <button type="button" className="ghost" onClick={onNew}>
+          Nueva partida
+        </button>
+      </div>
+    </main>
+  );
+}
+
 interface AdventureProps {
-  character: Character;
-  onCharacterChange: (character: Character) => void;
-  onRestart: () => void;
+  game: GameState;
+  onChange: (game: GameState) => void;
+  onExit: () => void;
 }
 
 type CombatBlock = Extract<ContentBlockDTO, { type: "combat" }>;
 
-function Adventure({ character, onCharacterChange, onRestart }: AdventureProps) {
-  const [sectionNumber, setSectionNumber] = useState(FIRST_SECTION);
+function Adventure({ game, onChange, onExit }: AdventureProps) {
+  const character: Character = game.character;
+  const sectionNumber = game.currentSection;
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(null);
   const section = useSection(sectionNumber);
 
@@ -70,7 +131,6 @@ function Adventure({ character, onCharacterChange, onRestart }: AdventureProps) 
       }
     : undefined;
 
-  // Durante un combate sin ganar, se ocultan las opciones de la sección.
   const showChoices = !enemy || combatOutcome === "won";
 
   return (
@@ -99,7 +159,7 @@ function Adventure({ character, onCharacterChange, onRestart }: AdventureProps) 
             <>
               <SectionView
                 section={section.data}
-                onNavigate={setSectionNumber}
+                onNavigate={(n) => onChange(goToSection(game, n))}
                 showChoices={showChoices}
               />
 
@@ -109,7 +169,9 @@ function Adventure({ character, onCharacterChange, onRestart }: AdventureProps) 
                   character={character}
                   enemy={enemy}
                   onEnduranceChange={(endurance) =>
-                    onCharacterChange(setEnduranceCurrent(character, endurance))
+                    onChange(
+                      updateCharacter(game, setEnduranceCurrent(character, endurance)),
+                    )
                   }
                   onEnd={(status) => setCombatOutcome(status)}
                 />
@@ -118,7 +180,7 @@ function Adventure({ character, onCharacterChange, onRestart }: AdventureProps) 
               {combatOutcome === "lost" && (
                 <div className="death">
                   <p className="status-bad">Tu aventura termina aquí.</p>
-                  <button type="button" className="primary" onClick={onRestart}>
+                  <button type="button" className="primary" onClick={onExit}>
                     Nueva partida
                   </button>
                 </div>
@@ -129,7 +191,7 @@ function Adventure({ character, onCharacterChange, onRestart }: AdventureProps) 
       </div>
 
       <footer className="game-footer">
-        <button type="button" className="ghost" onClick={onRestart}>
+        <button type="button" className="ghost" onClick={onExit}>
           ↺ Nueva partida
         </button>
       </footer>

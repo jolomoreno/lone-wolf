@@ -346,6 +346,13 @@ body {
   cursor: not-allowed;
 }
 
+.start-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
 /* ---------- Partida: ficha + lector ---------- */
 
 .layout {
