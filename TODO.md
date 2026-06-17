@@ -182,6 +182,10 @@
       usar `tsx` en prod; `@lone-wolf/shared` exporta `.ts`. Bloquea el Paso 14. (~1 h)
 - [ ] **Endurecer API** — rate-limit y validación explícita de variables de entorno al
       arrancar (helmet ya hecho). (~30 min)
+- [ ] **Añadir más textos con info preliminar del juego** — pantallas o secciones con
+      información introductoria antes de comenzar la aventura.
+- [ ] **Revisar imágenes del juego** — auditar qué ilustraciones cargan correctamente
+      desde Project Aon y cuáles caen al placeholder; corregir rutas o buscar alternativas.
 
 ---
 
