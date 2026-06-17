@@ -12,8 +12,11 @@ inventario y guardado de la partida.
 | 10 | Experiencia de juego — guardado manual, control consciente del jugador | ✅ Hecho |
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
-| **13** | **Refactors / deuda técnica** — lint, tests backend, build prod | ⬜ Siguiente |
+| **13** | **Refactors / deuda técnica** — 13.1 hecho (helmet, contratos, textos preliminares); 13.2 pendiente (lint, tests backend, build prod) | 🔄 En curso |
 | 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
+
+> El análisis exhaustivo de la app (bugs, refactors y huecos de fidelidad pendientes)
+> se mantiene como **Paso 13.3 (temporal)** en [TODO.md](TODO.md).
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
 
@@ -125,6 +128,29 @@ Dominio  →  Aplicación (casos de uso + puertos)  →  Infraestructura (adapta
 | Dominio | `apps/api/src/domain/` | Entidades `Section`, `ContentBlock`, `Choice`; puerto `SectionRepository` |
 | Aplicación | `apps/api/src/application/` | Caso de uso `GetSection` |
 | Infraestructura | `apps/api/src/infrastructure/` | `MongoSectionRepository`, routers HTTP, XML parser |
+
+## Flujo de la aplicación (pantallas)
+
+El orquestador es [`App.tsx`](apps/web/src/ui/App.tsx). El flujo de una partida nueva es:
+
+```
+IntroScreen ("El Principio de la Historia", tssf)
+      ↓
+CharacterCreation (tiradas con revelación progresiva + 5 disciplinas + almacén)
+      ↓
+KaiWisdomScreen ("La Sabiduría del Kai", kaiwisdm)
+      ↓
+Adventure (sect1 → … )  ←—— autoguardado en cada cambio de GameState
+```
+
+- Si al arrancar hay una **partida guardada**, se muestra `StartScreen` (Continuar / Nueva)
+  en vez de la intro.
+- Los estados terminales (**victoria** en sect350 o **muerte**, en combate o fuera de él)
+  borran el guardado y ofrecen "Nueva partida".
+- Dentro de la aventura, según la sección, se montan paneles especializados:
+  `CombatPanel` (si hay enemigo), `RollPanel` (tiradas obligatorias en la Tabla de la
+  Suerte), `LootPanel` (objetos cogibles) y los mensajes de entrada (`entryMessages`:
+  daño narrativo, comidas, oro recogido).
 
 ## Requisitos
 
@@ -261,6 +287,23 @@ en formato v1 (ids numéricos) se descartan automáticamente al cargar.
 - **CORS en desarrollo**: la API acepta cualquier `localhost:*` como origen en `development`
   (el puerto del frontend puede variar: 5173 con Vite directo, 5174 con herramientas de preview,
   etc.). En producción se usa el valor estricto de `CORS_ORIGIN` del entorno.
+
+## Limitaciones conocidas y desviaciones de las reglas
+
+Detalle y plan de corrección en el **Paso 13.3 (temporal)** de [TODO.md](TODO.md). En resumen:
+
+- **Objeto del almacén por tirada**, no por elección del jugador (decisión de diseño;
+  en las reglas oficiales el jugador elige).
+- **El combate en curso no se persiste**: recargar a mitad de un combate reinicia al
+  enemigo (la Resistencia del jugador sí se conserva).
+- **Falta la penalización de −4 a la Destreza por combatir sin arma** (regla oficial
+  cuando Lobo Solitario se queda desarmado).
+- **Los efectos de entrada de una sección** (daño narrativo, comidas) se reaplican si se
+  vuelve a entrar a la sección; solo el oro de botín está protegido contra repetición.
+- **El bonus +2 de "Dominio de las Armas"** no se aplica a armas recogidas como botín
+  (desajuste de identificadores de objeto).
+- **El parser aplana listas/tablas** (`ul`, `dl`, `signpost`) a párrafos: se pierde la
+  estructura en secciones de referencia.
 
 ## Créditos y licencia del contenido
 

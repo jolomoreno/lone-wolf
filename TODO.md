@@ -24,6 +24,8 @@
       progresiva y animación.
 - [~] **13. Refactors / deuda técnica** — 13.1 completado (helmet, contratos,
       UI fixes, CORS, claves estables). 13.2 pendiente: tests backend, lint, build prod.
+      13.3: log temporal del análisis exhaustivo del 2026-06-17 (4 bugs, 4 huecos de
+      fidelidad, 3 refactors) pendiente de triar.
 - [ ] **14. Despliegue + CI/CD** — Atlas + Render + Vercel + GitHub Actions.
 
 ---
@@ -197,6 +199,111 @@
       sección equivalente) como referencia al jugador.
 - [ ] **Reglas de combate** — mostrar las reglas del sistema de combate (tabla de
       resultados, elusión, etc.) como pantalla de referencia accesible durante la partida.
+
+---
+
+## 13.3 — Análisis exhaustivo (TEMPORAL · 2026-06-17)
+
+> Log escrito al cerrar la sesión del 2026-06-17 tras una revisión completa de la app
+> (dominio web, UI, backend, parser) cruzada con las reglas oficiales del Libro 1 de
+> Project Aon. Es una lista de trabajo para próximas sesiones; **ninguno está corregido
+> todavía**. Marcado "(temporal)" porque, una vez triados y movidos a sus pasos
+> definitivos (13.2 / 14 / nice-to-have), esta sección puede borrarse.
+>
+> Orden sugerido de ataque: primero los BUGS de fidelidad (B1–B4), luego refactors
+> de bajo riesgo (R1–R3), luego huecos de reglas (F1–F4).
+
+### Bugs detectados
+
+- [ ] **B1 · Weaponskill +2 no se aplica a armas de botín.**
+      `hasWeaponskillBonus` ([CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx:32))
+      compara `w.id === character.weaponskillWeapon`, donde `weaponskillWeapon` es un
+      `WeaponType` (`"dagger"`, `"spear"`, `"shortSword"`…). Pero los ids de las armas de
+      botín en [section-rules.ts](apps/web/src/domain/game/section-rules.ts) son
+      `"loot-dagger"`, `"loot-spear"`, `"short-sword"` → **no coinciden**. Un jugador con
+      Dominio de las Armas (Daga) que recoge la daga de sect291 no recibe el +2.
+      Las armas iniciales (Hacha `"axe"`, y las del almacén `"sword"`/`"mace"`/`"spear"`)
+      sí coinciden por casualidad. Arreglo: que la igualdad se base en un campo
+      `weaponType` del `InventoryItem`, no en el `id` de instancia.
+
+- [ ] **B2 · Los efectos de entrada NO son idempotentes (contradicen su comentario).**
+      `applyEntryEffect` (daño narrativo + comidas obligatorias) se aplica en `navigateTo`
+      ([App.tsx](apps/web/src/ui/App.tsx:303)) **cada vez** que se entra a la sección.
+      Solo el oro de botín está protegido por flag (`gold:<id>`). El comentario de
+      `SECTION_ENTRY_EFFECTS` dice "se aplican UNA vez al entrar", pero el código no lo
+      garantiza: en cualquier bucle del libro (volver a una sección) el daño/comida se
+      vuelve a aplicar. Arreglo: guardar un flag `entry:<id>` igual que con el oro.
+
+- [ ] **B3 · El combate en curso no se persiste en el GameState.**
+      `CombatState` (Resistencia del enemigo, asaltos) vive solo en el estado local de
+      [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx:74). El autoguardado
+      solo persiste la Resistencia del jugador vía `onEnduranceChange`. Si el jugador
+      recarga la página a mitad de combate, el enemigo revive a Resistencia plena mientras
+      el jugador conserva la suya mermada → estado inconsistente y explotable. Arreglo:
+      o bien serializar el combate en `GameState`, o impedir la recarga limpia (avisar).
+
+- [ ] **B4 · Sesgo de probabilidad y lógica duplicada en el objeto del almacén.**
+      `rollStoreroomChoiceId` ([equipment.ts](apps/web/src/domain/character/equipment.ts:72))
+      y `rollStore()` ([CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx:97))
+      hacen `(raw % 9) + 1` sobre una tirada 0-9. `raw=0` y `raw=9` dan ambos id 1 (Espada):
+      la Espada sale con **doble probabilidad** y el resto del reparto queda sesgado.
+      Además la regla está **duplicada** (dominio + UI) y pueden divergir. Arreglo: mapear
+      0-8 → 1-9 descartando/re-tirando el 9, o usar una tabla explícita; y que la UI use
+      la función del dominio en vez de reimplementarla con `Math.random()`.
+
+### Huecos de fidelidad vs reglas oficiales (Libro 1)
+
+- [ ] **F1 · Regla "sin arma en combate: −4 a la Destreza".** Si Lobo Solitario pelea
+      desarmado (perdió el equipo con el Kraan en sect188, o soltó todas sus armas con los
+      botones ✕ de la ficha) las reglas oficiales restan 4 a la Destreza en el Combate.
+      No está implementado: `startCombat` no penaliza por `weapons.length === 0`.
+
+- [ ] **F2 · "Objeto del almacén por tirada" es ya una desviación.** En las reglas
+      oficiales el jugador **elige** el objeto del almacén; aquí se decide por tirada
+      (documentado como decisión de diseño en el README). Revisar si se quiere ofrecer
+      elección manual como alternativa fiel.
+
+- [ ] **F3 · Poción Curativa (Laumspur) usable en cualquier momento.** La regla la
+      restringe a beberse **después del combate** (+4 Resistencia). La ficha permite usarla
+      siempre que `enduranceCurrent < max`. Desviación menor; decidir si se acota.
+
+- [ ] **F4 · Curación silenciosa.** El +1 de Resistencia por pasar por secciones sin
+      combate (`navigateTo`, [App.tsx](apps/web/src/ui/App.tsx:293)) no genera mensaje en
+      `entryMessages`, a diferencia del resto de efectos. El jugador no ve por qué sube su
+      Resistencia. Añadir aviso. (Verificar también que la condición correcta es "la
+      sección que se ENTRA no tiene combate", no la que se deja.)
+
+### Refactors / deuda técnica
+
+- [ ] **R1 · La UI de creación no usa las funciones de dominio.** `CharacterCreation`
+      reimplementa las tiradas con `Math.floor(Math.random()*10)` en vez de usar
+      `rollCombatSkill` / `rollEndurance` / `rollStartingGold` / `rollWeaponskillWeapon` /
+      `rollStoreroomChoiceId` (que son testables vía `RandomNumber`). Centralizar para que
+      el comportamiento probado sea el mismo que el de producción (ligado a B4).
+
+- [ ] **R2 · Sin red de seguridad ante inventario lleno al coger botín.**
+      `handleTakeLoot` ([App.tsx](apps/web/src/ui/App.tsx:343)) llama a `addWeapon` /
+      `addToBackpack`, que **lanzan** si no hay sitio. Hoy `LootPanel` deshabilita el botón
+      cuando está lleno, así que no peta en la práctica, pero es frágil: cualquier desfase
+      entre `canTake` y los límites reales sería un crash sin Error Boundary (ver
+      nice-to-have). Envolver en try/catch o reusar la validación.
+
+- [ ] **R3 · El parser aplana `ul`/`dl`/`signpost` a párrafo.**
+      `parseData` ([parse-gamebook-xml.ts](apps/api/src/infrastructure/import/parse-gamebook-xml.ts:176))
+      colapsa listas y tablas a texto plano. Para las secciones de referencia que quiere
+      mostrar 13.2 (equipo `howcarry`, disciplinas, rangos `kaiwisdm`) esto degrada el
+      contenido (se pierden viñetas/estructura). Si esos textos se incorporan, conviene
+      modelar listas en `ContentBlock`.
+
+### Notas verificadas (no son bugs, dejar constancia)
+
+- La Tabla de Resultados de Combate y `combatRatioColumn` se revisaron celda a celda
+  contra la tabla canónica: correctas (incluida la fila "sacas 0" sin daño al jugador y
+  las "K").
+- El equipo fijo (Hacha + 1 Comida + Mapa) y los bonus de Resistencia del almacén
+  (Casco +2, Cota de Malla +4) son fieles al Libro 1.
+- Las condiciones de elección, inmunidades al Mindblast, modificadores CS (Vordak/Kraan)
+  y elusiones cruzan bien con el texto; no se detectaron secciones mal mapeadas en esta pasada.
 
 ---
 
