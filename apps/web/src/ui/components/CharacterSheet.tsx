@@ -56,15 +56,6 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
           {stats.enduranceCurrent}/{stats.enduranceMax}
         </strong>
       </div>
-      <div className="stat-row">
-        <span>Comidas</span>
-        <strong>{countMeals(character)}</strong>
-      </div>
-      <div className="stat-row">
-        <span>Oro</span>
-        <strong>{character.gold}</strong>
-      </div>
-
       <h3>Disciplinas</h3>
       <ul className="sheet-list">
         {character.disciplines.map((discipline) => (
@@ -138,6 +129,18 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
         ) : (
           <li className="muted">—</li>
         )}
+        <li className="sheet-item-row">
+          <span>Comidas</span>
+          <strong>{countMeals(character)}</strong>
+        </li>
+      </ul>
+
+      <h3>Bolsa de Oro</h3>
+      <ul className="sheet-list">
+        <li className="sheet-item-row">
+          <span>Monedas</span>
+          <strong>{character.gold}</strong>
+        </li>
       </ul>
 
       {character.specialItems.length > 0 && (
