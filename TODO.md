@@ -199,6 +199,14 @@
       sección equivalente) como referencia al jugador.
 - [ ] **Reglas de combate** — mostrar las reglas del sistema de combate (tabla de
       resultados, elusión, etc.) como pantalla de referencia accesible durante la partida.
+- [ ] **Añadir texto reglas de juego** — mostrar la explicación de la Resistencia y la
+      Destreza en el Combate tal como aparece en el XML de Project Aon (sección
+      `combat` o equivalente): qué representan, cómo se calculan, cómo interactúan
+      con la Tabla de Resultados. Incorporarlo como pantalla de referencia accesible
+      durante la partida (p.ej. un modal o pestaña en la ficha del personaje).
+- [ ] **Añadir favicon** — incluir un favicon (`.ico` o `.png`) para que la pestaña
+      del navegador muestre el icono del juego en vez del genérico de Vite.
+      Añadirlo en `apps/web/public/` y referenciarlo en `apps/web/index.html`.
 
 ---
 
