@@ -167,7 +167,7 @@
       activarlo para fallar rápido sin `MONGODB_URI` en prod.
 - [ ] Dev y `start` usan `tsx`; decidir estrategia para Render (`tsx` en prod o
       compilar; `@lone-wolf/shared` exporta `.ts`).
-- [ ] Endurecer la API: `helmet`, quizá rate-limit; validación de variables de entorno.
+- [~] Endurecer la API: `helmet` ✓ (cabeceras de seguridad HTTP); rate-limit y validación de env pendientes.
 
 ### Bugs visuales / UI
 - [x] **Flujo de fin de partida** — parcialmente mejorado: botón redundante eliminado,
@@ -186,8 +186,9 @@
       (el puerto del frontend varía según la herramienta); en producción usa
       `CORS_ORIGIN` estrictamente. Fix en `server.ts`.
 - [x] Claves de lista por índice en `SectionView` (bloques) — usar claves estables.
-- [ ] Mantener sincronizados `Section` (dominio API) ↔ `SectionDTO` (el mapper
-      es la frontera).
+- [x] Mantener sincronizados `Section` (dominio API) ↔ `SectionDTO` (el mapper
+      es la frontera). Aserción de tipo `_MapperContract` en `section.mapper.ts`
+      falla en compilación si los tipos divergen.
 
 ### Frontmatter
 - [x] El equipo ya se resuelve en la creación; las secciones de

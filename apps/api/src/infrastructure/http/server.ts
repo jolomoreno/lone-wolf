@@ -14,6 +14,7 @@ import express, {
   type Router,
 } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import { env } from "../../config/env";
 
 export function createHttpServer(routers: Router[]): Express {
@@ -28,8 +29,8 @@ export function createHttpServer(routers: Router[]): Express {
           if (!origin || /^https?:\/\/localhost(:\d+)?$/.test(origin)) cb(null, true);
           else cb(new Error(`CORS: origen no permitido → ${origin}`));
         };
+  app.use(helmet()); // Cabeceras de seguridad HTTP
   app.use(cors({ origin: corsOrigin }));
-  // Parsea el cuerpo JSON de las peticiones.
   app.use(express.json());
 
   // Monta todos los routers que nos pasa el composition root.

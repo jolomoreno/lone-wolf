@@ -79,13 +79,13 @@ apps/api/src/
 │   └── section/          # Caso de uso GetSection: execute(id: string) → Section | null
 ├── infrastructure/
 │   ├── http/
-│   │   ├── server.ts         # Express app, CORS (localhost:* en dev; CORS_ORIGIN en prod),
-│   │   │                     #   middleware JSON, manejador de errores 500
+│   │   ├── server.ts         # Express app, helmet (cabeceras HTTP seguras), CORS
+│   │   │                     #   (localhost:* en dev; CORS_ORIGIN en prod), middleware JSON, 500
 │   │   ├── section.router    # Monta GET /sections/:id y GET /health
 │   │   └── section.controller# Valida el id (regex alfanum), llama al caso de uso, devuelve DTO
 │   └── persistence/
 │       ├── section.schema    # Mongoose schema + model (Mongo Atlas)
-│       ├── section.mapper    # Section (dominio) ↔ SectionDTO (@lone-wolf/shared)
+│       ├── section.mapper    # Section (dominio) → SectionDTO (@lone-wolf/shared); aserción de contrato en tiempo de compilación
 │       ├── mongo-section-repository  # Implementación de SectionRepository sobre Mongoose
 │       └── parse-gamebook-xml        # Parser ISO-8859-1 del XML de Project Aon → documentos Mongo
 └── config/

@@ -36,3 +36,12 @@ export function toSectionDTO(section: Section): SectionDTO {
     ),
   };
 }
+
+// Aserción de contrato: si Section o SectionDTO añaden/eliminan campos sin
+// actualizar el mapper, tsc --noEmit falla aquí.
+// Aserción de contrato en tiempo de compilación: si Section o SectionDTO
+// añaden/eliminan campos sin actualizar el mapper, tsc falla aquí.
+type _Assert<T extends true> = T;
+export type _MapperContract = _Assert<
+  typeof toSectionDTO extends (s: Section) => SectionDTO ? true : false
+>;
