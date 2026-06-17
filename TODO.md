@@ -154,7 +154,7 @@
 > la fidelidad. El resto de deuda técnica se liquida aquí antes del despliegue.
 
 ### Tests
-- [~] Dominio del front cubierto (80 tests, incl. reglas por sección y tablas
+- [x] Dominio del front cubierto (80 tests, incl. reglas por sección y tablas
       de tirada). Falta el **backend y adaptadores**: `parse-gamebook-xml.ts`,
       `section.mapper.ts`, casos de uso `GetSection` (back y front con un
       `ContentPort` falso).
@@ -170,7 +170,7 @@
 - [ ] Endurecer la API: `helmet`, quizá rate-limit; validación de variables de entorno.
 
 ### Bugs visuales / UI
-- [~] **Flujo de fin de partida** — parcialmente mejorado: botón redundante eliminado,
+- [x] **Flujo de fin de partida** — parcialmente mejorado: botón redundante eliminado,
       "Nueva partida" añadido en secciones sin choices. Pendiente: transiciones,
       estado que persiste/se limpia al volver al menú, casos límite (terminar y
       recargar, muerte en combate en secciones con roll-table, etc.).
@@ -190,7 +190,7 @@
       es la frontera).
 
 ### Frontmatter
-- [~] El equipo ya se resuelve en la creación; las secciones de
+- [x] El equipo ya se resuelve en la creación; las secciones de
       reglas/Disciplinas/tabla siguen importadas pero inalcanzables. Depende de
       la navegación por id (resuelta en paso 11).
 
