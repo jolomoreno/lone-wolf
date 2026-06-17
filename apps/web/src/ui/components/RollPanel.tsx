@@ -3,13 +3,14 @@
  * (0-9), el azar —no el jugador— decide la rama. Reemplaza a los botones de
  * elección normales.
  *
- * Flujo en dos pasos (como el combate): primero se tira y se muestra el número
- * y lo que ocurre; luego "Continuar" navega a la sección resultante.
+ * Flujo: se pulsa "Tirar", el dado 3D anima y se detiene en el resultado,
+ * luego "Continuar" navega a la sección resultante.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { defaultRandomNumber } from "../../domain/random/random-number";
 import { resolveRoll, type RollOutcome } from "../../domain/game/section-rules";
+import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
 
 interface Props {
   table: RollOutcome[];
@@ -23,11 +24,26 @@ function sectionLabel(id: string): string {
 
 export function RollPanel({ table, onResolve }: Props) {
   const [rolled, setRolled] = useState<number | null>(null);
+  const [rolling, setRolling] = useState(false);
+  const dieRef = useRef<DiceRollHandle>(null);
   const outcome = rolled != null ? resolveRoll(table, rolled) : undefined;
+
+  function handleRoll() {
+    if (rolling || rolled !== null) return;
+    setRolling(true);
+    const value = defaultRandomNumber();
+    dieRef.current?.roll(value, () => {
+      setRolled(value);
+      setRolling(false);
+    });
+  }
 
   return (
     <section className="roll-panel" data-testid="roll-panel">
       <h3>🎲 Tabla de la Suerte</h3>
+      <div className="roll-panel-die">
+        <DiceRoll ref={dieRef} size="lg" />
+      </div>
       {rolled == null ? (
         <>
           <p className="muted small">
@@ -37,7 +53,8 @@ export function RollPanel({ table, onResolve }: Props) {
             type="button"
             className="primary"
             data-testid="roll-button"
-            onClick={() => setRolled(defaultRandomNumber())}
+            disabled={rolling}
+            onClick={handleRoll}
           >
             Tirar
           </button>

@@ -20,7 +20,7 @@
       exacta, curación (Healing) por sección, victoria (sect350), muerte fuera de
       combate, reglas curadas por sección (condiciones, CS modifiers, Mindblast,
       elusión, daño narrativo, comidas, tiradas, botín), ilustraciones Project Aon.
-- [ ] **12. Tiradas animadas** — dados en la creación del personaje con revelación
+- [x] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
 - [ ] **13. Refactors / deuda técnica** — lint, tests del backend, build en
       producción y limpieza general de código.
@@ -112,16 +112,23 @@
 
 ---
 
-## Paso 12 — Tiradas animadas en la creación del personaje
+## Paso 12 — Tiradas animadas ✓
 
-El jugador lanzará cada tirada pulsando un botón, con animación de dado:
+### Hecho en este paso
 
-- [ ] **Dados virtuales**: mostrar un dado d10 (0-9) animado que "rueda" y se detiene
-      en el resultado. Puede ser CSS puro (rotación) o un emoji/SVG animado.
-- [ ] **Revelación progresiva**: Destreza → Resistencia → Oro → Disciplinas →
-      arma del Dominio → objeto del almacén. Cada tirada es independiente.
-- [ ] Alternativa más simple: botón "Tirar" por stat con transición breve
-      (fade o scale) antes de pasar a la siguiente.
+- [x] **Dado 3D CSS** (`DiceRoll.tsx`) — cubo de 6 caras con `transform-style: preserve-3d`,
+      animación en dos fases: giro lineal (950 ms) + resorte `cubic-bezier(.34,1.42,.64,1)`
+      (500 ms). Flash de borde dorado al aterrizar. Tamaños `sm` (62 px) y `lg` (90 px).
+      API via `forwardRef` + `useImperativeHandle`: `roll(value, onDone)` y `reset()`.
+- [x] **Glitch de arista corregido** — el dado reposa con una ligera inclinación (+3° X,
+      +5° Y) para que ninguna cara lateral quede exactamente a 90°. Un visor
+      (borde 2 px del color del panel) enmascara cualquier artefacto residual.
+- [x] **Revelación progresiva en la creación** — Destreza → Resistencia → Oro → Almacén.
+      Cada botón "Tirar" se desbloquea solo cuando termina la animación anterior.
+      La tarjeta pasa a borde dorado al resolverse. "Comenzar la aventura" requiere
+      los 4 dados resueltos + 5 disciplinas seleccionadas.
+- [x] **RollPanel animado** — la Tabla de la Suerte usa un dado `lg` centrado;
+      el botón "Tirar" dispara la animación y solo muestra el resultado al terminar.
 
 ---
 

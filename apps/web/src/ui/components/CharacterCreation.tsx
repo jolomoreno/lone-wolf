@@ -1,21 +1,14 @@
 /**
- * Pantalla de creación del personaje (Libro 1). Usa el dominio directamente:
- * - Tira Destreza, Resistencia, Oro y el objeto del almacén (Tabla de la Suerte).
- * - El jugador elige 5 Disciplinas del Kai (y el arma si coge "Dominio de las Armas").
- * Al confirmar, `createStartingCharacter` ensambla el equipo fijo + lo tirado.
+ * Pantalla de creación del personaje (Libro 1). El jugador tira cada stat
+ * pulsando un botón, con revelación progresiva: Destreza → Resistencia →
+ * Oro → Almacén. Solo entonces puede elegir disciplinas y comenzar.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Character } from "../../domain/character/character";
-import {
-  rollCombatSkill,
-  rollEndurance,
-  rollStartingGold,
-  rollWeaponskillWeapon,
-} from "../../domain/character/create-character";
+import { rollWeaponskillWeapon } from "../../domain/character/create-character";
 import {
   createStartingCharacter,
-  rollStoreroomChoiceId,
   STOREROOM,
   type StoreroomGrant,
 } from "../../domain/character/equipment";
@@ -26,10 +19,13 @@ import {
   type KaiDiscipline,
 } from "../../domain/character/kai-discipline";
 import { WEAPON_NAMES, type WeaponType } from "../../domain/character/weapon";
+import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
 
 interface Props {
   onCreate: (character: Character) => void;
 }
+
+type Step = "cs" | "end" | "gold" | "store" | "done";
 
 function storeroomHint(grant: StoreroomGrant): string {
   switch (grant.kind) {
@@ -49,19 +45,56 @@ function storeroomHint(grant: StoreroomGrant): string {
 }
 
 export function CharacterCreation({ onCreate }: Props) {
-  // Tiradas únicas al montar (la "elección" en la Tabla de la Suerte).
-  const [combatSkill] = useState(() => rollCombatSkill());
-  const [enduranceMax] = useState(() => rollEndurance());
-  const [gold] = useState(() => rollStartingGold());
-  const [storeroomId] = useState(() => rollStoreroomChoiceId());
-
+  const [step, setStep] = useState<Step>("cs");
+  const [combatSkill, setCombatSkill] = useState<number | null>(null);
+  const [enduranceMax, setEnduranceMax] = useState<number | null>(null);
+  const [gold, setGold] = useState<number | null>(null);
+  const [storeroomId, setStoreroomId] = useState<number | null>(null);
   const [selected, setSelected] = useState<KaiDiscipline[]>([]);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
 
-  const isFull = selected.length >= KAI_DISCIPLINES_TO_CHOOSE;
-  const ready = selected.length === KAI_DISCIPLINES_TO_CHOOSE;
+  const dieCs = useRef<DiceRollHandle>(null);
+  const dieEnd = useRef<DiceRollHandle>(null);
+  const dieGold = useRef<DiceRollHandle>(null);
+  const dieStore = useRef<DiceRollHandle>(null);
 
-  const storeroomItem = STOREROOM.find((c) => c.id === storeroomId);
+  const isFull = selected.length >= KAI_DISCIPLINES_TO_CHOOSE;
+  const ready = step === "done" && selected.length === KAI_DISCIPLINES_TO_CHOOSE;
+  const storeroomItem =
+    storeroomId !== null ? STOREROOM.find((c) => c.id === storeroomId) : null;
+
+  function rollCs() {
+    const raw = Math.floor(Math.random() * 10);
+    dieCs.current?.roll(raw, () => {
+      setCombatSkill(10 + raw);
+      setStep("end");
+    });
+  }
+
+  function rollEnd() {
+    const raw = Math.floor(Math.random() * 10);
+    dieEnd.current?.roll(raw, () => {
+      setEnduranceMax(20 + raw);
+      setStep("gold");
+    });
+  }
+
+  function rollGold() {
+    const raw = Math.floor(Math.random() * 10);
+    dieGold.current?.roll(raw, () => {
+      setGold(raw);
+      setStep("store");
+    });
+  }
+
+  function rollStore() {
+    const raw = Math.floor(Math.random() * 10);
+    const id = (raw % STOREROOM.length) + 1;
+    dieStore.current?.roll(raw, () => {
+      setStoreroomId(id);
+      setStep("done");
+    });
+  }
 
   function toggle(discipline: KaiDiscipline) {
     if (selected.includes(discipline)) {
@@ -75,6 +108,13 @@ export function CharacterCreation({ onCreate }: Props) {
   }
 
   function start() {
+    if (
+      combatSkill === null ||
+      enduranceMax === null ||
+      gold === null ||
+      storeroomId === null
+    )
+      return;
     onCreate(
       createStartingCharacter({
         combatSkill,
@@ -93,39 +133,83 @@ export function CharacterCreation({ onCreate }: Props) {
       <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
 
       <section className="stat-cards">
-        <div className="stat-card">
+        <div className={`stat-card${combatSkill !== null ? " stat-card--done" : ""}`}>
           <span className="stat-label">Destreza en el Combate</span>
+          <DiceRoll ref={dieCs} size="sm" />
           <span className="stat-value" data-testid="stat-combat-skill">
-            {combatSkill}
+            {combatSkill ?? "—"}
           </span>
+          <button
+            type="button"
+            className="primary die-roll-btn"
+            disabled={step !== "cs"}
+            onClick={rollCs}
+          >
+            Tirar
+          </button>
         </div>
-        <div className="stat-card">
+
+        <div className={`stat-card${enduranceMax !== null ? " stat-card--done" : ""}`}>
           <span className="stat-label">Resistencia</span>
+          <DiceRoll ref={dieEnd} size="sm" />
           <span className="stat-value" data-testid="stat-endurance">
-            {enduranceMax}
+            {enduranceMax ?? "—"}
           </span>
+          <button
+            type="button"
+            className="primary die-roll-btn"
+            disabled={step !== "end"}
+            onClick={rollEnd}
+          >
+            Tirar
+          </button>
         </div>
-        <div className="stat-card">
-          <span className="stat-label">Oro (Tabla de la Suerte)</span>
+
+        <div className={`stat-card${gold !== null ? " stat-card--done" : ""}`}>
+          <span className="stat-label">Oro inicial</span>
+          <DiceRoll ref={dieGold} size="sm" />
           <span className="stat-value" data-testid="stat-gold">
-            {gold}
+            {gold !== null ? gold : "—"}
           </span>
+          <button
+            type="button"
+            className="primary die-roll-btn"
+            disabled={step !== "gold"}
+            onClick={rollGold}
+          >
+            Tirar
+          </button>
+        </div>
+
+        <div className={`stat-card${storeroomItem ? " stat-card--done" : ""}`}>
+          <span className="stat-label">Almacén</span>
+          <DiceRoll ref={dieStore} size="sm" />
+          {storeroomItem ? (
+            <div
+              className="stat-value--item"
+              data-testid="storeroom-item"
+              data-store={storeroomId}
+            >
+              <strong>{storeroomItem.name}</strong>
+              <span className="muted small">{storeroomHint(storeroomItem.grant)}</span>
+            </div>
+          ) : (
+            <span className="stat-value">—</span>
+          )}
+          <button
+            type="button"
+            className="primary die-roll-btn"
+            disabled={step !== "store"}
+            onClick={rollStore}
+          >
+            Tirar
+          </button>
         </div>
       </section>
 
       <p className="muted small">
         Equipo fijo: Hacha, 1 Comida y Mapa de Sommerlund.
       </p>
-
-      {storeroomItem && (
-        <div className="rolled-item" data-testid="storeroom-item" data-store={storeroomId}>
-          <span className="muted small">Objeto del almacén (tirada {storeroomId})</span>
-          <span>
-            <strong>{storeroomItem.name}</strong> ·{" "}
-            <span className="muted small">{storeroomHint(storeroomItem.grant)}</span>
-          </span>
-        </div>
-      )}
 
       <h2>
         Disciplinas del Kai{" "}

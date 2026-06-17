@@ -11,8 +11,8 @@ inventario y guardado de la partida.
 | 1-9 | Base · Personaje · Combate · Guardado automático | ✅ Hecho |
 | 10 | Experiencia de juego — guardado manual, control consciente del jugador | ✅ Hecho |
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
-| **12** | **Tiradas animadas** — dados en la creación del personaje | ⬜ Siguiente |
-| 13 | Refactors / deuda técnica — lint, tests backend, build prod | ⬜ |
+| 12 | Tiradas animadas — dado 3D CSS, revelación progresiva en la creación | ✅ Hecho |
+| **13** | **Refactors / deuda técnica** — lint, tests backend, build prod | ⬜ Siguiente |
 | 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).

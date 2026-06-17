@@ -408,6 +408,15 @@ body {
   padding: 1rem;
   text-align: center;
   background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: border-color 0.3s;
+}
+
+.stat-card--done {
+  border-color: var(--accent);
 }
 
 .stat-label {
@@ -421,6 +430,20 @@ body {
   font-size: 2.5rem;
   font-weight: bold;
   color: var(--accent);
+}
+
+.stat-value--item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--accent);
+  width: 100%;
+  line-height: 1.3;
+  min-height: 3rem;
+  justify-content: center;
 }
 
 .discipline-grid {
@@ -480,11 +503,82 @@ body {
   cursor: not-allowed;
 }
 
+.die-roll-btn {
+  width: 100%;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+
 .start-actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-top: 1.5rem;
+}
+
+/* ---------- Dado 3D ---------- */
+
+.die-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.die-wrap-sm { width: 62px; height: 62px; }
+.die-wrap-lg { width: 90px; height: 90px; }
+
+.die-visor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border: 2px solid var(--panel);
+}
+
+.die-wrap-sm .die-visor { border-radius: 10px; }
+.die-wrap-lg .die-visor { border-radius: 14px; }
+
+.die-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: bold;
+  color: var(--accent);
+  box-sizing: border-box;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 2px solid var(--accent);
+  background: var(--panel);
+}
+
+.die-face-side {
+  background: var(--bg);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.die-face-sm {
+  width: 62px;
+  height: 62px;
+  font-size: 28px;
+  border-radius: 8px;
+}
+
+.die-face-lg {
+  width: 90px;
+  height: 90px;
+  font-size: 42px;
+  border-radius: 12px;
+}
+
+.roll-panel-die {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
 }
 
 /* ---------- Partida: ficha + lector ---------- */
