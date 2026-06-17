@@ -14,7 +14,7 @@
       usa y modifica la Resistencia real del personaje.
 - [x] **9. Guardado** — GameState (sección + personaje + historial + flags) con
       autoguardado en localStorage y pantalla "Continuar / Nueva partida".
-- [ ] **10. Experiencia de juego** — guardado manual, carga explícita y demás
+- [x] **10. Experiencia de juego** — guardado manual, carga explícita y demás
       acciones de partida bajo control consciente del jugador.
 - [ ] **11. Fidelidad del juego** — opciones condicionales, bonuses de arma,
       curación, comidas, eludir combate y estados finales. Arranca con el
@@ -39,17 +39,14 @@
 
 ---
 
-## Paso 10 — Experiencia de juego
+## Paso 10 — Experiencia de juego ✓
 
-El autoguardado silencioso actual no es fiel al libro y puede generar confusión
-(el jugador no sabe si está guardado). El jugador debe tener control consciente
-sobre cuándo guarda y cuándo carga.
-
-- [ ] Botón **"Guardar partida"** visible en el pie de la pantalla de aventura.
-- [ ] Botón **"Cargar partida"** en la pantalla de inicio.
-- [ ] Guardar sigue usando `localStorage` y el `SavePort` ya existe — solo cambia la UI.
-- [ ] Decidir si mantener el autoguardado como red de seguridad ante cierre inesperado
-      (recomendado) o eliminarlo del todo.
+- [x] Botón **"Guardar partida"** en el pie de la aventura con indicador "✓ Guardado HH:MM"
+      (desaparece a los 3 s).
+- [x] Pantalla de inicio muestra timestamp del guardado ("Partida guardada · HH:MM").
+- [x] Separados "← Inicio" (vuelve al menú sin borrar) y "Nueva partida" (con confirmación).
+- [x] `onNew` en `StartScreen` ahora borra el localStorage correctamente.
+- [x] Autoguardado silencioso mantenido como red de seguridad ante cierre inesperado.
 
 ---
 

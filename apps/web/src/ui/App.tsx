@@ -4,11 +4,12 @@
  *  - Sin partida y sin guardado → creación de personaje.
  *  - Con partida → la aventura (sección + ficha + combate).
  *
- * El GameState se autoguarda en cada cambio (navegar, daño de combate) a través
- * del SavePort.
+ * El GameState se autoguarda en cada cambio (red de seguridad ante cierre
+ * inesperado). El jugador también puede guardar explícitamente con el botón
+ * del pie de página.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ContentBlockDTO } from "@lone-wolf/shared";
 import type { Character } from "../domain/character/character";
 import { setEnduranceCurrent } from "../domain/character/character-operations";
@@ -28,24 +29,50 @@ import { useSection } from "./hooks/useSection";
 
 const FIRST_SECTION = 1;
 
+function formatSavedAt(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+}
+
 export function App() {
   const { save } = useContainer();
   const [savedState, setSavedState] = useState<GameState | null>(() => save.load());
   const [game, setGame] = useState<GameState | null>(null);
 
-  // Autoguardado en cada cambio del estado de partida.
+  // Autoguardado en cada cambio (red de seguridad ante cierre inesperado).
   useEffect(() => {
     if (game) save.save(game);
   }, [game, save]);
 
-  function exitToStart() {
+  // Vuelve al menú conservando la partida guardada.
+  function returnToMenu() {
+    setGame(null);
+    setSavedState(save.load());
+  }
+
+  // Borra la partida y va a la creación de personaje (con confirmación).
+  function startNewGame() {
+    if (game || savedState) {
+      const ok = window.confirm(
+        "¿Empezar una nueva partida? Se perderá el progreso actual.",
+      );
+      if (!ok) return;
+    }
     save.clear();
     setGame(null);
     setSavedState(null);
   }
 
   if (game) {
-    return <Adventure game={game} onChange={setGame} onExit={exitToStart} />;
+    return (
+      <Adventure
+        game={game}
+        onChange={setGame}
+        onSave={() => save.save(game)}
+        onReturnToMenu={returnToMenu}
+        onNewGame={startNewGame}
+      />
+    );
   }
 
   if (savedState) {
@@ -53,7 +80,7 @@ export function App() {
       <StartScreen
         saved={savedState}
         onContinue={() => setGame(savedState)}
-        onNew={() => setSavedState(null)}
+        onNew={startNewGame}
       />
     );
   }
@@ -79,7 +106,9 @@ function StartScreen({
       <h1>🐺 Lobo Solitario</h1>
       <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
       <div className="rolled-item">
-        <span className="muted small">Tienes una partida guardada</span>
+        <span className="muted small">
+          Partida guardada · {formatSavedAt(saved.updatedAt)}
+        </span>
         <span>
           Sección <strong>{saved.currentSection}</strong> · Resistencia{" "}
           {saved.character.stats.enduranceCurrent}/{saved.character.stats.enduranceMax}
@@ -100,21 +129,40 @@ function StartScreen({
 interface AdventureProps {
   game: GameState;
   onChange: (game: GameState) => void;
-  onExit: () => void;
+  onSave: () => void;
+  onReturnToMenu: () => void;
+  onNewGame: () => void;
 }
 
 type CombatBlock = Extract<ContentBlockDTO, { type: "combat" }>;
 
-function Adventure({ game, onChange, onExit }: AdventureProps) {
+function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: AdventureProps) {
   const character: Character = game.character;
   const sectionNumber = game.currentSection;
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(null);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const savedAtTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const section = useSection(sectionNumber);
 
   // Al cambiar de sección, se reinicia el resultado del combate.
   useEffect(() => {
     setCombatOutcome(null);
   }, [sectionNumber]);
+
+  // Limpia el timer al desmontar para evitar fugas.
+  useEffect(() => {
+    return () => {
+      if (savedAtTimerRef.current) clearTimeout(savedAtTimerRef.current);
+    };
+  }, []);
+
+  function handleSave() {
+    onSave();
+    const time = formatSavedAt(new Date().toISOString());
+    setSavedAt(time);
+    if (savedAtTimerRef.current) clearTimeout(savedAtTimerRef.current);
+    savedAtTimerRef.current = setTimeout(() => setSavedAt(null), 3000);
+  }
 
   const combatBlock =
     section.status === "ok"
@@ -180,7 +228,7 @@ function Adventure({ game, onChange, onExit }: AdventureProps) {
               {combatOutcome === "lost" && (
                 <div className="death">
                   <p className="status-bad">Tu aventura termina aquí.</p>
-                  <button type="button" className="primary" onClick={onExit}>
+                  <button type="button" className="primary" onClick={onNewGame}>
                     Nueva partida
                   </button>
                 </div>
@@ -191,9 +239,17 @@ function Adventure({ game, onChange, onExit }: AdventureProps) {
       </div>
 
       <footer className="game-footer">
-        <button type="button" className="ghost" onClick={onExit}>
-          ↺ Nueva partida
+        <button type="button" className="ghost" onClick={onReturnToMenu}>
+          ← Inicio
         </button>
+        <div className="save-controls">
+          {savedAt && (
+            <span className="save-indicator">✓ Guardado {savedAt}</span>
+          )}
+          <button type="button" className="ghost" onClick={handleSave}>
+            Guardar partida
+          </button>
+        </div>
       </footer>
     </main>
   );
