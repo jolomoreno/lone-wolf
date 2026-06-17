@@ -134,7 +134,7 @@ export function CharacterCreation({ onCreate }: Props) {
 
       <section className="stat-cards">
         <div className={`stat-card${combatSkill !== null ? " stat-card--done" : ""}`}>
-          <span className="stat-label">Destreza en el Combate</span>
+          <span className="stat-label">Destreza</span>
           <DiceRoll ref={dieCs} size="sm" />
           <span className="stat-value" data-testid="stat-combat-skill">
             {combatSkill ?? "—"}
