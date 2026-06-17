@@ -76,9 +76,17 @@ export function App() {
   const [savedState, setSavedState] = useState<GameState | null>(() => save.load());
   const [game, setGame] = useState<GameState | null>(null);
 
-  // Autoguardado en cada cambio (red de seguridad ante cierre inesperado).
+  // Autoguardado en cada cambio. Los estados terminales (muerte/victoria) se
+  // borran del guardado para que "Continuar" no lleve a una partida ya acabada.
   useEffect(() => {
-    if (game) save.save(game);
+    if (!game) return;
+    const isTerminal =
+      isDead(game.character) || game.currentSection === FINAL_SECTION;
+    if (isTerminal) {
+      save.clear();
+    } else {
+      save.save(game);
+    }
   }, [game, save]);
 
   // Vuelve al menú conservando la partida guardada.
@@ -100,6 +108,13 @@ export function App() {
     setSavedState(null);
   }
 
+  // Fin de partida (victoria o muerte): borra el guardado y va a creación sin confirmación.
+  function handleGameOver() {
+    save.clear();
+    setGame(null);
+    setSavedState(null);
+  }
+
   if (game) {
     return (
       <Adventure
@@ -107,7 +122,7 @@ export function App() {
         onChange={setGame}
         onSave={() => save.save(game)}
         onReturnToMenu={returnToMenu}
-        onNewGame={startNewGame}
+        onGameOver={handleGameOver}
       />
     );
   }
@@ -168,12 +183,12 @@ interface AdventureProps {
   onChange: (game: GameState) => void;
   onSave: () => void;
   onReturnToMenu: () => void;
-  onNewGame: () => void;
+  onGameOver: () => void;
 }
 
 type CombatBlock = Extract<ContentBlockDTO, { type: "combat" }>;
 
-function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: AdventureProps) {
+function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: AdventureProps) {
   const character: Character = game.character;
   const sectionId = game.currentSection;
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(null);
@@ -316,9 +331,14 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
           Lobo Solitario ha escapado con el Libro de Plenitud del Kai.
           El Maestro de las Tinieblas conocerá su nombre.
         </p>
-        <button type="button" className="primary" onClick={onNewGame}>
-          Nueva partida
-        </button>
+        <div className="start-actions">
+          <button type="button" className="primary" onClick={onGameOver}>
+            Nueva partida
+          </button>
+          <button type="button" className="ghost" onClick={onReturnToMenu}>
+            Volver al inicio
+          </button>
+        </div>
       </main>
     );
   }
@@ -331,9 +351,32 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
         <p className="status-bad">
           Las heridas y el agotamiento han acabado con Lobo Solitario.
         </p>
-        <button type="button" className="primary" onClick={onNewGame}>
-          Nueva partida
-        </button>
+        <div className="start-actions">
+          <button type="button" className="primary" onClick={onGameOver}>
+            Nueva partida
+          </button>
+          <button type="button" className="ghost" onClick={onReturnToMenu}>
+            Volver al inicio
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  // Muerte en combate: pantalla completa en lugar de div embebido.
+  if (combatOutcome === "lost") {
+    return (
+      <main className="creation">
+        <h1>🐺 Fin de la aventura</h1>
+        <p className="status-bad">Has caído en combate. Tu aventura termina aquí.</p>
+        <div className="start-actions">
+          <button type="button" className="primary" onClick={onGameOver}>
+            Nueva partida
+          </button>
+          <button type="button" className="ghost" onClick={onReturnToMenu}>
+            Volver al inicio
+          </button>
+        </div>
       </main>
     );
   }
@@ -413,14 +456,6 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
                 <RollPanel key={sectionId} table={rollTable} onResolve={handleRoll} />
               )}
 
-              {combatOutcome === "lost" && (
-                <div className="death">
-                  <p className="status-bad">Tu aventura termina aquí.</p>
-                  <button type="button" className="primary" onClick={onNewGame}>
-                    Nueva partida
-                  </button>
-                </div>
-              )}
             </>
           )}
         </div>
