@@ -82,14 +82,26 @@
       sect180, sect191, sect220 y sect339; navega a la sección correcta.
 - [x] **Poción Curativa** — botón "Usar" en la ficha cuando hay pociones en la
       mochila; aplica +4 Resistencia y elimina la poción del inventario.
+- [x] **Cambios de stats desde el texto** — `SECTION_ENTRY_EFFECTS` aplica el daño
+      narrativo incondicional (13 secciones: sect76, sect158, sect203…) una sola
+      vez al entrar, con aviso al jugador. Si la Resistencia llega a 0, se muestra
+      la pantalla de muerte fuera de combate.
+- [x] **Comidas cuando el libro lo exige** — 6 secciones (sect130, sect147…)
+      consumen una Comida; la disciplina de Caza la evita; sin Comida se pierden
+      3 de Resistencia.
+- [x] **Ilustraciones** — se enlazan desde el servidor de Project Aon (hotlink,
+      sin redistribuir → cumple la licencia) con fallback a placeholder si una
+      imagen no carga. Atribución + enlace a projectaon.org en el pie. Verificado:
+      las imágenes cargan en el navegador (sin bloqueo por referer/CORS).
 
 ### Pendiente
 
-- [ ] **Cambios de stats desde el texto** — "Pierdes 2 de Resistencia", "recibes X"
-      no se aplican; no hay datos estructurados en el XML para ello.
-- [ ] **Comidas cuando el libro lo exige** — algunas secciones requieren comer
-      (penalización si no tienes); requiere datos curados adicionales.
-- [ ] **Ilustraciones** — placeholder actual. Decidir licencia Project Aon.
+- [ ] **Cambios condicionales desde texto** — pérdidas/ganancias que dependen de
+      una tirada descrita en el propio texto (p.ej. sect36) o ganancias de oro/
+      objetos al registrar cadáveres. Requieren modelar la interacción, no solo
+      un efecto automático al entrar.
+- [ ] **`tssf.png`** (1 ilustración de portada, edición Alvarez) no se localiza en
+      el servidor de Project Aon; cae al placeholder. Buscar su ruta exacta.
 
 ---
 
@@ -112,9 +124,9 @@ El jugador lanzará cada tirada pulsando un botón, con animación de dado:
 > la fidelidad. El resto de deuda técnica se liquida aquí antes del despliegue.
 
 ### Tests
-- [~] Dominio del front cubierto (55 tests). Falta el **backend y adaptadores**:
-      `parse-gamebook-xml.ts`, `section.mapper.ts`, casos de uso `GetSection`
-      (back y front con un `ContentPort` falso).
+- [~] Dominio del front cubierto (69 tests, incl. reglas por sección). Falta el
+      **backend y adaptadores**: `parse-gamebook-xml.ts`, `section.mapper.ts`,
+      casos de uso `GetSection` (back y front con un `ContentPort` falso).
 
 ### Lint y formato
 - [ ] No hay ESLint/Prettier/Biome; `pnpm lint` (raíz) no hace nada.
@@ -127,9 +139,8 @@ El jugador lanzará cada tirada pulsando un botón, con animación de dado:
 - [ ] Endurecer la API: `helmet`, quizá rate-limit; validación de variables de entorno.
 
 ### Limpiezas de código
-- [ ] **CSS muerto:** `.combat-box` y `.combat-title` en
-      [index.css](apps/web/src/index.css) ya no se usan (el combate lo pinta
-      `CombatPanel`).
+- [x] **CSS muerto:** `.combat-box` y `.combat-title` eliminados de
+      [index.css](apps/web/src/index.css) (el combate lo pinta `CombatPanel`).
 - [ ] Claves de lista por índice en `SectionView` (bloques) — usar claves estables.
 - [ ] Mantener sincronizados `Section` (dominio API) ↔ `SectionDTO` (el mapper
       es la frontera).

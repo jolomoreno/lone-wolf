@@ -3,6 +3,7 @@
 /** Tipado de nuestras variables de entorno (las que empiezan por VITE_). */
 interface ImportMetaEnv {
   readonly VITE_API_URL?: string;
+  readonly VITE_ILLUSTRATION_BASE_URL?: string;
 }
 
 interface ImportMeta {

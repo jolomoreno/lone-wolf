@@ -22,10 +22,16 @@ import {
   updateCharacter,
 } from "../domain/game/game-state";
 import {
+  applyEntryEffect,
   evaluateCondition,
   SECTION_CHOICE_CONDITIONS,
   SECTION_COMBAT_RULES,
+  SECTION_ENTRY_EFFECTS,
 } from "../domain/game/section-rules";
+import {
+  PROJECT_AON_ATTRIBUTION,
+  PROJECT_AON_URL,
+} from "../config/project-aon";
 import { CharacterCreation } from "./components/CharacterCreation";
 import { CharacterSheet } from "./components/CharacterSheet";
 import { CombatPanel } from "./components/CombatPanel";
@@ -155,6 +161,7 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
   const sectionId = game.currentSection;
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [entryMessages, setEntryMessages] = useState<string[]>([]);
   const savedAtTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const section = useSection(sectionId);
 
@@ -207,19 +214,34 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
   }
 
   /**
-   * Al navegar a una sección: si la actual no tiene combate y el personaje
-   * tiene Curación, aplica +1 Resistencia antes de moverse.
+   * Al navegar a una sección:
+   *  1. Si la actual no tiene combate y el personaje tiene Curación, +1 Resistencia.
+   *  2. Mueve a la sección destino.
+   *  3. Aplica los efectos de entrada de la sección destino (daño narrativo,
+   *     comidas obligatorias) UNA sola vez y muestra qué ha pasado.
    */
   function handleNavigate(targetId: string) {
-    let currentGame = game;
+    let next = game;
     if (
       !enemy &&
       character.disciplines.includes("healing") &&
-      character.stats.enduranceCurrent < character.stats.enduranceMax
+      next.character.stats.enduranceCurrent < next.character.stats.enduranceMax
     ) {
-      currentGame = updateCharacter(currentGame, heal(character, 1));
+      next = updateCharacter(next, heal(next.character, 1));
     }
-    onChange(goToSection(currentGame, targetId));
+
+    next = goToSection(next, targetId);
+
+    const effect = SECTION_ENTRY_EFFECTS[targetId];
+    if (effect) {
+      const { character: updated, messages } = applyEntryEffect(next.character, effect);
+      next = updateCharacter(next, updated);
+      setEntryMessages(messages);
+    } else {
+      setEntryMessages([]);
+    }
+
+    onChange(next);
   }
 
   // Pantalla de victoria al llegar a la sección final.
@@ -286,6 +308,14 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
           )}
           {section.status === "ok" && (
             <>
+              {entryMessages.length > 0 && (
+                <div className="entry-messages" data-testid="entry-messages">
+                  {entryMessages.map((msg, i) => (
+                    <p key={i}>{msg}</p>
+                  ))}
+                </div>
+              )}
+
               <SectionView
                 section={section.data}
                 onNavigate={handleNavigate}
@@ -335,6 +365,13 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onNewGame }: Advent
           </button>
         </div>
       </footer>
+
+      <p className="attribution muted small">
+        {PROJECT_AON_ATTRIBUTION}{" "}
+        <a href={PROJECT_AON_URL} target="_blank" rel="noopener noreferrer">
+          projectaon.org
+        </a>
+      </p>
     </main>
   );
 }

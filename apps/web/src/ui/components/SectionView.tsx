@@ -6,7 +6,37 @@
  * atenuadas y deshabilitadas si la condición no se cumple.
  */
 
+import { useState } from "react";
 import type { SectionDTO } from "@lone-wolf/shared";
+import { illustrationUrl } from "../../config/project-aon";
+
+/**
+ * Ilustración de Project Aon enlazada desde su servidor. Si la imagen no carga
+ * (p.ej. fichero inexistente o sin conexión), cae a un marcador de posición.
+ */
+function Illustration({ src, alt }: { src: string; alt?: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <figure className="illustration">
+        <span aria-hidden>🖼️</span>
+        <span className="muted small">{alt ?? "Ilustración"}</span>
+      </figure>
+    );
+  }
+
+  return (
+    <figure className="illustration">
+      <img
+        src={illustrationUrl(src)}
+        alt={alt ?? "Ilustración de Lobo Solitario"}
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </figure>
+  );
+}
 
 interface Props {
   section: SectionDTO;
@@ -35,12 +65,7 @@ export function SectionView({
             case "paragraph":
               return <p key={index}>{block.text}</p>;
             case "illustration":
-              return (
-                <figure key={index} className="illustration">
-                  <span aria-hidden>🖼️</span>
-                  <span className="muted small">Ilustración</span>
-                </figure>
-              );
+              return <Illustration key={index} src={block.src} alt={block.alt} />;
             case "combat":
               return null;
             default:
