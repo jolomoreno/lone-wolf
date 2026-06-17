@@ -395,6 +395,21 @@ body {
   max-width: 42rem;
 }
 
+.intro-heading {
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.intro-text {
+  text-align: left;
+  line-height: 1.75;
+  margin: 1rem 0 1.5rem;
+}
+
+.intro-text p {
+  margin-bottom: 1rem;
+}
+
 .stat-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));

@@ -51,9 +51,11 @@ apps/web/src/
 │   ├── composition-root  # Única instancia de adaptadores; inyectada vía DependencyProvider
 │   └── project-aon       # URL base de ilustraciones + texto de atribución de licencia
 └── ui/
-    ├── App.tsx            # Orquestador: inicio / creación / aventura; autoguardado
+    ├── App.tsx            # Orquestador: intro → creación → sabiduría → aventura; autoguardado
     ├── DependencyProvider # Contexto React que expone los adaptadores inyectados
     ├── components/
+    │   ├── IntroScreen        # "El Principio de la Historia" (tssf): contexto narrativo antes de crear personaje
+    │   ├── KaiWisdomScreen    # "La Sabiduría del Kai" (kaiwisdm): briefing final antes de sect1
     │   ├── CharacterCreation  # Tiradas de stats (revelación progresiva), selección de 5 disciplinas, equipo inicial
     │   ├── CharacterSheet     # Ficha en partida: stats, disciplinas, inventario,
     │   │                      #   botones Usar (poción) y Soltar (arma/mochila)

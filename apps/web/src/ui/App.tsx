@@ -50,6 +50,8 @@ import {
 import { CharacterCreation } from "./components/CharacterCreation";
 import { CharacterSheet } from "./components/CharacterSheet";
 import { CombatPanel } from "./components/CombatPanel";
+import { IntroScreen } from "./components/IntroScreen";
+import { KaiWisdomScreen } from "./components/KaiWisdomScreen";
 import { LootPanel } from "./components/LootPanel";
 import { RollPanel } from "./components/RollPanel";
 import { SectionView } from "./components/SectionView";
@@ -71,10 +73,14 @@ function sectionLabel(sectionId: string): string {
   return match ? match[1] : sectionId;
 }
 
+type PreGameScreen = "intro" | "creation" | "wisdom";
+
 export function App() {
   const { save } = useContainer();
   const [savedState, setSavedState] = useState<GameState | null>(() => save.load());
   const [game, setGame] = useState<GameState | null>(null);
+  const [screen, setScreen] = useState<PreGameScreen>("intro");
+  const [pendingCharacter, setPendingCharacter] = useState<Character | null>(null);
 
   // Autoguardado en cada cambio. Los estados terminales (muerte/victoria) se
   // borran del guardado para que "Continuar" no lleve a una partida ya acabada.
@@ -95,7 +101,7 @@ export function App() {
     setSavedState(save.load());
   }
 
-  // Borra la partida y va a la creación de personaje (con confirmación).
+  // Borra la partida y va a la introducción (con confirmación si hay partida activa).
   function startNewGame() {
     if (game || savedState) {
       const ok = window.confirm(
@@ -106,13 +112,17 @@ export function App() {
     save.clear();
     setGame(null);
     setSavedState(null);
+    setPendingCharacter(null);
+    setScreen("intro");
   }
 
-  // Fin de partida (victoria o muerte): borra el guardado y va a creación sin confirmación.
+  // Fin de partida (victoria o muerte): va directo a creación, sin re-leer la intro.
   function handleGameOver() {
     save.clear();
     setGame(null);
     setSavedState(null);
+    setPendingCharacter(null);
+    setScreen("creation");
   }
 
   if (game) {
@@ -137,9 +147,27 @@ export function App() {
     );
   }
 
+  if (screen === "intro") {
+    return <IntroScreen onContinue={() => setScreen("creation")} />;
+  }
+
+  if (screen === "wisdom" && pendingCharacter) {
+    return (
+      <KaiWisdomScreen
+        onContinue={() => {
+          setGame(createGameState(pendingCharacter, FIRST_SECTION));
+          setPendingCharacter(null);
+        }}
+      />
+    );
+  }
+
   return (
     <CharacterCreation
-      onCreate={(character) => setGame(createGameState(character, FIRST_SECTION))}
+      onCreate={(character) => {
+        setPendingCharacter(character);
+        setScreen("wisdom");
+      }}
     />
   );
 }
