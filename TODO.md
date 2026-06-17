@@ -207,6 +207,11 @@
 - [ ] **Añadir favicon** — incluir un favicon (`.ico` o `.png`) para que la pestaña
       del navegador muestre el icono del juego en vez del genérico de Vite.
       Añadirlo en `apps/web/public/` y referenciarlo en `apps/web/index.html`.
+- [ ] **Añadir mapa de Sommerlund** — mostrar el mapa del Libro 1 desde Project Aon
+      (https://www.projectaon.org/es/xhtml/ls/01hdlo/map.htm) con dos modos de
+      visualización: versión normal (miniatura integrada en la UI) y versión ampliada
+      (modal o página completa para explorar el detalle). Hotlink igual que las
+      ilustraciones (sin redistribuir, cumple la licencia).
 
 ---
 
