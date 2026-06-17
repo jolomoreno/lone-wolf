@@ -19,8 +19,16 @@ import { env } from "../../config/env";
 export function createHttpServer(routers: Router[]): Express {
   const app = express();
 
-  // Permite que el frontend (otro origen) llame a la API.
-  app.use(cors({ origin: env.corsOrigin }));
+  // En desarrollo acepta cualquier localhost (el puerto puede variar según la
+  // herramienta de preview). En producción usa el origen exacto de CORS_ORIGIN.
+  const corsOrigin =
+    env.nodeEnv === "production"
+      ? env.corsOrigin
+      : (origin: string | undefined, cb: (e: Error | null, ok?: boolean) => void) => {
+          if (!origin || /^https?:\/\/localhost(:\d+)?$/.test(origin)) cb(null, true);
+          else cb(new Error(`CORS: origen no permitido → ${origin}`));
+        };
+  app.use(cors({ origin: corsOrigin }));
   // Parsea el cuerpo JSON de las peticiones.
   app.use(express.json());
 
