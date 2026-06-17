@@ -116,13 +116,14 @@
 
 ### Hecho en este paso
 
-- [x] **Dado 3D CSS** (`DiceRoll.tsx`) — cubo de 6 caras con `transform-style: preserve-3d`,
-      animación en dos fases: giro lineal (950 ms) + resorte `cubic-bezier(.34,1.42,.64,1)`
-      (500 ms). Flash de borde dorado al aterrizar. Tamaños `sm` (62 px) y `lg` (90 px).
-      API via `forwardRef` + `useImperativeHandle`: `roll(value, onDone)` y `reset()`.
-- [x] **Glitch de arista corregido** — el dado reposa con una ligera inclinación (+3° X,
-      +5° Y) para que ninguna cara lateral quede exactamente a 90°. Un visor
-      (borde 2 px del color del panel) enmascara cualquier artefacto residual.
+- [x] **Dado animado** (`DiceRoll.tsx`) — **rediseñado**: el cubo 3D de 6 caras
+      (`preserve-3d` + resorte con overshoot) daba artefactos de arista, número que
+      parpadeaba en una cara girada hacia atrás e inclinación residual permanente.
+      Se sustituye por un dado de una sola cara que gira (rotación Z multivuelta +
+      inclinación 3D acotada a ±35° para no quedar nunca de canto) con dígitos
+      parpadeando, y aterriza con un pop + flash dorado (`@keyframes die-tumble` /
+      `die-land`). Robusto, sin huecos ni `die-visor`. Respeta `prefers-reduced-motion`.
+      Tamaños `sm` (62 px) y `lg` (90 px). API igual: `roll(value, onDone)` y `reset()`.
 - [x] **Revelación progresiva en la creación** — Destreza → Resistencia → Oro → Almacén.
       Cada botón "Tirar" se desbloquea solo cuando termina la animación anterior.
       La tarjeta pasa a borde dorado al resolverse. "Comenzar la aventura" requiere
@@ -154,6 +155,11 @@
 - [ ] Endurecer la API: `helmet`, quizá rate-limit; validación de variables de entorno.
 
 ### Bugs visuales / UI
+- [ ] **Flujo de fin de partida sin pulir** — las pantallas de fin de juego
+      (victoria sect350, muerte fuera de combate, derrota en combate) y el reinicio
+      tras terminar no terminan de estar finos. Dar un repaso: transiciones,
+      mensajes, estado que persiste/se limpia al volver al menú o empezar de nuevo,
+      y casos límite (terminar y recargar, etc.).
 - [ ] **Ficha — Comidas y Oro aparecen bajo "Objetos Especiales"** en lugar de
       bajo "Mochila". Son stats globales del personaje, no ítems, así que deben
       mostrarse en la sección correcta de `CharacterSheet`. Revisar el orden del
