@@ -902,15 +902,72 @@ body {
 .map-modal-body {
   overflow: auto;
   padding: 1rem;
+  /* Sin justify-content: center para que al hacer zoom el scroll funcione desde el origen */
+}
+
+.map-loading {
   display: flex;
+  align-items: center;
   justify-content: center;
+  min-height: 200px;
+  width: 100%;
+  font-size: 0.9rem;
 }
 
 .map-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
   border-radius: 4px;
+  transition: transform 0.15s ease;
+}
+
+.map-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  margin-right: 0.75rem;
+}
+
+.map-zoom-btn {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  font-family: inherit;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.map-zoom-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.map-zoom-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.map-zoom-reset {
+  font-family: inherit;
+  font-size: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  min-width: 2.8rem;
+  text-align: center;
+  padding: 0 0.25rem;
+}
+
+.map-zoom-reset:hover {
+  color: var(--accent);
 }
 
 /* ── Modal de niveles Kai ───────────────────────────────────────────────── */
