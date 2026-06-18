@@ -491,28 +491,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Panel de descripción de disciplina en la creación del personaje */
-.disc-description-panel {
-  margin-top: 1rem;
-  padding: 0.85rem 1rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 6px 6px 0;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.disc-description-panel strong {
-  display: block;
-  color: var(--accent);
-  margin-bottom: 0.35rem;
-}
-
-.disc-description-panel p {
-  margin: 0;
-  color: var(--text);
-}
 
 .rolled-item {
   display: flex;
@@ -705,18 +683,17 @@ body {
   padding: 0.45rem 0.75rem;
   font-family: inherit;
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--accent);
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   border-radius: 6px;
   cursor: pointer;
   text-align: center;
-  transition: color 0.15s, border-color 0.15s;
+  transition: background 0.15s;
 }
 
 .rules-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 /* ── Modal overlay ────────────────────────────────────────────────────── */

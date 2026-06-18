@@ -19,10 +19,10 @@ import {
   KAI_DISCIPLINES_TO_CHOOSE,
   type KaiDiscipline,
 } from "../../domain/character/kai-discipline";
-import { KAI_DISCIPLINE_DESCRIPTIONS } from "../../domain/character/kai-discipline-descriptions";
 import { WEAPON_NAMES, type WeaponType } from "../../domain/character/weapon";
 import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
 import { EquipmentRulesModal } from "./EquipmentRulesModal";
+import { KaiDisciplinesModal } from "./KaiDisciplinesModal";
 
 interface Props {
   onCreate: (character: Character) => void;
@@ -55,8 +55,8 @@ export function CharacterCreation({ onCreate }: Props) {
   const [gold, setGold] = useState<number | null>(null);
   const [storeroomId, setStoreroomId] = useState<number | null>(null);
   const [selected, setSelected] = useState<KaiDiscipline[]>([]);
-  const [focusedDisc, setFocusedDisc] = useState<KaiDiscipline | null>(null);
   const [showEquipRules, setShowEquipRules] = useState(false);
+  const [showDiscModal, setShowDiscModal] = useState(false);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
   const [conflictChoice, setConflictChoice] = useState<"weaponskill" | "storeroom" | null>(null);
 
@@ -169,6 +169,13 @@ export function CharacterCreation({ onCreate }: Props) {
   return (
     <>
     {showEquipRules && <EquipmentRulesModal onClose={() => setShowEquipRules(false)} />}
+    {showDiscModal && (
+      <KaiDisciplinesModal
+        onClose={() => setShowDiscModal(false)}
+        activeDisciplines={selected}
+        weaponskillWeapon={weapon}
+      />
+    )}
     <main className="creation" data-testid="creation">
       <h1>🐺 Crea a Lobo Solitario</h1>
       <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
@@ -259,6 +266,13 @@ export function CharacterCreation({ onCreate }: Props) {
         >
           ¿Cómo funciona el equipo?
         </button>
+        <button
+          type="button"
+          className="rules-btn"
+          onClick={() => setShowDiscModal(true)}
+        >
+          ¿Cómo funcionan las disciplinas?
+        </button>
       </div>
 
       <h2>
@@ -279,7 +293,7 @@ export function CharacterCreation({ onCreate }: Props) {
               className={`discipline-toggle${active ? " active" : ""}`}
               aria-pressed={active}
               disabled={!active && isFull}
-              onClick={() => { toggle(discipline); setFocusedDisc(prev => prev === discipline ? null : discipline); }}
+              onClick={() => toggle(discipline)}
             >
               {KAI_DISCIPLINE_NAMES[discipline]}
               {discipline === "weaponskill" && weapon
@@ -289,13 +303,6 @@ export function CharacterCreation({ onCreate }: Props) {
           );
         })}
       </div>
-
-      {focusedDisc && (
-        <div className="disc-description-panel">
-          <strong>{KAI_DISCIPLINE_NAMES[focusedDisc]}</strong>
-          <p>{KAI_DISCIPLINE_DESCRIPTIONS[focusedDisc]}</p>
-        </div>
-      )}
 
       {isConflict && weapon && storeroomWeaponName && (
         <div className="rolled-item" style={{ marginTop: "1.5rem" }}>
