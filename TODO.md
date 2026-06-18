@@ -409,7 +409,7 @@
 ### Fase 3 — Primer deploy Vercel
 
 - [x] **V1** · `vercel link` — vincular repo local con proyecto de Vercel; añadir `.vercel/` a `.gitignore` (~5 min)
-- [ ] **V2** · Env vars en Vercel dashboard: `MONGODB_URI` + `NODE_ENV=production` (~5 min)
+- [x] **V2** · Env vars en Vercel dashboard: `MONGODB_URI` + `NODE_ENV=production` (~5 min)
 - [ ] **V3** · `vercel --prod` + verificar `/health` y `/sections/sect1` + smoke test web (~15 min)
 
 ### Fase 4 — GitHub Actions

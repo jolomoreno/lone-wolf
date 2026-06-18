@@ -13,7 +13,7 @@ inventario y guardado de la partida.
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
 | 13 | Refactors / deuda técnica — bugs gameplay, fidelidad de reglas, contenido/UX, deuda técnica | ✅ Hecho |
-| **14** | **Despliegue + CI/CD** — Vercel serverless (web + API) · GitHub Actions CI · MongoDB Atlas | ⬜ |
+| **14** | **Despliegue + CI/CD** — Vercel serverless (web + API) · GitHub Actions CI · MongoDB Atlas | 🔄 |
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
 
@@ -173,7 +173,7 @@ pnpm install
 # 2. Configurar la API: copia el ejemplo y rellena tu cadena de conexión
 cp apps/api/.env.example apps/api/.env
 #    edita apps/api/.env y pon tu MONGODB_URI, p.ej.:
-#    MONGODB_URI=mongodb+srv://USUARIO:PASSWORD@TU-CLUSTER.xxxxx.mongodb.net/lonewolf?retryWrites=true&w=majority
+#    MONGODB_URI=mongodb+srv://USUARIO:PASSWORD@TU-CLUSTER.xxxxx.mongodb.net/lonewolf-dev?retryWrites=true&w=majority
 
 # 3. Importar el contenido del Libro 1 a Mongo
 #    (antes, descarga data/01hdlo.xml; ver data/README.md)

@@ -184,7 +184,7 @@ vercel link   # asocia el directorio local con el proyecto de Vercel
 
 ### V2 · Variables de entorno en Vercel (~5 min)
 
-- [ ] En Vercel dashboard → Settings → Environment Variables → entorno **Production**:
+- [x] En Vercel dashboard → Settings → Environment Variables → entorno **Production**:
 
 | Variable | Valor | Nota |
 |---|---|---|
