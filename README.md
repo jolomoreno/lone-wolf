@@ -300,9 +300,10 @@ Detalle y plan de corrección en [TODO.md](TODO.md) (paso 13.2). En resumen:
   cuando Lobo Solitario se queda desarmado).
 - **El parser aplana listas/tablas** (`ul`, `dl`, `signpost`) a párrafos: se pierde la
   estructura en secciones de referencia.
-- **Dominio de las Armas con inventario lleno**: si el almacén dio un arma (Hacha +
-  arma del almacén = 2 huecos ocupados) y el arma de dominio es de otro tipo, la
-  disciplina queda latente hasta encontrar esa arma durante la aventura.
+- **Dominio de las Armas con inventario lleno**: si el almacén dio un arma diferente
+  a la de dominio y ambos huecos están ocupados, la creación muestra un selector
+  para elegir qué arma conservar. Si se elige la del almacén, la disciplina queda
+  latente hasta encontrar el arma de dominio durante la aventura.
 
 ## Créditos y licencia del contenido
 

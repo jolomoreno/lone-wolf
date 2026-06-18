@@ -54,6 +54,7 @@ export function CharacterCreation({ onCreate }: Props) {
   const [storeroomId, setStoreroomId] = useState<number | null>(null);
   const [selected, setSelected] = useState<KaiDiscipline[]>([]);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
+  const [conflictChoice, setConflictChoice] = useState<"weaponskill" | "storeroom" | null>(null);
 
   const dieCs = useRef<DiceRollHandle>(null);
   const dieEnd = useRef<DiceRollHandle>(null);
@@ -61,9 +62,26 @@ export function CharacterCreation({ onCreate }: Props) {
   const dieStore = useRef<DiceRollHandle>(null);
 
   const isFull = selected.length >= KAI_DISCIPLINES_TO_CHOOSE;
-  const ready = step === "done" && selected.length === KAI_DISCIPLINES_TO_CHOOSE;
   const storeroomItem =
     storeroomId !== null ? STOREROOM.find((c) => c.id === storeroomId) : null;
+
+  // Hay conflicto cuando: el almacén dio un arma, el jugador tiene Dominio de las Armas
+  // con un arma diferente y la Hacha no la cubre — los dos huecos quedarían llenos.
+  const storeroomWeaponName =
+    storeroomItem?.grant.kind === "weapon" ? storeroomItem.grant.item.name : null;
+  const storeroomWeaponId =
+    storeroomItem?.grant.kind === "weapon" ? storeroomItem.grant.item.id : null;
+  const isConflict = !!(
+    weapon &&
+    storeroomWeaponId &&
+    weapon !== "axe" &&          // la Hacha ya cubre el dominio de hacha
+    storeroomWeaponId !== weapon  // el arma del almacén no es la de dominio
+  );
+
+  const ready =
+    step === "done" &&
+    selected.length === KAI_DISCIPLINES_TO_CHOOSE &&
+    (!isConflict || conflictChoice !== null);
 
   function rollCs() {
     const raw = Math.floor(Math.random() * 10);
@@ -109,12 +127,18 @@ export function CharacterCreation({ onCreate }: Props) {
   function toggle(discipline: KaiDiscipline) {
     if (selected.includes(discipline)) {
       setSelected(selected.filter((d) => d !== discipline));
-      if (discipline === "weaponskill") setWeapon(null);
+      if (discipline === "weaponskill") {
+        setWeapon(null);
+        setConflictChoice(null);
+      }
       return;
     }
     if (isFull) return;
     setSelected([...selected, discipline]);
-    if (discipline === "weaponskill") setWeapon(rollWeaponskillWeapon());
+    if (discipline === "weaponskill") {
+      setWeapon(rollWeaponskillWeapon());
+      setConflictChoice(null); // nueva tirada, elección anterior ya no aplica
+    }
   }
 
   function start() {
@@ -133,6 +157,7 @@ export function CharacterCreation({ onCreate }: Props) {
         disciplines: selected,
         ...(weapon ? { weaponskillWeapon: weapon } : {}),
         storeroomChoiceId: storeroomId,
+        ...(conflictChoice ? { weaponConflictResolution: conflictChoice } : {}),
       }),
     );
   }
@@ -249,6 +274,39 @@ export function CharacterCreation({ onCreate }: Props) {
           );
         })}
       </div>
+
+      {isConflict && weapon && storeroomWeaponName && (
+        <div className="rolled-item" style={{ marginTop: "1.5rem" }}>
+          <span className="muted small">⚔️ Conflicto de armas</span>
+          <p className="small" style={{ margin: "0.5rem 0 0.75rem" }}>
+            Los dos huecos de arma están ocupados. ¿Con cuál te quedas junto a la Hacha?
+          </p>
+          <div className="discipline-grid">
+            <button
+              type="button"
+              className={`discipline-toggle${conflictChoice === "weaponskill" ? " active" : ""}`}
+              aria-pressed={conflictChoice === "weaponskill"}
+              onClick={() => setConflictChoice("weaponskill")}
+            >
+              {WEAPON_NAMES[weapon]}
+              <span className="muted small" style={{ display: "block", fontSize: "0.75rem" }}>
+                Dominio de las Armas (+2 DC)
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`discipline-toggle${conflictChoice === "storeroom" ? " active" : ""}`}
+              aria-pressed={conflictChoice === "storeroom"}
+              onClick={() => setConflictChoice("storeroom")}
+            >
+              {storeroomWeaponName}
+              <span className="muted small" style={{ display: "block", fontSize: "0.75rem" }}>
+                del almacén
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
       <button
         type="button"

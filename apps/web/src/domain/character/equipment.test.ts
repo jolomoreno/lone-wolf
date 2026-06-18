@@ -130,3 +130,31 @@ describe("createStartingCharacter — Dominio de las Armas", () => {
     expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(false);
   });
 });
+
+describe("createStartingCharacter — conflicto de armas", () => {
+  it("weaponConflictResolution='weaponskill': descarta el arma del almacén y añade la de dominio", () => {
+    // Almacén id 7 = Estaca, dominio = Daga → conflict → jugador elige daga
+    const character = createStartingCharacter({
+      ...baseWs,
+      weaponskillWeapon: "dagger",
+      storeroomChoiceId: 7,
+      weaponConflictResolution: "weaponskill",
+    });
+    expect(character.weapons).toHaveLength(2);
+    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(true);
+    expect(character.weapons.some((w) => w.id === "stake")).toBe(false);
+  });
+
+  it("weaponConflictResolution='storeroom': mantiene el arma del almacén, la de dominio queda latente", () => {
+    // Almacén id 7 = Estaca, dominio = Daga → conflict → jugador elige estaca
+    const character = createStartingCharacter({
+      ...baseWs,
+      weaponskillWeapon: "dagger",
+      storeroomChoiceId: 7,
+      weaponConflictResolution: "storeroom",
+    });
+    expect(character.weapons).toHaveLength(2);
+    expect(character.weapons.some((w) => w.id === "stake")).toBe(true);
+    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(false);
+  });
+});

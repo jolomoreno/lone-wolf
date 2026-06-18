@@ -94,6 +94,16 @@ export interface StartingCharacterParams {
   weaponskillWeapon?: WeaponType;
   /** Objeto elegido del almacén (1-9). */
   storeroomChoiceId: number;
+  /**
+   * Resolución del conflicto cuando el almacén da un arma diferente al arma de dominio
+   * y ambos huecos de arma quedarían ocupados.
+   *
+   * "weaponskill" → se descarta el arma del almacén y se añade la de dominio.
+   * "storeroom"   → se mantiene el arma del almacén; la de dominio queda latente.
+   *
+   * Si no hay conflicto, este campo se ignora.
+   */
+  weaponConflictResolution?: "weaponskill" | "storeroom";
 }
 
 /**
@@ -119,7 +129,11 @@ export function createStartingCharacter(params: StartingCharacterParams): Charac
   const { grant } = choice;
   switch (grant.kind) {
     case "weapon":
-      weapons.push(grant.item);
+      // Si el jugador resolvió el conflicto a favor del arma de dominio,
+      // el arma del almacén se descarta (el hueco lo ocupará la de dominio).
+      if (params.weaponConflictResolution !== "weaponskill") {
+        weapons.push(grant.item);
+      }
       break;
     case "special":
       specialItems.push(grant.item);
