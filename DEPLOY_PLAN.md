@@ -235,6 +235,10 @@ vercel --prod
   - `https://lone-wolf-five.vercel.app/health` → `{ "status": "ok", "db": "connected" }` ✓
   - `https://lone-wolf-five.vercel.app/sections/sect1` → JSON con el contenido de la sección 1 ✓
 - [x] Abrir la web, crear un personaje, navegar secciones — app jugable confirmada. ✓
+- [x] **Fix post-V3 — pantalla de victoria (sect350):** el early return de `App.tsx` reemplazaba
+  el contenido real de sect350 por una pantalla genérica. Eliminado: ahora se muestra el texto
+  del capítulo (discurso del Rey) y el panel de victoria queda al pie. Commit `d6dbdbc`,
+  redesplegado con `vercel --prod`.
 
 **Incidencia resuelta durante V3:** Vercel CLI subía `apps/web/.env` (con
 `VITE_API_URL=http://localhost:4000`) a pesar de estar en `.gitignore`, horneando la
