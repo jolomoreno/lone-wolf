@@ -410,25 +410,6 @@ function Adventure({
     }
   }
 
-  // Pantalla de victoria al llegar a la sección final.
-  if (sectionId === FINAL_SECTION) {
-    return (
-      <main className="creation">
-        <h1>🐺 ¡Victoria!</h1>
-        <p>Has completado el Libro 1 — Huida de la Oscuridad.</p>
-        <p className="muted small">
-          Lobo Solitario ha escapado con el Libro de Plenitud del Kai. El
-          Maestro de las Tinieblas conocerá su nombre.
-        </p>
-        <div className="start-actions">
-          <button type="button" className="primary" onClick={onGameOver}>
-            Nueva partida
-          </button>
-        </div>
-      </main>
-    );
-  }
-
   // Muerte fuera de combate (Resistencia a 0 por causas no relacionadas con el combate).
   if (isDead(character) && !enemy) {
     return (
@@ -547,15 +528,35 @@ function Adventure({
               )}
 
               {section.data.choices.length === 0 && !rollTable && !enemy && (
-                <div className="start-actions" style={{ marginTop: "1.5rem" }}>
-                  <button
-                    type="button"
-                    className="primary"
-                    onClick={onGameOver}
-                  >
-                    Nueva partida
-                  </button>
-                </div>
+                sectionId === FINAL_SECTION ? (
+                  <div style={{ marginTop: "1.5rem" }}>
+                    <p>
+                      <strong>🐺 Has completado el Libro 1 — Huida de la Oscuridad.</strong>
+                    </p>
+                    <p className="muted small">
+                      El Maestro de las Tinieblas conocerá tu nombre.
+                    </p>
+                    <div className="start-actions" style={{ marginTop: "1rem" }}>
+                      <button
+                        type="button"
+                        className="primary"
+                        onClick={onGameOver}
+                      >
+                        Nueva partida
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="start-actions" style={{ marginTop: "1.5rem" }}>
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={onGameOver}
+                    >
+                      Nueva partida
+                    </button>
+                  </div>
+                )
               )}
             </>
           )}
