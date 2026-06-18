@@ -2,7 +2,7 @@
 
 > Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
 > 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado.
-> 13.2-C (contenido/UX) completado. 13.2-D en curso: R1, R2 completados; pendiente R3 (diferible) y tests backend.
+> 13.2-C (contenido/UX) completado. 13.2-D completado (R1, R2, R3). Pendiente: tests backend (sin urgencia) y paso 14.
 
 ## Roadmap principal
 
@@ -348,12 +348,19 @@
       no se coge y el error queda en la consola.
       Fichero: [App.tsx](apps/web/src/ui/App.tsx)
 
-- [ ] **R3 · Parser: modelar listas y tablas como `ContentBlock`** (~2-3 h, diferible)
-      `parseData` aplana `ul`/`dl`/`signpost` a párrafo plano, perdiendo la estructura.
-      Modelar un `ContentBlock` de tipo `list` para preservar viñetas y mejorar la
-      legibilidad de las secciones de referencia (disciplinas, equipo, rangos Kai).
-      Fichero: [parse-gamebook-xml.ts:176](apps/api/src/infrastructure/import/parse-gamebook-xml.ts)
-      Solo prioritario si D · Contenido resulta ilegible en texto plano.
+- [x] **R3 · Parser: modelar listas y tablas como `ContentBlock`** (~2-3 h, diferible)
+      Nuevo tipo `{ type: "list"; items: string[] }` en domain (`section.ts`), DTO
+      (`section.dto.ts`), mapper (`section.mapper.ts`) y renderer (`SectionView.tsx`).
+      `parseData` tiene ahora cases explícitos `"ul"` y `"dl"`: `ul`/`li` → lista de
+      strings; `dl`/`dt`/`dd` → `"término: definición"` por par. `signpost` no requirió
+      tipo propio (solo aparece dentro de `<illustration><instance class="text">`, nunca
+      como hijo directo de `<data>`). BD reimportada (388 secciones). TypeScript limpio,
+      88 tests en verde.
+      Ficheros: [parse-gamebook-xml.ts](apps/api/src/infrastructure/import/parse-gamebook-xml.ts) ·
+      [section.ts](apps/api/src/domain/section/section.ts) ·
+      [section.dto.ts](packages/shared/src/section.dto.ts) ·
+      [section.mapper.ts](apps/api/src/infrastructure/http/section.mapper.ts) ·
+      [SectionView.tsx](apps/web/src/ui/components/SectionView.tsx)
 
 - [ ] **Tests del backend** (~3-4 h)
       Tests de `parse-gamebook-xml.ts`, `section.mapper.ts` y caso de uso `GetSection`

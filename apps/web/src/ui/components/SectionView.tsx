@@ -60,6 +60,14 @@ export function SectionView({
           switch (block.type) {
             case "paragraph":
               return <p key={`p-${i}`}>{block.text}</p>;
+            case "list":
+              return (
+                <ul key={`list-${i}`} className="section-list">
+                  {block.items.map((item, j) => (
+                    <li key={j}>{item}</li>
+                  ))}
+                </ul>
+              );
             case "illustration":
               return <Illustration key={block.src} src={block.src} alt={block.alt} />;
             case "combat":

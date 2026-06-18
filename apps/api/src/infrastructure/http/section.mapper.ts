@@ -17,6 +17,8 @@ function toBlockDTO(block: ContentBlock): ContentBlockDTO {
   switch (block.type) {
     case "paragraph":
       return { type: "paragraph", text: block.text };
+    case "list":
+      return { type: "list", items: [...block.items] };
     case "illustration":
       return block.alt
         ? { type: "illustration", src: block.src, alt: block.alt }

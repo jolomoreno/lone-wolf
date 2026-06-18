@@ -139,6 +139,46 @@ function parseIllustration(node: XmlNode): ContentBlock | null {
   return alt ? { type: "illustration", src, alt } : { type: "illustration", src };
 }
 
+/**
+ * Parsea <ul><li>…</li></ul> como lista de strings.
+ * Cada <li> puede contener texto inline, párrafos anidados o ilustraciones;
+ * aplana el texto visible de cada elemento.
+ */
+function parseUl(node: XmlNode): ContentBlock | null {
+  const items: string[] = [];
+  for (const child of kids(node)) {
+    if (tagOf(child) !== "li") continue;
+    const text = normalize(flattenChildren(kids(child)));
+    if (text) items.push(text);
+  }
+  return items.length > 0 ? { type: "list", items } : null;
+}
+
+/**
+ * Parsea <dl><dt>…</dt><dd>…</dd></dl> como lista de strings "término: definición".
+ * Empareja cada <dt> con el <dd> siguiente; <dd> sin <dt> previo se añade sola.
+ */
+function parseDl(node: XmlNode): ContentBlock | null {
+  const items: string[] = [];
+  let pendingTerm: string | null = null;
+  for (const child of kids(node)) {
+    const tag = tagOf(child);
+    if (tag === "dt") {
+      pendingTerm = normalize(flattenChildren(kids(child)));
+    } else if (tag === "dd") {
+      const def = normalize(flattenChildren(kids(child)));
+      if (pendingTerm) {
+        items.push(`${pendingTerm}: ${def}`);
+        pendingTerm = null;
+      } else if (def) {
+        items.push(def);
+      }
+    }
+  }
+  if (pendingTerm) items.push(pendingTerm);
+  return items.length > 0 ? { type: "list", items } : null;
+}
+
 /** Recorre los hijos de <data> separando bloques de contenido y opciones. */
 function parseData(dataChildren: XmlNode[]): {
   blocks: ContentBlock[];
@@ -173,8 +213,18 @@ function parseData(dataChildren: XmlNode[]): {
         if (text) blocks.push({ type: "paragraph", text });
         break;
       }
+      case "ul": {
+        const list = parseUl(node);
+        if (list) blocks.push(list);
+        break;
+      }
+      case "dl": {
+        const list = parseDl(node);
+        if (list) blocks.push(list);
+        break;
+      }
       default: {
-        // ul, dl, signpost, etc.: aplanamos a párrafo para no perder contenido.
+        // signpost y otros: aplanamos a párrafo para no perder contenido.
         const text = normalize(flattenChildren(kids(node)));
         if (text) blocks.push({ type: "paragraph", text });
       }

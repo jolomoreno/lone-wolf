@@ -16,6 +16,7 @@ export interface Combat {
 /** Un bloque de contenido renderizable (unión discriminada por `type`). */
 export type ContentBlock =
   | { type: "paragraph"; text: string }
+  | { type: "list"; items: string[] }
   | { type: "illustration"; src: string; alt?: string }
   | { type: "combat"; combat: Combat };
 

@@ -16,6 +16,7 @@ export interface CombatDTO {
 /** Un bloque de contenido renderizable (unión discriminada por `type`). */
 export type ContentBlockDTO =
   | { type: "paragraph"; text: string }
+  | { type: "list"; items: string[] }
   | { type: "illustration"; src: string; alt?: string }
   | { type: "combat"; combat: CombatDTO };
 
