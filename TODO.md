@@ -1,8 +1,7 @@
 # TODO / Backlog — Lobo Solitario
 
-> Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
-> 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado.
-> 13.2-C (contenido/UX) completado. 13.2-D completado (R1-R3 + fix choices vacías). Pendiente: tests backend y paso 14.
+> Última actualización: 2026-06-18. Pasos 1-13 completados.
+> Pendiente: paso 14 (despliegue). Plan detallado en [DEPLOY_PLAN.md](DEPLOY_PLAN.md).
 
 ## Roadmap principal
 
@@ -23,10 +22,9 @@
       elusión, daño narrativo, comidas, tiradas, botín), ilustraciones Project Aon.
 - [x] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
-- [~] **13. Refactors / deuda técnica** — 13.1 completado (helmet, contratos,
-      UI fixes, CORS, claves estables). 13.2 en curso: grupo A (bugs de gameplay)
-      completado; pendiente grupos B–E (fidelidad, contenido/UX, deuda técnica).
-- [ ] **14. Despliegue + CI/CD** — prerequisitos (lint, build, endurecer API) + Atlas + Render + Vercel + GitHub Actions.
+- [x] **13. Refactors / deuda técnica** — 13.1 a 13.2-D completados: bugs gameplay,
+      fidelidad de reglas, contenido/UX (favicon, modales, mapa), deuda técnica (R1-R3).
+- [ ] **14. Despliegue + CI/CD** — ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md) para el detalle completo.
 
 ---
 
@@ -379,30 +377,57 @@
 
 ## Paso 14 — Despliegue + CI/CD
 
-### Prerequisitos (hacer antes de desplegar)
+> Plan completo con código, comandos y orden de ejecución en **[DEPLOY_PLAN.md](DEPLOY_PLAN.md)**.
+> Aquí solo el resumen de tareas pendientes como checklist rápido.
 
-- [ ] **Estrategia de build para Render** (~1 h)
-      Dev y `start` usan `tsx`; `@lone-wolf/shared` exporta `.ts` sin compilar.
-      Decidir y configurar: compilar con `tsc`/`esbuild` antes de arrancar en prod,
-      o mantener `tsx` en prod (arranque levemente más lento pero sin paso de build).
+### Decisiones tomadas
 
-- [ ] **Lint y formato** (~1-1.5 h)
-      No hay ESLint/Prettier/Biome configurado; `pnpm lint` en raíz no hace nada.
-      Añadir Biome (recomendado: monorepo, rápido, zero-config) o ESLint + Prettier
-      con reglas básicas y el script `pnpm lint` funcional en los tres paquetes.
+- **Plataforma**: Vercel (único proveedor — web estático + API serverless en el mismo origen)
+- **Linter**: Biome (`biome ci` en CI, `biome check --write` en local)
+- **CI/CD**: GitHub Actions como gate real (`needs: ci` bloquea el deploy si falla)
+- **Sin CORS** en producción (mismo origen); **sin `VITE_API_URL`** en Vercel (fallback `""`)
 
-- [ ] **Endurecer API** (~30 min)
-      Añadir `express-rate-limit` y validación explícita de `PORT`, `MONGODB_URI` y
-      `CORS_ORIGIN` al arrancar (fallar rápido en prod si falta alguna). Helmet ya hecho.
+### Fase 0 — Prerrequisitos
 
-### Despliegue
+- [ ] **P1 · Validación env vars** — añadir guard en `apps/api/src/config/env.ts`:
+      lanza error si `MONGODB_URI` está vacía en producción (~15 min)
+- [ ] **P2 · Biome** — `pnpm add -Dw @biomejs/biome`, `biome.json` en raíz,
+      script `"lint": "biome ci ."` en `package.json` raíz (~45 min)
 
-- [ ] `CORS_ORIGIN` apuntando a la URL desplegada del front (Vercel).
-- [ ] Configurar monorepo pnpm en Vercel/Render (root dir, install/build), Node 22
-      vía `.nvmrc`/`engines`, y asegurar el build de `esbuild` (`allowBuilds`).
-- [ ] CI (GitHub Actions): `typecheck` + `test` + `lint` en cada push.
-- [ ] Cumplir la **Project Aon License** al publicar: atribución visible + enlace
-      a Project Aon + sin uso comercial.
+### Fase 1 — Cambios serverless
+
+- [ ] **S1** · Nuevo `api/handler.ts` — glue Vercel ↔ Express, cachea `app` y conexión (~15 min)
+- [ ] **S2** · Nuevo `vercel.json` — build web + rewrites `/sections/*` y `/health` (~10 min)
+- [ ] **S3** · `mongoose.ts` — añadir guard `readyState >= 1` al inicio de `connectToDatabase` (~5 min)
+- [ ] **S4** · `apps/web/src/config/composition-root.ts` — fallback `apiUrl`: `"http://localhost:4000"` → `""` (~5 min)
+- [ ] **S5** · `pnpm add -Dw @vercel/node` (~5 min)
+
+### Fase 2 — MongoDB Atlas
+
+- [ ] **M1** · Network Access → añadir `0.0.0.0/0` (IPs dinámicas de Vercel) (~5 min)
+
+### Fase 3 — Primer deploy Vercel
+
+- [ ] **V1** · `vercel link` — vincular repo local con proyecto de Vercel; añadir `.vercel/` a `.gitignore` (~5 min)
+- [ ] **V2** · Env vars en Vercel dashboard: `MONGODB_URI` + `NODE_ENV=production` (~5 min)
+- [ ] **V3** · `vercel --prod` + verificar `/health` y `/sections/sect1` + smoke test web (~15 min)
+
+### Fase 4 — GitHub Actions
+
+- [ ] **CI1** · Crear `.github/workflows/ci.yml` — jobs `ci` (typecheck+lint+test) y `deploy` (needs: ci) (~30 min)
+- [ ] **CI2** · Secrets en GitHub: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (~5 min)
+- [ ] **CI3** · Desactivar auto-deploy en Vercel dashboard (el deploy lo controla el YAML) (~2 min)
+
+### Fase 5 — Smoke test
+
+- [ ] **T1** · Test manual E2E: personaje → combate → guardar → recargar → muerte/victoria (~20 min)
+
+### Nice-to-have (sin fase asignada)
+
+- [ ] Tests del backend: `parse-gamebook-xml.ts`, `section.mapper.ts`, caso de uso `GetSection`
+- [ ] Responsive/móvil y accesibilidad básica
+- [ ] Error Boundary en React (evitar pantalla en blanco si algo falla)
+- [ ] Cumplir **Project Aon License** al publicar: atribución visible en el pie + enlace a projectaon.org (ya hecho en dev, verificar en producción)
 
 ---
 

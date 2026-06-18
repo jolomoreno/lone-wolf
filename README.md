@@ -12,8 +12,8 @@ inventario y guardado de la partida.
 | 10 | Experiencia de juego — guardado manual, control consciente del jugador | ✅ Hecho |
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
-| **13** | **Refactors / deuda técnica** — 13.1 hecho; 13.2-A (bugs gameplay) hecho; 13.2-B (fidelidad de reglas) hecho; 13.2-C (contenido/UX: favicon, modales de referencia, mapa) hecho; pendiente grupo D (deuda técnica) | 🔄 En curso |
-| 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
+| 13 | Refactors / deuda técnica — bugs gameplay, fidelidad de reglas, contenido/UX, deuda técnica | ✅ Hecho |
+| **14** | **Despliegue + CI/CD** — Vercel serverless (web + API) · GitHub Actions CI · MongoDB Atlas | ⬜ |
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
 
@@ -229,6 +229,7 @@ pnpm --filter @lone-wolf/web dev
 pnpm dev                  # arranca web + api en paralelo
 pnpm build                # build de producción de todos los paquetes
 pnpm typecheck            # comprobación de tipos de todo el monorepo (3 proyectos)
+pnpm lint                 # Biome CI (lint + formato, sin modificar ficheros)
 pnpm test                 # ejecuta todos los tests (vitest)
 pnpm --filter @lone-wolf/api import:book -- --dry-run   # parsea el XML sin tocar Mongo
 ```
@@ -236,7 +237,7 @@ pnpm --filter @lone-wolf/api import:book -- --dry-run   # parsea el XML sin toca
 ## Tests
 
 ```bash
-pnpm test          # todos (80 tests)
+pnpm test          # todos (88 tests)
 pnpm test --watch  # modo watch
 ```
 
@@ -249,7 +250,7 @@ de DOM o aleatoriedad real.
 Un test específico valida que **cada tabla de tirada en `SECTION_ROLL_TABLES` cubre
 exactamente los 10 valores (0–9) sin huecos ni solapamientos**.
 
-Pendiente: tests del backend (parser XML, mapper, caso de uso `GetSection`).
+Pendiente (paso 14): tests del backend (parser XML, mapper, caso de uso `GetSection`).
 
 ## API REST
 
@@ -297,7 +298,8 @@ anterior se descartan automáticamente al cargar. v2 → ids de sección como st
   detecta el encoding por la cabecera XML y lee con `latin1` si es necesario.
 - **CORS en desarrollo**: la API acepta cualquier `localhost:*` como origen en `development`
   (el puerto del frontend puede variar: 5173 con Vite directo, 5174 con herramientas de preview,
-  etc.). En producción se usa el valor estricto de `CORS_ORIGIN` del entorno.
+  etc.). En producción (Vercel) la web y la API están en el mismo origen, por lo que CORS
+  no aplica y `CORS_ORIGIN` no necesita configurarse.
 
 ## Limitaciones conocidas y desviaciones de las reglas
 
