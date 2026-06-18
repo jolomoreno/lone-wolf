@@ -2,7 +2,7 @@
 
 > Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
 > 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado.
-> 13.2-C (contenido/UX) completado. 13.2-D completado (R1, R2, R3). Pendiente: tests backend (sin urgencia) y paso 14.
+> 13.2-C (contenido/UX) completado. 13.2-D completado (R1-R3 + fix choices vacías). Pendiente: tests backend y paso 14.
 
 ## Roadmap principal
 

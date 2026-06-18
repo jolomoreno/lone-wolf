@@ -100,12 +100,6 @@ function normalize(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
-function parseChoice(node: XmlNode): Choice {
-  return {
-    text: normalize(flattenChildren(kids(node))),
-    target: attrOf(node, "idref") ?? "",
-  };
-}
 
 function parseCombat(node: XmlNode): Combat {
   const children = kids(node);
@@ -193,9 +187,19 @@ function parseData(dataChildren: XmlNode[]): {
       case "#text":
       case "":
         break;
-      case "choice":
-        choices.push(parseChoice(node));
+      case "choice": {
+        const target = attrOf(node, "idref");
+        if (target) {
+          choices.push({ text: normalize(flattenChildren(kids(node))), target });
+        } else {
+          // <choice> sin idref = declaración de fin de partida en el libro.
+          // Se convierte en párrafo para que el jugador vea el texto, y la
+          // sección queda sin choices → el botón "Nueva partida" aparece.
+          const text = normalize(flattenChildren(kids(node)));
+          if (text) blocks.push({ type: "paragraph", text });
+        }
         break;
+      }
       case "combat":
         blocks.push({ type: "combat", combat: parseCombat(node) });
         break;
@@ -207,7 +211,10 @@ function parseData(dataChildren: XmlNode[]): {
       case "p": {
         // Un párrafo puede contener un <choice> anidado (poco frecuente).
         for (const child of kids(node)) {
-          if (tagOf(child) === "choice") choices.push(parseChoice(child));
+          if (tagOf(child) === "choice") {
+            const target = attrOf(child, "idref");
+            if (target) choices.push({ text: normalize(flattenChildren(kids(child))), target });
+          }
         }
         const text = normalize(flattenChildren(kids(node)));
         if (text) blocks.push({ type: "paragraph", text });
