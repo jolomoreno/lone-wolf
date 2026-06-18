@@ -279,7 +279,7 @@ export function CharacterCreation({ onCreate }: Props) {
               className={`discipline-toggle${active ? " active" : ""}`}
               aria-pressed={active}
               disabled={!active && isFull}
-              onClick={() => { toggle(discipline); setFocusedDisc(discipline); }}
+              onClick={() => { toggle(discipline); setFocusedDisc(prev => prev === discipline ? null : discipline); }}
             >
               {KAI_DISCIPLINE_NAMES[discipline]}
               {discipline === "weaponskill" && weapon
