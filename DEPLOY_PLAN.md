@@ -77,7 +77,7 @@ la variable, en vez de fallar en la primera query con un error de Mongoose críp
 
 ### S1 · Nuevo fichero: `api/handler.ts` (raíz del monorepo, ~15 min)
 
-- [ ] Crear `api/handler.ts`:
+- [x] Crear `api/handler.ts`:
 
 ```typescript
 import type { VercelRequest, VercelResponse } from "@vercel/node";

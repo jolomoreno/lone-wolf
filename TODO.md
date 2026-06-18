@@ -396,7 +396,7 @@
 
 ### Fase 1 — Cambios serverless
 
-- [ ] **S1** · Nuevo `api/handler.ts` — glue Vercel ↔ Express, cachea `app` y conexión (~15 min)
+- [x] **S1** · Nuevo `api/handler.ts` — glue Vercel ↔ Express, cachea `app` y conexión (~15 min)
 - [ ] **S2** · Nuevo `vercel.json` — build web + rewrites `/sections/*` y `/health` (~10 min)
 - [ ] **S3** · `mongoose.ts` — añadir guard `readyState >= 1` al inicio de `connectToDatabase` (~5 min)
 - [ ] **S4** · `apps/web/src/config/composition-root.ts` — fallback `apiUrl`: `"http://localhost:4000"` → `""` (~5 min)
