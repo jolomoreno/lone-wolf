@@ -30,5 +30,9 @@ coverage/
 # Configuración local de Claude Code (específica de la máquina)
 .claude/settings.local.json
 
+# Vercel (generado por vercel link — contiene IDs del proyecto, no secretos,
+# pero es específico de la máquina y no debe compartirse en el repo)
+.vercel/
+
 # Contenido del libro (Project Aon): no se redistribuye en el repo
 data/*.xml
