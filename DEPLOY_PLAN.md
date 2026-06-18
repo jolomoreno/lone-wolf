@@ -99,7 +99,7 @@ es solo el glue layer entre Vercel y Express.
 
 ### S2 · Nuevo fichero: `vercel.json` (raíz del monorepo, ~10 min)
 
-- [ ] Crear `vercel.json`:
+- [x] Crear `vercel.json`:
 
 ```json
 {
