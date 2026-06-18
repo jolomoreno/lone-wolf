@@ -909,6 +909,33 @@ body {
   letter-spacing: 0.04em;
 }
 
+/* ── Modal del mapa ─────────────────────────────────────────────────────── */
+.map-modal-overlay {
+  align-items: center;
+  padding: 1rem;
+}
+
+.map-modal {
+  max-width: 70rem;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+}
+
+.map-modal-body {
+  overflow: auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.map-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
 /* ── Modal de niveles Kai ───────────────────────────────────────────────── */
 .kai-levels-list {
   list-style: none;

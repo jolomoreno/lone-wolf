@@ -321,10 +321,14 @@
       [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) ·
       [index.css](apps/web/src/index.css)
 
-- [ ] **Mapa de Sommerlund** (~1-1.5 h)
-      Mostrar el mapa del Libro 1 desde Project Aon en dos modos: miniatura integrada
-      en la UI y versión ampliada en modal. Hotlink igual que las ilustraciones
-      (sin redistribuir, cumple la licencia).
+- [x] **Mapa de Sommerlund** (~45 min)
+      Botón "ver mapa" junto al objeto especial "Mapa de Sommerlund" en la ficha del
+      personaje. Abre `MapModal` con el mapa completo (1024×793 px) hotlinkeado desde
+      Project Aon (`map.png` en el directorio chalk de la edición inglesa), scrollable
+      y a tamaño completo. Sin redistribuir el fichero — cumple la licencia.
+      Ficheros: [MapModal.tsx](apps/web/src/ui/components/MapModal.tsx) ·
+      [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) ·
+      [index.css](apps/web/src/index.css)
 
 #### D · Deuda técnica / refactors
 

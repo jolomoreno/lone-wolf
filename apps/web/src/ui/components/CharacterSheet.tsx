@@ -19,6 +19,7 @@ import { WEAPON_NAMES } from "../../domain/character/weapon";
 import { CombatRulesModal } from "./CombatRulesModal";
 import { KaiDisciplinesModal } from "./KaiDisciplinesModal";
 import { KaiLevelsModal } from "./KaiLevelsModal";
+import { MapModal } from "./MapModal";
 
 interface Props {
   character: Character;
@@ -33,6 +34,7 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
   const [showRules, setShowRules] = useState(false);
   const [showDisciplines, setShowDisciplines] = useState(false);
   const [showLevels, setShowLevels] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const { stats } = character;
   const backpackItems = character.backpack.filter((i) => i.kind !== "meal");
 
@@ -55,6 +57,7 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
     <>
     {showRules && <CombatRulesModal onClose={() => setShowRules(false)} />}
     {showLevels && <KaiLevelsModal onClose={() => setShowLevels(false)} />}
+    {showMap && <MapModal onClose={() => setShowMap(false)} />}
     {showDisciplines && (
       <KaiDisciplinesModal
         onClose={() => setShowDisciplines(false)}
@@ -163,7 +166,18 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
           <h3>Objetos especiales</h3>
           <ul className="sheet-list">
             {character.specialItems.map((i) => (
-              <li key={i.id}>{i.name}</li>
+              <li key={i.id} className="sheet-item-row">
+                {i.name}
+                {i.id === "map" && (
+                  <button
+                    type="button"
+                    className="use-item-btn"
+                    onClick={() => setShowMap(true)}
+                  >
+                    ver mapa
+                  </button>
+                )}
+              </li>
             ))}
           </ul>
         </>
