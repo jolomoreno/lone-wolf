@@ -282,6 +282,9 @@ en formato v1 (ids numéricos) se descartan automáticamente al cargar.
   para ser 100 % deterministas en tests.
 - **Tabla de Resultados de Combate canónica**: 10 filas (tirada 0–9) × 13 columnas (rangos de
   ratio de combate de ≤−11 a ≥+11). Fuente: MikeSchulenberg/LoneWolfCombatCalculator.
+- **DC efectiva en la ficha**: cuando el personaje lleva el arma de "Dominio de las Armas",
+  la Destreza se muestra con el bono activo ("15 (+2 Dominio)"). El indicador desaparece
+  si se suelta el arma. `hasWeaponskillBonus` es lógica de dominio pura en `character.ts`.
 - **Encoding ISO-8859-1**: el XML de Project Aon está en ISO-8859-1. El script de importación
   detecta el encoding por la cabecera XML y lee con `latin1` si es necesario.
 - **CORS en desarrollo**: la API acepta cualquier `localhost:*` como origen en `development`

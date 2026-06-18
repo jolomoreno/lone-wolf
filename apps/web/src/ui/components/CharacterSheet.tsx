@@ -6,6 +6,7 @@
 import {
   type Character,
   countMeals,
+  hasWeaponskillBonus,
 } from "../../domain/character/character";
 import {
   heal,
@@ -47,7 +48,12 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
 
       <div className="stat-row">
         <span>Destreza</span>
-        <strong>{stats.combatSkill}</strong>
+        <strong>
+          {stats.combatSkill + (hasWeaponskillBonus(character) ? 2 : 0)}
+          {hasWeaponskillBonus(character) && (
+            <span className="muted small"> (+2 Dominio)</span>
+          )}
+        </strong>
       </div>
       <div className="stat-row">
         <span>Resistencia</span>

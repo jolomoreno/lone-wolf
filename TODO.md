@@ -194,6 +194,11 @@
       el daño ni consume otra comida.
       Ficheros: [App.tsx](apps/web/src/ui/App.tsx)
 
+- [x] **B1 · Weaponskill +2 visible en la ficha y aplicado en combate** —
+      `hasWeaponskillBonus` movida al dominio (`character.ts`) para ser reutilizable.
+      La ficha muestra la DC efectiva ("15 (+2 Dominio)") cuando el arma de dominio
+      está en el inventario; si se suelta, el indicador desaparece. `CombatPanel`
+      ya no lo define localmente, importa del dominio.
 - [x] **B1 · Weaponskill +2 aplicado también a armas de botín y al arma inicial de dominio** —
       `InventoryItem` tiene campo opcional `weaponType?: WeaponType`. `hasWeaponskillBonus`
       compara `(w.weaponType ?? w.id)` con `weaponskillWeapon`. Las armas de botín

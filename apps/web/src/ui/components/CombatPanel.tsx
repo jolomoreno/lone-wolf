@@ -9,7 +9,7 @@
  */
 
 import { useState } from "react";
-import type { Character } from "../../domain/character/character";
+import { hasWeaponskillBonus, type Character } from "../../domain/character/character";
 import type { Damage } from "../../domain/combat/combat-results-table";
 import {
   type CombatState,
@@ -28,15 +28,6 @@ interface Props {
   onEvade?: (targetId: string) => void;
 }
 
-/** +2 si el personaje lucha con el arma de "Dominio de las Armas". */
-function hasWeaponskillBonus(character: Character): boolean {
-  return (
-    character.weaponskillWeapon != null &&
-    character.weapons.some(
-      (w) => (w.weaponType ?? w.id) === character.weaponskillWeapon,
-    )
-  );
-}
 
 function formatLoss(loss: Damage): string {
   return loss === "K" ? "¡muerte!" : `−${loss}`;

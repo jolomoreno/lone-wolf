@@ -66,3 +66,16 @@ export function isDead(character: Character): boolean {
 export function countMeals(character: Character): number {
   return character.backpack.filter((item) => item.kind === "meal").length;
 }
+
+/**
+ * ¿Aplica el +2 de "Dominio de las Armas" en el próximo combate?
+ * True si el personaje lleva en su inventario el tipo de arma de dominio.
+ */
+export function hasWeaponskillBonus(character: Character): boolean {
+  return (
+    character.weaponskillWeapon != null &&
+    character.weapons.some(
+      (w) => (w.weaponType ?? w.id) === character.weaponskillWeapon,
+    )
+  );
+}
