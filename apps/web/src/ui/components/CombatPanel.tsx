@@ -23,7 +23,17 @@ interface Props {
   character: Character;
   enemy: Enemy;
   rules?: SectionCombatRules;
-  onEnduranceChange: (loneWolfEndurance: number) => void;
+  /**
+   * Estado de combate serializado para restaurar una partida recargada.
+   * Solo se usa si `status === "ongoing"`; en cualquier otro caso se ignora.
+   */
+  initialState?: CombatState;
+  /**
+   * Llamado tras cada asalto con el nuevo CombatState.
+   * Reemplaza a `onEnduranceChange`: el orquestador extrae la Resistencia
+   * y persiste el estado del combate en un único `onChange` atómico.
+   */
+  onStateChange: (state: CombatState) => void;
   onEnd: (status: "won" | "lost") => void;
   onEvade?: (targetId: string) => void;
 }
@@ -37,7 +47,8 @@ export function CombatPanel({
   character,
   enemy,
   rules,
-  onEnduranceChange,
+  initialState,
+  onStateChange,
   onEnd,
   onEvade,
 }: Props) {
@@ -55,6 +66,7 @@ export function CombatPanel({
       weaponskill: hasWeaponskillBonus(character),
       mindblast: !mindblastImmune && character.disciplines.includes("mindblast"),
       bonus: csBonus,
+      unarmed: character.weapons.length === 0,
       mindblastImmune,
       mindshieldActive:
         (rules?.playerCSModifier ?? 0) < 0 &&
@@ -64,8 +76,10 @@ export function CombatPanel({
     };
   });
 
-  const [combat, setCombat] = useState<CombatState>(() =>
-    startCombat(
+  const [combat, setCombat] = useState<CombatState>(() => {
+    // Restaurar desde el guardado si el combate sigue en curso.
+    if (initialState?.status === "ongoing") return initialState;
+    return startCombat(
       character.stats.combatSkill,
       character.stats.enduranceCurrent,
       enemy,
@@ -73,14 +87,15 @@ export function CombatPanel({
         weaponskill: modifiers.weaponskill,
         mindblast: modifiers.mindblast,
         bonus: modifiers.bonus,
+        unarmed: modifiers.unarmed,
       },
-    ),
-  );
+    );
+  });
 
   function nextRound() {
     const next = fightRound(combat);
     setCombat(next);
-    onEnduranceChange(next.loneWolfEndurance);
+    onStateChange(next);
     if (next.status !== "ongoing") onEnd(next.status);
   }
 
@@ -130,6 +145,7 @@ export function CombatPanel({
 
       <p className="muted small">
         Ratio de combate: {ratioLabel}
+        {modifiers.unarmed ? " · Sin arma (−4)" : ""}
         {modifiers.weaponskill ? " · Dominio de las Armas (+2)" : ""}
         {modifiers.mindblast ? " · Ataque Psíquico (+2)" : ""}
         {modifiers.mindblastImmune ? " · Inmune al Ataque Psíquico" : ""}

@@ -22,6 +22,8 @@ export interface CombatModifiers {
   mindblast?: boolean;
   /** Modificador extra específico de la sección (puede ser negativo). */
   bonus?: number;
+  /** −4 si Lobo Solitario no lleva ningún arma al inicio del combate. */
+  unarmed?: boolean;
 }
 
 /** Ratio de Combate = Destreza de Lobo Solitario (+ bonus) − Destreza del enemigo. */
@@ -33,6 +35,7 @@ export function combatRatio(
   let combatSkill = loneWolfCombatSkill;
   if (modifiers.weaponskill) combatSkill += 2;
   if (modifiers.mindblast) combatSkill += 2;
+  if (modifiers.unarmed) combatSkill -= 4;
   combatSkill += modifiers.bonus ?? 0;
   return combatSkill - enemyCombatSkill;
 }

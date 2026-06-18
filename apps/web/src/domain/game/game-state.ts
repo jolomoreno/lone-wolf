@@ -6,13 +6,15 @@
  */
 
 import type { Character } from "../character/character";
+import type { CombatState } from "../combat/combat";
 
 /**
  * Versión del formato de guardado. Incrementar cuando el esquema cambie de
  * forma incompatible para que el adaptador descarte partidas antiguas.
  * v2: currentSection e history pasaron de number a string (id, p.ej. "sect1").
+ * v3: añadido pendingCombat (serialización del combate en curso).
  */
-export const SAVE_FORMAT_VERSION = 2;
+export const SAVE_FORMAT_VERSION = 3;
 
 /** Tipos admitidos por las banderas de estado del juego. */
 export type FlagValue = boolean | number | string;
@@ -30,6 +32,11 @@ export interface GameState {
   flags: Record<string, FlagValue>;
   /** Marca de tiempo ISO de la última modificación. */
   updatedAt: string;
+  /**
+   * Combate en curso serializado para sobrevivir a un reload de página.
+   * null / undefined si no hay combate activo.
+   */
+  pendingCombat?: CombatState | null;
 }
 
 const now = (): string => new Date().toISOString();
@@ -83,4 +90,12 @@ export function setFlag(
 /** Lee una bandera de estado (undefined si no existe). */
 export function getFlag(state: GameState, key: string): FlagValue | undefined {
   return state.flags[key];
+}
+
+/** Actualiza el estado del combate en curso (null para borrarlo). */
+export function setPendingCombat(
+  state: GameState,
+  combat: CombatState | null,
+): GameState {
+  return { ...state, pendingCombat: combat, updatedAt: now() };
 }

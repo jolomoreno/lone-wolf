@@ -1,7 +1,7 @@
 # TODO / Backlog — Lobo Solitario
 
 > Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
-> 13.2-A (bugs de gameplay) completado.
+> 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado (F1, F3, B3).
 
 ## Roadmap principal
 
@@ -220,25 +220,31 @@
       1 de Resistencia."), igual que el resto de efectos de entrada.
       Fichero: [App.tsx](apps/web/src/ui/App.tsx)
 
-#### B · Fidelidad de reglas
+#### B · Fidelidad de reglas ✓
 
-- [ ] **F1 · Penalización −4 a Destreza sin arma** (~30 min)
-      Si `character.weapons.length === 0` al iniciar combate, restar 4 a la Destreza
-      efectiva. No implementado en `startCombat`.
-      Fichero: [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx)
+- [x] **F1 · Penalización −4 a Destreza sin arma**
+      `unarmed?: boolean` en `CombatModifiers`; `combatRatio` resta 4 cuando es true.
+      `CombatPanel` calcula `unarmed: character.weapons.length === 0` en la inicialización
+      de `modifiers` y lo pasa a `startCombat`. Se muestra "Sin arma (−4)" en la barra
+      de ratio.
+      Ficheros: [combat.ts](apps/web/src/domain/combat/combat.ts) · [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx)
 
-- [ ] **F3 · Poción Curativa: restringir a después del combate** (~20 min)
-      La ficha permite usar la poción siempre que `enduranceCurrent < max`; las reglas
-      la restringen a después del combate. Decidir si se acota con una condición en
-      el botón "Usar" (p.ej. deshabilitar si `combatState` está activo).
-      Fichero: [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx)
+- [x] **F3 · Poción Curativa: restringir a después del combate**
+      Prop `combatActive?: boolean` en `CharacterSheet`; el botón "Usar" se deshabilita
+      con tooltip "Solo puedes usar la poción después del combate". `Adventure` pasa
+      `combatActive={!!enemy && combatOutcome === null}`.
+      Ficheros: [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) · [App.tsx](apps/web/src/ui/App.tsx)
 
-- [ ] **B3 · Combate en curso no se persiste en el GameState** (~2-3 h, puede diferirse)
-      `CombatState` vive solo en el estado local de `CombatPanel`. Al recargar, el enemigo
-      revive con Resistencia plena mientras el jugador conserva la suya mermada.
-      Opción A: serializar `CombatState` en `GameState` (requiere bump de `SAVE_FORMAT_VERSION`).
-      Opción B: mostrar aviso al intentar navegar/recargar mid-combat.
-      Fichero: [CombatPanel.tsx:74](apps/web/src/ui/components/CombatPanel.tsx)
+- [x] **B3 · Combate en curso se persiste en el GameState** (Opción A)
+      `pendingCombat?: CombatState | null` en `GameState` (v3, bump de
+      `SAVE_FORMAT_VERSION`). `CombatPanel` reemplaza `onEnduranceChange` por
+      `onStateChange(CombatState)` para actualizar Resistencia + estado del combate
+      en un único `onChange` atómico (evita el problema de snapshot obsoleto de `game`).
+      Prop `initialState?: CombatState` restaura un combate en curso al recargar.
+      Flag `combat-won:<sectionId>` en `GameState.flags` restaura el estado "ganado"
+      si el jugador recarga antes de navegar tras vencer. `navigateTo` limpia
+      `pendingCombat` al cambiar de sección.
+      Ficheros: [game-state.ts](apps/web/src/domain/game/game-state.ts) · [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx) · [App.tsx](apps/web/src/ui/App.tsx)
 
 - [ ] **F2 · Almacén por tirada vs. elección libre** (decisión de diseño, ~1-2 h si se cambia)
       En las reglas el jugador elige; aquí es por tirada (documentado en README y decisión

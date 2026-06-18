@@ -20,13 +20,14 @@ import {
   heal,
   setEnduranceCurrent,
 } from "../domain/character/character-operations";
-import type { CombatStatus, Enemy } from "../domain/combat/combat";
+import type { CombatState, CombatStatus, Enemy } from "../domain/combat/combat";
 import {
   createGameState,
   type GameState,
   getFlag,
   goToSection,
   setFlag,
+  setPendingCombat,
   updateCharacter,
 } from "../domain/game/game-state";
 import {
@@ -219,15 +220,23 @@ type CombatBlock = Extract<ContentBlockDTO, { type: "combat" }>;
 function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: AdventureProps) {
   const character: Character = game.character;
   const sectionId = game.currentSection;
-  const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(null);
+  const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(() => {
+    // Restaura el estado "ganado" si el jugador recargó tras vencer pero antes de navegar.
+    if (game.flags[`combat-won:${game.currentSection}`]) return "won";
+    return null;
+  });
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [entryMessages, setEntryMessages] = useState<string[]>([]);
   const savedAtTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref para leer los flags actuales dentro de efectos sin retrigger.
+  const gameRef = useRef(game);
+  gameRef.current = game;
   const section = useSection(sectionId);
 
-  // Al cambiar de sección, se reinicia el resultado del combate.
+  // Al cambiar de sección, restaura el combatOutcome (null, o "won" si ya se ganó).
   useEffect(() => {
-    setCombatOutcome(null);
+    const wonFlag = gameRef.current.flags[`combat-won:${sectionId}`];
+    setCombatOutcome(wonFlag ? "won" : null);
   }, [sectionId]);
 
   // Limpia el timer al desmontar para evitar fugas.
@@ -301,6 +310,9 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
 
     next = goToSection(next, targetId);
 
+    // Limpia el combate pendiente al llegar a una sección nueva.
+    if (next.pendingCombat) next = setPendingCombat(next, null);
+
     const effect = SECTION_ENTRY_EFFECTS[targetId];
     const entryFlag = `entry:${targetId}`;
     if (effect && !getFlag(next, entryFlag)) {
@@ -320,6 +332,27 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
     }
 
     return { game: next, messages };
+  }
+
+  /**
+   * Llamado por CombatPanel tras cada asalto.
+   * Actualiza Resistencia + combate pendiente en un único onChange atómico,
+   * evitando que dos llamadas sucesivas con el mismo snapshot de `game` se anulen.
+   */
+  function handleCombatStateChange(state: CombatState) {
+    let updated = updateCharacter(
+      game,
+      setEnduranceCurrent(character, state.loneWolfEndurance),
+    );
+    if (state.status === "ongoing") {
+      updated = setPendingCombat(updated, state);
+    } else {
+      updated = setPendingCombat(updated, null);
+      if (state.status === "won") {
+        updated = setFlag(updated, `combat-won:${sectionId}`, true);
+      }
+    }
+    onChange(updated);
   }
 
   function handleNavigate(targetId: string) {
@@ -423,6 +456,7 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
       <div className="layout">
         <CharacterSheet
           character={character}
+          combatActive={!!enemy && combatOutcome === null}
           onCharacterChange={(updated) => onChange(updateCharacter(game, updated))}
         />
 
@@ -456,11 +490,12 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
                   character={character}
                   enemy={enemy}
                   rules={combatRules}
-                  onEnduranceChange={(endurance) =>
-                    onChange(
-                      updateCharacter(game, setEnduranceCurrent(character, endurance)),
-                    )
+                  initialState={
+                    game.pendingCombat?.status === "ongoing"
+                      ? game.pendingCombat
+                      : undefined
                   }
+                  onStateChange={handleCombatStateChange}
                   onEnd={(status) => setCombatOutcome(status)}
                   onEvade={handleNavigate}
                 />

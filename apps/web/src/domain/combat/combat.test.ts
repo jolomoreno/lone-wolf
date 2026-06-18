@@ -23,6 +23,10 @@ describe("combatRatio", () => {
   it("aplica el bonus de sección (puede ser negativo)", () => {
     expect(combatRatio(15, 13, { bonus: -3 })).toBe(-1);
   });
+
+  it("resta 4 cuando Lobo Solitario no lleva armas (unarmed)", () => {
+    expect(combatRatio(15, 13, { unarmed: true })).toBe(-2);
+  });
 });
 
 describe("startCombat", () => {

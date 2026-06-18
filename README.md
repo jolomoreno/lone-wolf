@@ -12,7 +12,7 @@ inventario y guardado de la partida.
 | 10 | Experiencia de juego — guardado manual, control consciente del jugador | ✅ Hecho |
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
-| **13** | **Refactors / deuda técnica** — 13.1 hecho (helmet, contratos, textos preliminares); 13.2 pendiente (lint, tests backend, build prod) | 🔄 En curso |
+| **13** | **Refactors / deuda técnica** — 13.1 hecho; 13.2-A (bugs gameplay) hecho; 13.2-B (fidelidad: −4 sin arma, poción post-combate, persistir combate) hecho; pendiente grupos C-D (contenido/UX, deuda técnica) | 🔄 En curso |
 | 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
 
 > El análisis exhaustivo de la app (bugs, refactors y huecos de fidelidad pendientes)

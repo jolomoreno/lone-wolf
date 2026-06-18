@@ -5,6 +5,7 @@ import {
   goToSection,
   SAVE_FORMAT_VERSION,
   setFlag,
+  setPendingCombat,
   updateCharacter,
 } from "./game-state";
 import { createCharacter } from "../character/create-character";
@@ -69,5 +70,30 @@ describe("flags", () => {
     const state = setFlag(createGameState(character(), "sect1"), "tieneMapa", true);
     expect(getFlag(state, "tieneMapa")).toBe(true);
     expect(getFlag(state, "noExiste")).toBeUndefined();
+  });
+});
+
+describe("setPendingCombat", () => {
+  const enemy = { name: "Kraan", combatSkill: 13, endurance: 25 };
+  const mockCombat = {
+    enemy,
+    ratio: 2,
+    loneWolfEndurance: 20,
+    enemyEndurance: 15,
+    rounds: [],
+    status: "ongoing" as const,
+  };
+
+  it("guarda el estado del combate en curso", () => {
+    const state = createGameState(character(), "sect1");
+    const withCombat = setPendingCombat(state, mockCombat);
+    expect(withCombat.pendingCombat).toEqual(mockCombat);
+    expect(state.pendingCombat).toBeUndefined();
+  });
+
+  it("borra el combate al pasar null", () => {
+    const state = setPendingCombat(createGameState(character(), "sect1"), mockCombat);
+    const cleared = setPendingCombat(state, null);
+    expect(cleared.pendingCombat).toBeNull();
   });
 });

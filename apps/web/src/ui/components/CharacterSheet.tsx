@@ -19,11 +19,13 @@ import { WEAPON_NAMES } from "../../domain/character/weapon";
 interface Props {
   character: Character;
   onCharacterChange?: (character: Character) => void;
+  /** Deshabilita el uso de la Poción Curativa mientras haya un combate activo. */
+  combatActive?: boolean;
 }
 
 const POTION_HEAL = 4;
 
-export function CharacterSheet({ character, onCharacterChange }: Props) {
+export function CharacterSheet({ character, onCharacterChange, combatActive }: Props) {
   const { stats } = character;
   const backpackItems = character.backpack.filter((i) => i.kind !== "meal");
 
@@ -103,8 +105,12 @@ export function CharacterSheet({ character, onCharacterChange }: Props) {
                 <button
                   type="button"
                   className="use-item-btn"
-                  title={`Usar (+${POTION_HEAL} Resistencia)`}
-                  disabled={stats.enduranceCurrent >= stats.enduranceMax}
+                  title={
+                    combatActive
+                      ? "Solo puedes usar la poción después del combate"
+                      : `Usar (+${POTION_HEAL} Resistencia)`
+                  }
+                  disabled={stats.enduranceCurrent >= stats.enduranceMax || !!combatActive}
                   onClick={() => usePotion(item.id)}
                 >
                   Usar
