@@ -6,7 +6,13 @@
 
 import { useRef, useState } from "react";
 import type { Character } from "../../domain/character/character";
-import { rollWeaponskillWeapon } from "../../domain/character/create-character";
+import {
+  rollCombatSkill,
+  rollEndurance,
+  rollStartingGold,
+  rollWeaponskillWeapon,
+} from "../../domain/character/create-character";
+import { defaultRandomNumber } from "../../domain/random/random-number";
 import {
   createStartingCharacter,
   rollStoreroomChoiceId,
@@ -88,37 +94,37 @@ export function CharacterCreation({ onCreate }: Props) {
     (!isConflict || conflictChoice !== null);
 
   function rollCs() {
-    const raw = Math.floor(Math.random() * 10);
+    const raw = defaultRandomNumber();
     setRolling(true);
     dieCs.current?.roll(raw, () => {
-      setCombatSkill(10 + raw);
+      setCombatSkill(rollCombatSkill(() => raw));
       setStep("end");
       setRolling(false);
     });
   }
 
   function rollEnd() {
-    const raw = Math.floor(Math.random() * 10);
+    const raw = defaultRandomNumber();
     setRolling(true);
     dieEnd.current?.roll(raw, () => {
-      setEnduranceMax(20 + raw);
+      setEnduranceMax(rollEndurance(() => raw));
       setStep("gold");
       setRolling(false);
     });
   }
 
   function rollGold() {
-    const raw = Math.floor(Math.random() * 10);
+    const raw = defaultRandomNumber();
     setRolling(true);
     dieGold.current?.roll(raw, () => {
-      setGold(raw);
+      setGold(rollStartingGold(() => raw));
       setStep("store");
       setRolling(false);
     });
   }
 
   function rollStore() {
-    const raw = Math.floor(Math.random() * 10);
+    const raw = defaultRandomNumber();
     const id = rollStoreroomChoiceId(() => raw);
     setRolling(true);
     dieStore.current?.roll(raw, () => {

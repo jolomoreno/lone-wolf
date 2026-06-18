@@ -2,7 +2,7 @@
 
 > Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
 > 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado.
-> 13.2-C (contenido/UX) completado. Pendiente: 13.2-D (deuda técnica) y paso 14.
+> 13.2-C (contenido/UX) completado. 13.2-D en curso: R1 completado; pendiente R2, R3, tests backend.
 
 ## Roadmap principal
 
@@ -333,13 +333,13 @@
 
 #### D · Deuda técnica / refactors
 
-- [ ] **R1 · CharacterCreation debe usar las funciones de dominio** (~45 min)
-      El componente reimplementa tiradas con `Math.floor(Math.random()*10)` en vez de
-      llamar a `rollCombatSkill` / `rollEndurance` / `rollStartingGold` /
-      `rollWeaponskillWeapon` / `rollStoreroomChoiceId`. Centralizar para que el
-      comportamiento probado en tests sea el mismo que corre en producción.
+- [x] **R1 · CharacterCreation debe usar las funciones de dominio** (~45 min)
+      `Math.floor(Math.random()*10)` sustituido por `defaultRandomNumber()` en las
+      4 funciones `rollCs/rollEnd/rollGold/rollStore`. Los stats se calculan con
+      `rollCombatSkill(() => raw)` / `rollEndurance(() => raw)` / `rollStartingGold(() => raw)`
+      en vez de inline (`10+raw`, `20+raw`). La animación del dado sigue recibiendo
+      el mismo `raw`; el comportamiento probado en tests es ahora idéntico al de producción.
       Fichero: [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx)
-      **↳** Prerequisito para corregir B4 completamente.
 
 - [ ] **R2 · try/catch en `handleTakeLoot`** (~15 min)
       `addWeapon` / `addToBackpack` lanzan si no hay sitio. `LootPanel` ya deshabilita el
