@@ -9,6 +9,7 @@ import type { Character } from "../../domain/character/character";
 import { rollWeaponskillWeapon } from "../../domain/character/create-character";
 import {
   createStartingCharacter,
+  rollStoreroomChoiceId,
   STOREROOM,
   type StoreroomGrant,
 } from "../../domain/character/equipment";
@@ -96,7 +97,7 @@ export function CharacterCreation({ onCreate }: Props) {
 
   function rollStore() {
     const raw = Math.floor(Math.random() * 10);
-    const id = (raw % STOREROOM.length) + 1;
+    const id = rollStoreroomChoiceId(() => raw);
     setRolling(true);
     dieStore.current?.roll(raw, () => {
       setStoreroomId(id);

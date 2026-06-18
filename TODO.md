@@ -1,7 +1,7 @@
 # TODO / Backlog — Lobo Solitario
 
-> Última actualización: 2026-06-17. Roadmap + deuda técnica + huecos de fidelidad detectados
-> en una revisión de toda la app. Pasos 1-12 completados.
+> Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
+> 13.2-A (bugs de gameplay) completado.
 
 ## Roadmap principal
 
@@ -23,8 +23,8 @@
 - [x] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
 - [~] **13. Refactors / deuda técnica** — 13.1 completado (helmet, contratos,
-      UI fixes, CORS, claves estables). 13.2 pendiente: bugs de gameplay, infra de
-      despliegue, fidelidad de reglas, contenido/UX y deuda técnica (plan unificado).
+      UI fixes, CORS, claves estables). 13.2 en curso: grupo A (bugs de gameplay)
+      completado; pendiente grupos B–E (fidelidad, contenido/UX, deuda técnica).
 - [ ] **14. Despliegue + CI/CD** — prerequisitos (lint, build, endurecer API) + Atlas + Render + Vercel + GitHub Actions.
 
 ---
@@ -186,36 +186,30 @@
 > no prerequisito estricto. Excepción: **R1 (grupo D) es prerequisito de B4 (grupo A)**.
 > Las dependencias entre tareas se indican con **↳**.
 
-#### A · Bugs de gameplay — corregir primero
+#### A · Bugs de gameplay — corregir primero ✓
 
-- [ ] **B2 · Efectos de entrada no son idempotentes** (~20 min)
-      `applyEntryEffect` (daño narrativo + comidas obligatorias en `SECTION_ENTRY_EFFECTS`)
-      se aplica **cada vez** que se entra a la sección; en cualquier bucle del libro
-      el daño o la pérdida de comida se vuelve a aplicar. Solo el oro tiene flag.
-      Arreglo: guardar `entry:<sectionId>` en el `GameState` igual que `gold:<sectionId>`.
-      Ficheros: [App.tsx](apps/web/src/ui/App.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
+- [x] **B2 · Efectos de entrada idempotentes** — `applyEntryEffect` (daño narrativo
+      + comidas en `SECTION_ENTRY_EFFECTS`) ahora se guarda con flag `entry:<sectionId>`
+      en el `GameState`, igual que el oro. Re-entrar a la sección no vuelve a aplicar
+      el daño ni consume otra comida.
+      Ficheros: [App.tsx](apps/web/src/ui/App.tsx)
 
-- [ ] **B1 · Weaponskill +2 no se aplica a armas de botín** (~30 min)
-      `hasWeaponskillBonus` compara `w.id === character.weaponskillWeapon` pero los ids de
-      botín son `"loot-dagger"`, `"loot-spear"`, `"short-sword"` — no coinciden con el
-      `WeaponType`. Arreglo: añadir campo `weaponType` a `InventoryItem` y comparar por él.
-      Ficheros: [CombatPanel.tsx:32](apps/web/src/ui/components/CombatPanel.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
-      **↳** Beneficio extra si se resuelve R1 (grupo D) a la vez (lógica centralizada).
+- [x] **B1 · Weaponskill +2 aplicado también a armas de botín** — `InventoryItem`
+      tiene ahora un campo opcional `weaponType?: WeaponType`. `hasWeaponskillBonus`
+      compara `(w.weaponType ?? w.id)` con `weaponskillWeapon`. Las armas de botín
+      (`"loot-dagger"`, `"loot-spear"`, `"short-sword"`) llevan su `weaponType` al
+      convertirse en `InventoryItem` mediante `lootToInventoryItem`.
+      Ficheros: [character.ts](apps/web/src/domain/character/character.ts) · [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
 
-- [ ] **B4 · Sesgo de probabilidad en el almacén + lógica duplicada** (~30 min)
-      `(raw % 9) + 1` sobre tirada 0-9 da doble probabilidad a la Espada (raw 0 y raw 9
-      producen el mismo id). La regla además está duplicada en dominio y en
-      `CharacterCreation`. Arreglo: tabla explícita 0→"sword"…8→último; UI llama a
-      `rollStoreroomChoiceId` del dominio en vez de reimplementar con `Math.random()`.
-      Ficheros: [equipment.ts:72](apps/web/src/domain/character/equipment.ts) · [CharacterCreation.tsx:97](apps/web/src/ui/components/CharacterCreation.tsx)
-      **↳** Requiere R1 (grupo D) para eliminar la duplicación.
+- [x] **B4 · Tabla explícita del almacén, lógica centralizada** — `STOREROOM_ROLL_TABLE`
+      en `equipment.ts` mapea 0-8 → ids 1-9 y 9 → id 9 (sin sesgo). `CharacterCreation`
+      ya no reimplementa `(raw % 9) + 1` sino que llama a `rollStoreroomChoiceId(() => raw)`.
+      Ficheros: [equipment.ts](apps/web/src/domain/character/equipment.ts) · [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx)
 
-- [ ] **F4 · Curación silenciosa** (~15 min)
-      El +1 de Resistencia por la disciplina Curación no genera mensaje en
-      `entryMessages`, a diferencia del resto de efectos de entrada.
-      Añadir aviso. Verificar también que la condición es "sección que se ENTRA
-      no tiene combate", no la que se deja.
-      Fichero: [App.tsx:293](apps/web/src/ui/App.tsx)
+- [x] **F4 · Curación visible** — el +1 de Resistencia de la disciplina Curación
+      aparece ahora como mensaje en `entryMessages` ("La disciplina de Curación restaura
+      1 de Resistencia."), igual que el resto de efectos de entrada.
+      Fichero: [App.tsx](apps/web/src/ui/App.tsx)
 
 #### B · Fidelidad de reglas
 

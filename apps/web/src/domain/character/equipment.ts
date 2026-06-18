@@ -66,13 +66,21 @@ export const STOREROOM: StoreroomChoice[] = [
 ];
 
 /**
+ * Tabla explícita tirada 0-9 → id de objeto del almacén (1-9).
+ * Sustituye a `(raw % 9) + 1`, que daba doble probabilidad al id 1
+ * porque raw=0 y raw=9 producían el mismo resultado.
+ * El 9 comparte el último objeto (12 Coronas), igual que la tabla de
+ * Weaponskill reparte el 0 y el 9 entre la Daga.
+ */
+const STOREROOM_ROLL_TABLE: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 9];
+
+/**
  * Tira el objeto del almacén (1-9) en la Tabla de la Suerte.
- * La tabla da 0-9; lo mapeamos sobre los 9 objetos de la lista.
  */
 export function rollStoreroomChoiceId(
   random: RandomNumber = defaultRandomNumber,
 ): number {
-  return (random() % STOREROOM.length) + 1;
+  return STOREROOM_ROLL_TABLE[random()];
 }
 
 export interface StartingCharacterParams {

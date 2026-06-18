@@ -18,6 +18,7 @@ import {
   removeFromBackpack,
 } from "../character/character-operations";
 import type { KaiDiscipline } from "../character/kai-discipline";
+import type { WeaponType } from "../character/weapon";
 
 // ---------------------------------------------------------------------------
 // Condiciones de elección
@@ -429,6 +430,8 @@ export interface LootItem {
   name: string;
   slot: "weapon" | "backpack" | "special";
   kind?: ItemKind;
+  /** Tipo de arma canónico, para que el +2 de Dominio de las Armas aplique al botín. */
+  weaponType?: WeaponType;
 }
 
 export interface SectionLoot {
@@ -453,13 +456,13 @@ export const SECTION_LOOT: Record<string, SectionLoot> = {
   },
   sect197: {
     gold: 6,
-    items: [{ id: "short-sword", name: "Espada corta", slot: "weapon" }],
+    items: [{ id: "short-sword", name: "Espada corta", slot: "weapon", weaponType: "shortSword" }],
   },
   sect291: {
     gold: 6,
     items: [
-      { id: "loot-dagger", name: "Daga", slot: "weapon" },
-      { id: "loot-spear", name: "Lanza", slot: "weapon" },
+      { id: "loot-dagger", name: "Daga", slot: "weapon", weaponType: "dagger" },
+      { id: "loot-spear", name: "Lanza", slot: "weapon", weaponType: "spear" },
     ],
   },
   sect315: {
@@ -472,9 +475,12 @@ export const SECTION_LOOT: Record<string, SectionLoot> = {
 
 /** Convierte un LootItem en el InventoryItem que se guarda en la ficha. */
 export function lootToInventoryItem(item: LootItem): InventoryItem {
-  return item.kind
-    ? { id: item.id, name: item.name, kind: item.kind }
-    : { id: item.id, name: item.name };
+  return {
+    id: item.id,
+    name: item.name,
+    ...(item.kind ? { kind: item.kind } : {}),
+    ...(item.weaponType ? { weaponType: item.weaponType } : {}),
+  };
 }
 
 /** Cobra el oro de una sección (acotado al máximo de la bolsa). */

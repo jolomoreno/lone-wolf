@@ -296,14 +296,17 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
       next.character.stats.enduranceCurrent < next.character.stats.enduranceMax
     ) {
       next = updateCharacter(next, heal(next.character, 1));
+      messages.push("La disciplina de Curación restaura 1 de Resistencia.");
     }
 
     next = goToSection(next, targetId);
 
     const effect = SECTION_ENTRY_EFFECTS[targetId];
-    if (effect) {
+    const entryFlag = `entry:${targetId}`;
+    if (effect && !getFlag(next, entryFlag)) {
       const result = applyEntryEffect(next.character, effect);
       next = updateCharacter(next, result.character);
+      next = setFlag(next, entryFlag, true);
       messages.push(...result.messages);
     }
 

@@ -290,7 +290,7 @@ en formato v1 (ids numéricos) se descartan automáticamente al cargar.
 
 ## Limitaciones conocidas y desviaciones de las reglas
 
-Detalle y plan de corrección en el **Paso 13.3 (temporal)** de [TODO.md](TODO.md). En resumen:
+Detalle y plan de corrección en [TODO.md](TODO.md) (paso 13.2). En resumen:
 
 - **Objeto del almacén por tirada**, no por elección del jugador (decisión de diseño;
   en las reglas oficiales el jugador elige).
@@ -298,10 +298,6 @@ Detalle y plan de corrección en el **Paso 13.3 (temporal)** de [TODO.md](TODO.m
   enemigo (la Resistencia del jugador sí se conserva).
 - **Falta la penalización de −4 a la Destreza por combatir sin arma** (regla oficial
   cuando Lobo Solitario se queda desarmado).
-- **Los efectos de entrada de una sección** (daño narrativo, comidas) se reaplican si se
-  vuelve a entrar a la sección; solo el oro de botín está protegido contra repetición.
-- **El bonus +2 de "Dominio de las Armas"** no se aplica a armas recogidas como botín
-  (desajuste de identificadores de objeto).
 - **El parser aplana listas/tablas** (`ul`, `dl`, `signpost`) a párrafos: se pierde la
   estructura en secciones de referencia.
 

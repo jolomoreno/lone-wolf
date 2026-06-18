@@ -32,7 +32,9 @@ interface Props {
 function hasWeaponskillBonus(character: Character): boolean {
   return (
     character.weaponskillWeapon != null &&
-    character.weapons.some((w) => w.id === character.weaponskillWeapon)
+    character.weapons.some(
+      (w) => (w.weaponType ?? w.id) === character.weaponskillWeapon,
+    )
   );
 }
 

@@ -23,11 +23,12 @@ describe("STOREROOM", () => {
 });
 
 describe("rollStoreroomChoiceId", () => {
-  it("mapea la tirada 0-9 a un id de objeto 1-9", () => {
-    expect(rollStoreroomChoiceId(() => 0)).toBe(1);
-    expect(rollStoreroomChoiceId(() => 3)).toBe(4);
-    expect(rollStoreroomChoiceId(() => 8)).toBe(9);
-    expect(rollStoreroomChoiceId(() => 9)).toBe(1);
+  it("mapea la tirada 0-9 a un id de objeto 1-9 (tabla explícita, sin sesgo)", () => {
+    expect(rollStoreroomChoiceId(() => 0)).toBe(1); // Espada
+    expect(rollStoreroomChoiceId(() => 3)).toBe(4); // Cota de Malla
+    expect(rollStoreroomChoiceId(() => 8)).toBe(9); // 12 Coronas
+    // El 9 también da 12 Coronas (no repite Espada como hacía el % 9 anterior)
+    expect(rollStoreroomChoiceId(() => 9)).toBe(9);
   });
 
   it("siempre devuelve un id existente en el almacén", () => {

@@ -16,6 +16,11 @@ export interface InventoryItem {
   name: string;
   /** Categoría opcional (p.ej. "meal" para que cuente como Comida). */
   kind?: ItemKind;
+  /**
+   * Tipo de arma canónico. Necesario para aplicar el +2 de Dominio de las Armas
+   * cuando el id del objeto no coincide con el WeaponType (p.ej. "loot-dagger").
+   */
+  weaponType?: WeaponType;
 }
 
 /** Atributos numéricos. */
