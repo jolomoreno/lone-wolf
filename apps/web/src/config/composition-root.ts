@@ -13,7 +13,7 @@ import { HttpContentAdapter } from "../infrastructure/http/http-content.adapter"
 import { HttpHealthAdapter } from "../infrastructure/http/http-health.adapter";
 import { LocalStorageSaveAdapter } from "../infrastructure/storage/local-storage-save.adapter";
 
-const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+const apiUrl = import.meta.env.VITE_API_URL ?? "";
 
 // --- Adaptadores de salida ---
 const healthAdapter = new HttpHealthAdapter(apiUrl);

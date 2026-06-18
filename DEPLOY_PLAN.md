@@ -134,7 +134,7 @@ reconectar a MongoDB aunque la conexión siga activa en esa instancia.
 
 ### S4 · Edit: `apps/web/src/config/composition-root.ts` (1 línea, ~5 min)
 
-- [ ] Cambiar el fallback de `apiUrl`:
+- [x] Cambiar el fallback de `apiUrl`:
 
 ```typescript
 // Antes:
