@@ -1,0 +1,5 @@
+# Ficheros de entorno local — nunca subir a Vercel
+# (VITE_API_URL=localhost:4000 no debe hornearse en el bundle de producción)
+**/.env
+**/.env.*
+!**/.env.example
