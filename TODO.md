@@ -404,7 +404,7 @@
 
 ### Fase 2 — MongoDB Atlas
 
-- [ ] **M1** · Network Access → añadir `0.0.0.0/0` (IPs dinámicas de Vercel) (~5 min)
+- [x] **M1** · Network Access → añadir `0.0.0.0/0` (IPs dinámicas de Vercel) (~5 min)
 
 ### Fase 3 — Primer deploy Vercel
 

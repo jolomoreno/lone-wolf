@@ -160,7 +160,7 @@ Solo tipos y runtime helper de Vercel. No afecta al bundle de producción.
 
 ### M1 · Network Access — IPs dinámicas de Vercel (~5 min)
 
-- [ ] En Atlas dashboard → **Network Access** → **Add IP Address** → `0.0.0.0/0` → confirmar.
+- [x] En Atlas dashboard → **Network Access** → **Add IP Address** → `0.0.0.0/0` → confirmar.
 
 Vercel Functions ejecutan desde IPs dinámicas de AWS; sin este paso Atlas rechaza
 todas las conexiones desde producción. La única protección real es el `MONGODB_URI`
