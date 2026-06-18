@@ -39,7 +39,7 @@ git push → GitHub → GitHub Actions ──(CI ✓)──> vercel --prod
 
 ### P1 · Validación de variables de entorno (~15 min)
 
-- [ ] Editar [`apps/api/src/config/env.ts`](apps/api/src/config/env.ts)
+- [x] Editar [`apps/api/src/config/env.ts`](apps/api/src/config/env.ts)
 
 Añadir al final del fichero, después de exportar `env`:
 

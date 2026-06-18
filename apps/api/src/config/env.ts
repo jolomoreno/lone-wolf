@@ -22,3 +22,7 @@ export const env = {
 } as const;
 
 export const isProduction = env.nodeEnv === "production";
+
+if (isProduction && !env.mongodbUri) {
+  throw new Error("[config] MONGODB_URI es obligatoria en producción");
+}
