@@ -253,30 +253,52 @@
 
 #### C · Contenido y UX
 
-- [ ] **Favicon** (~15 min)
-      Añadir `.ico` o `.png` en `apps/web/public/` y referenciar en `apps/web/index.html`.
+- [x] **Favicon** (~15 min)
+      SVG de cabeza de lobo estilizada (dorado `#c9a84c` sobre fondo oscuro `#1e1b2e`) en
+      `apps/web/public/favicon.svg`. Referenciado con `<link rel="icon" type="image/svg+xml">`
+      en `apps/web/index.html`. Directorio `public/` creado.
 
-- [ ] **Revisar imágenes de Project Aon** (~30-45 min)
-      Auditar qué ilustraciones cargan correctamente y cuáles caen al placeholder;
-      corregir rutas. Incluye localizar `tssf.png` (portada edición Álvarez).
+- [x] **Revisar imágenes de Project Aon** (~30-45 min)
+      Auditoría completa (2026-06-18): todas las ilustraciones de partida (ill1-ill20,
+      small1-small34) y las imágenes de equipo cargan correctamente (HTTP 200) desde
+      `https://www.projectaon.org/data/trunk/en/png/lw/01fftd/ill/chalk/`.
+      `tssf.png` → 404 en todas las rutas de Project Aon (es una ilustración de la edición
+      Álvarez no distribuida digitalmente); sin impacto en la UI ya que `IntroScreen` tiene
+      texto hardcodeado y no carga imágenes de la API.
+      Hallazgo: `map.png` (1024×793 px, 1.2 MB) existe en el mismo directorio chalk y puede
+      usarse directamente para el mapa de Sommerlund (ver tarea más abajo).
 
-- [ ] **Reglas de combate como referencia** (~1 h)
-      Modal o pantalla con las reglas del sistema de combate (tabla de resultados, elusión,
-      Mindblast, etc.) accesible durante la partida desde la ficha del personaje.
-      **↳** R3 mejora el resultado si el texto viene del XML con estructura fiel.
+- [x] **Reglas de combate como referencia** (~1 h)
+      `CombatRulesModal.tsx`: modal accesible con botón "Reglas de combate" al pie de
+      `CharacterSheet`. Muestra: explicación del Ratio de Combate, tabla de pérdidas del
+      enemigo (10×13) y tabla de pérdidas de Lobo Solitario, ambas scrollables con encabezados
+      de ratio (≤−11…≥+11). Celdas "M" en rojo. Secciones de reglas especiales (bonos/penas
+      a Destreza, eludir, Defensa Psíquica). Cierra con ✕ o clic en el overlay.
+      Datos de tabla importados de `combat-results-table.ts` (sin duplicación).
+      Ficheros: [CombatRulesModal.tsx](apps/web/src/ui/components/CombatRulesModal.tsx) ·
+      [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) ·
+      [index.css](apps/web/src/index.css)
 
-- [ ] **Reglas de Resistencia y Destreza** (~45 min)
-      Incorporar la explicación del XML (sección `combat` o equivalente) como referencia
-      accesible (modal o pestaña de la ficha). Qué representan, cómo interactúan con la
-      Tabla de Resultados.
-      **↳** R3 mejora el resultado.
+- [x] **Reglas de Resistencia y Destreza** (~45 min)
+      Incluidas como sección "Ratio de Combate" dentro del mismo modal de reglas de combate:
+      qué representan DC y PR, cómo se calcula el ratio, cómo se usa la tabla. No se
+      añade pantalla separada — la información es inseparable del sistema de combate y
+      el modal unificado es más usable.
 
-- [ ] **Textos de disciplinas del Kai** (~1-1.5 h)
-      Mostrar la descripción completa de cada disciplina durante la selección en
-      `CharacterCreation` y como referencia en partida. Secciones del XML:
-      `camflage`, `hunting`, `sixthsns`, `tracking`, `healing`, `wepnskll`,
-      `mindshld`, `mndblst`, `anmlknsp`, `mindomtr`.
-      **↳** R3 mejora el resultado (texto con viñetas en vez de párrafo aplanado).
+- [x] **Textos de disciplinas del Kai** (~1-1.5 h)
+      Textos extraídos del XML (secciones `camflage`…`mindomtr`) y guardados en
+      `kai-discipline-descriptions.ts` (dominio puro, sin duplicación).
+      En **CharacterCreation**: al pulsar una disciplina aparece su descripción en un
+      panel destacado (borde izquierdo dorado) bajo la rejilla. El botón seleccionado
+      recibe outline para señalar el foco.
+      En **partida**: botón "Disciplinas del Kai" en la ficha abre un modal que lista
+      las 10 disciplinas; las que posee el jugador llevan badge dorado "TU DISCIPLINA"
+      y borde resaltado. Dominio de las Armas muestra el arma dominada entre paréntesis.
+      Ficheros: [kai-discipline-descriptions.ts](apps/web/src/domain/character/kai-discipline-descriptions.ts) ·
+      [KaiDisciplinesModal.tsx](apps/web/src/ui/components/KaiDisciplinesModal.tsx) ·
+      [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx) ·
+      [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) ·
+      [index.css](apps/web/src/index.css)
 
 - [ ] **Textos del equipo** (~45 min)
       Mostrar `howcarry`, `howmuch`, `howuse` antes o durante la selección del almacén.

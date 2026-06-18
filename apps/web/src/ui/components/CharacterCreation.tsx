@@ -19,6 +19,7 @@ import {
   KAI_DISCIPLINES_TO_CHOOSE,
   type KaiDiscipline,
 } from "../../domain/character/kai-discipline";
+import { KAI_DISCIPLINE_DESCRIPTIONS } from "../../domain/character/kai-discipline-descriptions";
 import { WEAPON_NAMES, type WeaponType } from "../../domain/character/weapon";
 import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
 
@@ -53,6 +54,7 @@ export function CharacterCreation({ onCreate }: Props) {
   const [gold, setGold] = useState<number | null>(null);
   const [storeroomId, setStoreroomId] = useState<number | null>(null);
   const [selected, setSelected] = useState<KaiDiscipline[]>([]);
+  const [focusedDisc, setFocusedDisc] = useState<KaiDiscipline | null>(null);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
   const [conflictChoice, setConflictChoice] = useState<"weaponskill" | "storeroom" | null>(null);
 
@@ -261,10 +263,10 @@ export function CharacterCreation({ onCreate }: Props) {
             <button
               key={discipline}
               type="button"
-              className={`discipline-toggle${active ? " active" : ""}`}
+              className={`discipline-toggle${active ? " active" : ""}${focusedDisc === discipline ? " focused" : ""}`}
               aria-pressed={active}
               disabled={!active && isFull}
-              onClick={() => toggle(discipline)}
+              onClick={() => { toggle(discipline); setFocusedDisc(discipline); }}
             >
               {KAI_DISCIPLINE_NAMES[discipline]}
               {discipline === "weaponskill" && weapon
@@ -274,6 +276,13 @@ export function CharacterCreation({ onCreate }: Props) {
           );
         })}
       </div>
+
+      {focusedDisc && (
+        <div className="disc-description-panel">
+          <strong>{KAI_DISCIPLINE_NAMES[focusedDisc]}</strong>
+          <p>{KAI_DISCIPLINE_DESCRIPTIONS[focusedDisc]}</p>
+        </div>
+      )}
 
       {isConflict && weapon && storeroomWeaponName && (
         <div className="rolled-item" style={{ marginTop: "1.5rem" }}>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- fondo oscuro redondeado -->
+  <rect width="32" height="32" rx="5" fill="#1e1b2e"/>
+  <!-- oreja izquierda -->
+  <polygon points="8,18 11,6 15,16" fill="#c9a84c"/>
+  <!-- oreja derecha -->
+  <polygon points="17,16 21,6 24,18" fill="#c9a84c"/>
+  <!-- cabeza -->
+  <ellipse cx="16" cy="21" rx="9" ry="8" fill="#c9a84c"/>
+  <!-- ojos -->
+  <circle cx="12.5" cy="19.5" r="1.8" fill="#1e1b2e"/>
+  <circle cx="19.5" cy="19.5" r="1.8" fill="#1e1b2e"/>
+  <!-- destellos en los ojos (blanco pequeño) -->
+  <circle cx="13.2" cy="18.8" r="0.6" fill="#fff"/>
+  <circle cx="20.2" cy="18.8" r="0.6" fill="#fff"/>
+  <!-- nariz -->
+  <ellipse cx="16" cy="24.5" rx="2.5" ry="1.5" fill="#3d2e0f"/>
+</svg>

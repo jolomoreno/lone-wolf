@@ -3,6 +3,7 @@
  * Permite usar la Poción Curativa (+4 Resistencia) directamente desde la mochila.
  */
 
+import { useState } from "react";
 import {
   type Character,
   countMeals,
@@ -15,6 +16,8 @@ import {
 } from "../../domain/character/character-operations";
 import { KAI_DISCIPLINE_NAMES } from "../../domain/character/kai-discipline";
 import { WEAPON_NAMES } from "../../domain/character/weapon";
+import { CombatRulesModal } from "./CombatRulesModal";
+import { KaiDisciplinesModal } from "./KaiDisciplinesModal";
 
 interface Props {
   character: Character;
@@ -26,6 +29,8 @@ interface Props {
 const POTION_HEAL = 4;
 
 export function CharacterSheet({ character, onCharacterChange, combatActive }: Props) {
+  const [showRules, setShowRules] = useState(false);
+  const [showDisciplines, setShowDisciplines] = useState(false);
   const { stats } = character;
   const backpackItems = character.backpack.filter((i) => i.kind !== "meal");
 
@@ -45,6 +50,15 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
   }
 
   return (
+    <>
+    {showRules && <CombatRulesModal onClose={() => setShowRules(false)} />}
+    {showDisciplines && (
+      <KaiDisciplinesModal
+        onClose={() => setShowDisciplines(false)}
+        activeDisciplines={character.disciplines}
+        weaponskillWeapon={character.weaponskillWeapon}
+      />
+    )}
     <aside className="sheet">
       <h2>Lobo Solitario</h2>
 
@@ -151,6 +165,24 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
           </ul>
         </>
       )}
+
+      <div className="sheet-ref-buttons">
+        <button
+          type="button"
+          className="rules-btn"
+          onClick={() => setShowDisciplines(true)}
+        >
+          Disciplinas del Kai
+        </button>
+        <button
+          type="button"
+          className="rules-btn"
+          onClick={() => setShowRules(true)}
+        >
+          Reglas de combate
+        </button>
+      </div>
     </aside>
+    </>
   );
 }
