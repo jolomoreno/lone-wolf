@@ -12,11 +12,8 @@ inventario y guardado de la partida.
 | 10 | Experiencia de juego — guardado manual, control consciente del jugador | ✅ Hecho |
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
-| **13** | **Refactors / deuda técnica** — 13.1 hecho; 13.2-A (bugs gameplay) hecho; 13.2-B (fidelidad: −4 sin arma, poción post-combate, persistir combate) hecho; pendiente grupos C-D (contenido/UX, deuda técnica) | 🔄 En curso |
+| **13** | **Refactors / deuda técnica** — 13.1 hecho; 13.2-A (bugs gameplay) hecho; 13.2-B (fidelidad de reglas) hecho; 13.2-C (contenido/UX: favicon, modales de referencia, mapa) hecho; pendiente grupo D (deuda técnica) | 🔄 En curso |
 | 14 | Despliegue + CI/CD — Atlas · Render · Vercel · GitHub Actions | ⬜ |
-
-> El análisis exhaustivo de la app (bugs, refactors y huecos de fidelidad pendientes)
-> se mantiene como **Paso 13.3 (temporal)** en [TODO.md](TODO.md).
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
 
@@ -38,7 +35,8 @@ lone-wolf/
 apps/web/src/
 ├── domain/
 │   ├── character/        # Character, create-character (stats + disciplinas + equipo inicial),
-│   │                     #   character-operations (heal, applyDamage, addWeapon, loseAllEquipment…)
+│   │                     #   character-operations (heal, applyDamage, addWeapon, loseAllEquipment…),
+│   │                     #   kai-discipline-descriptions (textos de las 10 disciplinas del XML)
 │   ├── combat/           # CombatTable canónica (10×13), applyRound, tipos Enemy/CombatStatus
 │   └── game/             # GameState (inmutable, versionado), goToSection, getFlag/setFlag
 │                         #   section-rules: reglas curadas por sección (condiciones de elección,
@@ -59,13 +57,21 @@ apps/web/src/
     ├── components/
     │   ├── IntroScreen        # "El Principio de la Historia" (tssf): contexto narrativo antes de crear personaje
     │   ├── KaiWisdomScreen    # "La Sabiduría del Kai" (kaiwisdm): briefing final antes de sect1
-    │   ├── CharacterCreation  # Tiradas de stats (revelación progresiva), selección de 5 disciplinas, equipo inicial
+    │   ├── CharacterCreation  # Tiradas de stats (revelación progresiva), selección de 5 disciplinas,
+    │   │                      #   equipo inicial; botón «¿Cómo funciona el equipo?» (EquipmentRulesModal)
     │   ├── CharacterSheet     # Ficha en partida: stats, disciplinas, inventario,
-    │   │                      #   botones Usar (poción) y Soltar (arma/mochila)
+    │   │                      #   botones Usar (poción), Soltar (arma/mochila), «ver mapa» (MapModal);
+    │   │                      #   botones de referencia: Disciplinas (KaiDisciplinesModal),
+    │   │                      #   Niveles Kai (KaiLevelsModal), Reglas de combate (CombatRulesModal)
     │   ├── SectionView        # Texto + ilustración (hotlink Project Aon) + opciones;
     │   │                      #   deshabilita con 🔒 las opciones cuya condición no se cumple
     │   ├── CombatPanel        # Barras de Resistencia, ratio efectivo, modificadores CS,
     │   │                      #   botón Eludir (si la sección lo permite), log de asaltos
+    │   ├── CombatRulesModal   # Modal: tabla 10×13 + reglas de ratio, bonos, eludir, Defensa Psíquica
+    │   ├── KaiDisciplinesModal# Modal: 10 disciplinas con descripciones; badge «TU DISCIPLINA»
+    │   ├── KaiLevelsModal     # Modal: 10 rangos (Postulante → Maestro); rango actual resaltado
+    │   ├── MapModal           # Modal: mapa de Sommerlund hotlinkeado desde Project Aon
+    │   ├── EquipmentRulesModal# Modal: howcarry / howmuch / howuse del libro de reglas
     │   ├── DiceRoll           # Dado animado (CSS @keyframes); API: roll(value, onDone) / reset()
     │   ├── RollPanel          # Tirada en Tabla de la Suerte: muestra dado, aplica rama y navega
     │   └── LootPanel          # Objetos cogibles por sección; respeta límites de inventario
@@ -258,8 +264,9 @@ alfanuméricos sin número fijo.
 
 El DTO de sección sigue el esquema de `@lone-wolf/shared` (`API_CONTRACT_VERSION = 1`).
 Cada sección contiene bloques de contenido (`paragraph | illustration | combat`) y opciones.
-El guardado en `localStorage` está versionado (`SAVE_FORMAT_VERSION = 2`); partidas antiguas
-en formato v1 (ids numéricos) se descartan automáticamente al cargar.
+El guardado en `localStorage` está versionado (`SAVE_FORMAT_VERSION = 3`); partidas en formato
+anterior se descartan automáticamente al cargar. v2 → ids de sección como string; v3 → añadido
+`pendingCombat` para persistir combates en curso.
 
 ## Decisiones de diseño relevantes
 
@@ -272,9 +279,10 @@ en formato v1 (ids numéricos) se descartan automáticamente al cargar.
   inmunidades al Mindblast, puntos de elusión, daño narrativo, comidas, tablas de tirada y botín)
   se declaran en una tabla estática derivada del XML de Project Aon. Evita heurísticas frágiles
   y es fácil de auditar sección por sección.
-- **Ilustraciones hotlinked desde Project Aon**: las imágenes se cargan directamente desde
-  `projectaon.org` (sin redistribuir), cumpliendo la Project Aon License. Si una imagen
-  no carga, aparece un marcador de posición. Atribución y enlace visibles en el pie de página.
+- **Ilustraciones y mapa hotlinked desde Project Aon**: las imágenes se cargan directamente
+  desde `projectaon.org` (sin redistribuir), cumpliendo la Project Aon License. Si una imagen
+  no carga (p.ej. ilustraciones de la edición Álvarez no disponibles en Project Aon), se omite
+  silenciosamente. Atribución y enlace visibles en el pie de página.
 - **Meals como objetos de mochila**: las comidas no son un contador; son `InventoryItem` con
   `kind: "meal"` dentro del `backpack[]`. Así respetan el límite de 8 huecos de mochila.
 - **Objeto del almacén**: se decide por tirada (0–9 aleatorio), no por elección del jugador.
@@ -293,20 +301,14 @@ en formato v1 (ids numéricos) se descartan automáticamente al cargar.
 
 ## Limitaciones conocidas y desviaciones de las reglas
 
-Detalle y plan de corrección en [TODO.md](TODO.md) (paso 13.2). En resumen:
+Detalle y plan de corrección en [TODO.md](TODO.md) (paso 13.2-D). En resumen:
 
 - **Objeto del almacén por tirada**, no por elección del jugador (decisión de diseño;
   en las reglas oficiales el jugador elige).
-- **El combate en curso no se persiste**: recargar a mitad de un combate reinicia al
-  enemigo (la Resistencia del jugador sí se conserva).
-- **Falta la penalización de −4 a la Destreza por combatir sin arma** (regla oficial
-  cuando Lobo Solitario se queda desarmado).
 - **El parser aplana listas/tablas** (`ul`, `dl`, `signpost`) a párrafos: se pierde la
-  estructura en secciones de referencia.
-- **Dominio de las Armas con inventario lleno**: si el almacén dio un arma diferente
-  a la de dominio y ambos huecos están ocupados, la creación muestra un selector
-  para elegir qué arma conservar. Si se elige la del almacén, la disciplina queda
-  latente hasta encontrar el arma de dominio durante la aventura.
+  estructura en secciones de referencia (pendiente en R3).
+- **sect21 (tirada encadenada)**: la cascada de tiradas con posibilidad de muerte no está
+  modelada; la sección queda como elección libre.
 
 ## Créditos y licencia del contenido
 

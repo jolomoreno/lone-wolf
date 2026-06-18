@@ -1,7 +1,8 @@
 # TODO / Backlog — Lobo Solitario
 
 > Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
-> 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado (F1, F3, B3).
+> 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado.
+> 13.2-C (contenido/UX) completado. Pendiente: 13.2-D (deuda técnica) y paso 14.
 
 ## Roadmap principal
 
@@ -108,8 +109,8 @@
 
 - [ ] **sect21** — tirada encadenada (cascada con muerte); excluida de
       `SECTION_ROLL_TABLES`, sigue como elección libre. Modelar tiradas múltiples.
-- [ ] **`tssf.png`** (1 ilustración de portada, edición Alvarez) no se localiza en
-      el servidor de Project Aon; cae al placeholder. Buscar su ruta exacta.
+- [~] **`tssf.png`** — 404 en todas las rutas de Project Aon. Sin impacto: `IntroScreen`
+      muestra solo texto, no carga imágenes desde la API. No hay acción pendiente.
 
 ---
 
