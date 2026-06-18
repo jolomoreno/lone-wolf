@@ -24,7 +24,7 @@
       progresiva y animación.
 - [x] **13. Refactors / deuda técnica** — 13.1 a 13.2-D completados: bugs gameplay,
       fidelidad de reglas, contenido/UX (favicon, modales, mapa), deuda técnica (R1-R3).
-- [ ] **14. Despliegue + CI/CD** — ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md) para el detalle completo.
+- [~] **14. Despliegue + CI/CD** — deploy Vercel operativo (https://lone-wolf-five.vercel.app); pendiente CI/CD GitHub Actions. Ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md).
 
 ---
 
@@ -410,7 +410,7 @@
 
 - [x] **V1** · `vercel link` — vincular repo local con proyecto de Vercel; añadir `.vercel/` a `.gitignore` (~5 min)
 - [x] **V2** · Env vars en Vercel dashboard: `MONGODB_URI` + `NODE_ENV=production` (~5 min)
-- [x] **V3** · `vercel --prod` — deploy OK. `/health` y `/sections/sect1` responden. Smoke test manual pendiente.
+- [x] **V3** · `vercel --prod` — deploy OK. `/health` y `/sections/sect1` responden. App jugable verificada en https://lone-wolf-five.vercel.app
 
 ### Fase 4 — GitHub Actions
 

@@ -13,20 +13,33 @@ inventario y guardado de la partida.
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
 | 13 | Refactors / deuda técnica — bugs gameplay, fidelidad de reglas, contenido/UX, deuda técnica | ✅ Hecho |
-| **14** | **Despliegue + CI/CD** — Vercel serverless (web + API) · GitHub Actions CI · MongoDB Atlas | 🔄 |
+| **14** | **Despliegue + CI/CD** — deploy Vercel ✅ · CI/CD GitHub Actions 🔄 | 🔄 |
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
+
+## Demo en producción
+
+🌐 **https://lone-wolf-five.vercel.app**
+
+| Endpoint | URL |
+|----------|-----|
+| Web (juego) | https://lone-wolf-five.vercel.app |
+| API health | https://lone-wolf-five.vercel.app/health |
+| API sección | https://lone-wolf-five.vercel.app/sections/sect1 |
 
 ## Estructura (monorepo con pnpm workspaces)
 
 ```
 lone-wolf/
 ├── apps/
-│   ├── web/      # Frontend: React + Vite + TypeScript
-│   └── api/      # Backend: Express 5 + TypeScript + Mongoose (MongoDB)
+│   ├── web/          # Frontend: React + Vite + TypeScript
+│   └── api/          # Backend: Express 5 + TypeScript + Mongoose (MongoDB)
+│       └── handler.ts  # Serverless entry point (esbuild lo empaqueta en api/handler.js)
 ├── packages/
-│   └── shared/   # DTOs/contratos entre web y api (solo tipos de red)
-└── data/         # XML de Project Aon + script de importación a Mongo
+│   └── shared/       # DTOs/contratos entre web y api (solo tipos de red)
+├── api/              # Destino del bundle serverless (generado en build, no se versiona)
+├── data/             # XML de Project Aon + script de importación a Mongo
+└── vercel.json       # Build config: esbuild (API) + Vite (web) + rewrites
 ```
 
 ### apps/web — frontend
@@ -228,6 +241,7 @@ pnpm --filter @lone-wolf/web dev
 ```bash
 pnpm dev                  # arranca web + api en paralelo
 pnpm build                # build de producción de todos los paquetes
+pnpm build:api            # genera api/handler.js (bundle serverless para Vercel)
 pnpm typecheck            # comprobación de tipos de todo el monorepo (3 proyectos)
 pnpm lint                 # Biome CI (lint + formato, sin modificar ficheros)
 pnpm test                 # ejecuta todos los tests (vitest)
@@ -255,9 +269,11 @@ Pendiente (paso 14): tests del backend (parser XML, mapper, caso de uso `GetSect
 ## API REST
 
 ```
-GET /health          → { status: "ok", db: "connected" }
+GET /health          → { status: "ok", db: "connected", uptime: …, timestamp: … }
 GET /sections/:id    → SectionDTO  (id de sección del libro, ej: /sections/sect1)
 ```
+
+En producción la base URL es `https://lone-wolf-five.vercel.app`; en local, `http://localhost:4000`.
 
 El `id` de sección sigue el formato `sect<número>` (ej. `sect1`, `sect85`, `sect350`).
 Las secciones especiales (reglas, tabla de Weaponskill, equipo del almacén) tienen ids
@@ -307,8 +323,6 @@ Detalle y plan de corrección en [TODO.md](TODO.md) (paso 13.2-D). En resumen:
 
 - **Objeto del almacén por tirada**, no por elección del jugador (decisión de diseño;
   en las reglas oficiales el jugador elige).
-- **El parser aplana listas/tablas** (`ul`, `dl`, `signpost`) a párrafos: se pierde la
-  estructura en secciones de referencia (pendiente en R3).
 - **sect21 (tirada encadenada)**: la cascada de tiradas con posibilidad de muerte no está
   modelada; la sección queda como elección libre.
 
@@ -318,7 +332,7 @@ El texto e ilustraciones de *Lobo Solitario* pertenecen a sus autores y se distr
 a través de [Project Aon](https://www.projectaon.org) bajo la **Project Aon License**
 (uso no comercial, con condiciones de atribución y distribución).
 
-Este proyecto es un trabajo personal **no comercial**. Antes de publicarlo en internet,
-revisa y cumple los términos de la Project Aon License (atribución visible, enlace a
-Project Aon, sin uso comercial). El código de esta aplicación es independiente del
-contenido del libro.
+Este proyecto es un trabajo personal **no comercial** y está publicado en
+https://lone-wolf-five.vercel.app cumpliendo los términos de la Project Aon License
+(atribución visible en el pie de página, enlace a Project Aon, sin uso comercial).
+El código de esta aplicación es independiente del contenido del libro.

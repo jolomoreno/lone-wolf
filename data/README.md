@@ -22,3 +22,14 @@ Desde `apps/api`:
 pnpm import:book -- --dry-run   # solo parsea y muestra estadísticas
 pnpm import:book                # importa a Mongo (requiere MONGODB_URI en apps/api/.env)
 ```
+
+### Bases de datos separadas (dev / prod)
+
+- **Desarrollo local** (`lonewolf-dev`): el `MONGODB_URI` de `apps/api/.env` apunta aquí.
+- **Producción** (`lonewolf-prod`): la variable `MONGODB_URI` en Vercel apunta aquí.
+
+Para importar a producción, cambia temporalmente el `MONGODB_URI` de `apps/api/.env`
+para apuntar a `lonewolf-prod`, ejecuta `pnpm import:book` y luego restaura el valor.
+Ver instrucciones detalladas en [DEPLOY_PLAN.md — M2](../DEPLOY_PLAN.md).
+
+El XML de Project Aon para el Libro 1 cambia raramente; esta operación es puntual.

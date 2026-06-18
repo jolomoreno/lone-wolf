@@ -234,7 +234,12 @@ vercel --prod
 - [x] Verificar endpoints:
   - `https://lone-wolf-five.vercel.app/health` → `{ "status": "ok", "db": "connected" }` ✓
   - `https://lone-wolf-five.vercel.app/sections/sect1` → JSON con el contenido de la sección 1 ✓
-- [ ] Abrir la web, crear un personaje, navegar al menos 3 secciones.
+- [x] Abrir la web, crear un personaje, navegar secciones — app jugable confirmada. ✓
+
+**Incidencia resuelta durante V3:** Vercel CLI subía `apps/web/.env` (con
+`VITE_API_URL=http://localhost:4000`) a pesar de estar en `.gitignore`, horneando la
+URL local en el bundle de producción. Solución: `.vercelignore` en la raíz que excluye
+explícitamente todos los `.env`.
 
 ---
 
@@ -374,9 +379,10 @@ Fase 5
 |---|---|---|
 | `apps/api/handler.ts` | Nuevo | Serverless handler — glue entre Vercel y Express |
 | `vercel.json` | Nuevo | Build web + rewrites `/sections/*` y `/health` (esbuild genera `api/handler.js`) |
+| `.vercelignore` | Nuevo | Excluye `.env` del upload de Vercel CLI (evita localhost en bundle prod) |
 | `biome.json` | Nuevo | Config lint + formato para todo el monorepo |
-| `.github/workflows/ci.yml` | Nuevo | CI gate + deploy condicional |
+| `.github/workflows/ci.yml` | Nuevo | CI gate + deploy condicional (pendiente) |
 | `apps/api/src/config/env.ts` | Edit | Validación MONGODB_URI en producción |
 | `apps/api/src/infrastructure/persistence/mongoose.ts` | Edit | Guard `readyState >= 1` |
 | `apps/web/src/config/composition-root.ts` | Edit | Fallback `apiUrl` de `"http://localhost:4000"` a `""` |
-| `package.json` (raíz) | Edit | Script `"lint": "biome ci ."` |
+| `package.json` (raíz) | Edit | Scripts `"lint": "biome ci ."` y `"build:api": "esbuild …"` |
