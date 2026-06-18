@@ -194,12 +194,14 @@
       el daño ni consume otra comida.
       Ficheros: [App.tsx](apps/web/src/ui/App.tsx)
 
-- [x] **B1 · Weaponskill +2 aplicado también a armas de botín** — `InventoryItem`
-      tiene ahora un campo opcional `weaponType?: WeaponType`. `hasWeaponskillBonus`
+- [x] **B1 · Weaponskill +2 aplicado también a armas de botín y al arma inicial de dominio** —
+      `InventoryItem` tiene campo opcional `weaponType?: WeaponType`. `hasWeaponskillBonus`
       compara `(w.weaponType ?? w.id)` con `weaponskillWeapon`. Las armas de botín
-      (`"loot-dagger"`, `"loot-spear"`, `"short-sword"`) llevan su `weaponType` al
-      convertirse en `InventoryItem` mediante `lootToInventoryItem`.
-      Ficheros: [character.ts](apps/web/src/domain/character/character.ts) · [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
+      (`"loot-dagger"`, `"loot-spear"`, `"short-sword"`) llevan su `weaponType`.
+      `createStartingCharacter` añade el arma de dominio al inventario si hay hueco
+      y no está ya; si ambos huecos están ocupados (Hacha + arma del almacén), la
+      disciplina queda latente hasta encontrar esa arma en la aventura.
+      Ficheros: [character.ts](apps/web/src/domain/character/character.ts) · [equipment.ts](apps/web/src/domain/character/equipment.ts) · [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
 
 - [x] **B4 · Tabla explícita del almacén, lógica centralizada** — `STOREROOM_ROLL_TABLE`
       en `equipment.ts` mapea 0-8 → ids 1-9 y 9 → id 9 (sin sesgo). `CharacterCreation`

@@ -85,3 +85,48 @@ describe("createStartingCharacter", () => {
     ).toThrow();
   });
 });
+
+const disciplinesWeaponskill: KaiDiscipline[] = [
+  "camouflage",
+  "hunting",
+  "sixthSense",
+  "tracking",
+  "weaponskill",
+];
+const baseWs = { combatSkill: 15, enduranceMax: 25, gold: 5, disciplines: disciplinesWeaponskill };
+
+describe("createStartingCharacter — Dominio de las Armas", () => {
+  it("añade el arma de dominio si el almacén no dio arma (hueco libre)", () => {
+    // Almacén id 2 = Casco (no arma) → weapons: [Hacha, Daga]
+    const character = createStartingCharacter({
+      ...baseWs,
+      weaponskillWeapon: "dagger",
+      storeroomChoiceId: 2,
+    });
+    expect(character.weapons).toHaveLength(2);
+    expect(character.weapons.some((w) => w.weaponType === "dagger")).toBe(true);
+  });
+
+  it("no añade el arma de dominio si ya la tiene (Hacha con weaponskill=axe)", () => {
+    // La Hacha cubre weaponskill=axe, no se añade una segunda hacha
+    const character = createStartingCharacter({
+      ...baseWs,
+      weaponskillWeapon: "axe",
+      storeroomChoiceId: 2, // Casco
+    });
+    expect(character.weapons).toHaveLength(1);
+    expect(character.weapons[0].id).toBe("axe");
+  });
+
+  it("no supera el límite de 2 armas cuando el almacén ya dio un arma diferente", () => {
+    // Almacén id 5 = Maza → weapons: [Hacha, Maza] → lleno; daga queda latente
+    const character = createStartingCharacter({
+      ...baseWs,
+      weaponskillWeapon: "dagger",
+      storeroomChoiceId: 5,
+    });
+    expect(character.weapons).toHaveLength(2);
+    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "mace")).toBe(true);
+    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(false);
+  });
+});

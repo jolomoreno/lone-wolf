@@ -7,10 +7,10 @@
  * Además, el jugador elige UN objeto del almacén del monasterio (lista de 9).
  */
 
-import { type Character, type InventoryItem } from "./character";
+import { type Character, type InventoryItem, MAX_WEAPONS } from "./character";
 import { createCharacter } from "./create-character";
 import type { KaiDiscipline } from "./kai-discipline";
-import type { WeaponType } from "./weapon";
+import { WEAPON_NAMES, type WeaponType } from "./weapon";
 import { defaultRandomNumber, type RandomNumber } from "../random/random-number";
 
 /** Cómo afecta un objeto del almacén al personaje. */
@@ -136,6 +136,23 @@ export function createStartingCharacter(params: StartingCharacterParams): Charac
     case "gold":
       gold += grant.amount;
       break;
+  }
+
+  // Si el jugador tiene Dominio de las Armas y el arma de dominio no está ya
+  // en el inventario, añadirla si hay hueco. Así el bono +2 aplica desde el
+  // principio. Si ambos huecos están ocupados (Hacha + arma del almacén),
+  // la disciplina queda latente hasta encontrar esa arma en la aventura.
+  if (params.weaponskillWeapon) {
+    const alreadyHasIt = weapons.some(
+      (w) => (w.weaponType ?? w.id) === params.weaponskillWeapon,
+    );
+    if (!alreadyHasIt && weapons.length < MAX_WEAPONS) {
+      weapons.push({
+        id: params.weaponskillWeapon,
+        name: WEAPON_NAMES[params.weaponskillWeapon],
+        weaponType: params.weaponskillWeapon,
+      });
+    }
   }
 
   return createCharacter({
