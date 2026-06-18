@@ -172,7 +172,7 @@ todas las conexiones desde producción. La única protección real es el `MONGOD
 
 ### V1 · Vincular el repo (~5 min)
 
-- [ ] Instalar la CLI y vincular:
+- [x] Instalar la CLI y vincular:
 
 ```bash
 pnpm add -g vercel
@@ -180,7 +180,7 @@ vercel link   # asocia el directorio local con el proyecto de Vercel
               # genera .vercel/project.json (añadir a .gitignore si no está)
 ```
 
-- [ ] Añadir `.vercel/` a `.gitignore` si no está ya.
+- [x] Añadir `.vercel/` a `.gitignore` si no está ya.
 
 ### V2 · Variables de entorno en Vercel (~5 min)
 
