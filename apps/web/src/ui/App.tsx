@@ -377,12 +377,16 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
 
   /** Coge un objeto del botín, respetando la ranura de inventario. */
   function handleTakeLoot(item: LootItem) {
-    const inv = lootToInventoryItem(item);
-    let updated = character;
-    if (item.slot === "weapon") updated = addWeapon(character, inv);
-    else if (item.slot === "backpack") updated = addToBackpack(character, inv);
-    else updated = addSpecialItem(character, inv);
-    onChange(updateCharacter(game, updated));
+    try {
+      const inv = lootToInventoryItem(item);
+      let updated = character;
+      if (item.slot === "weapon") updated = addWeapon(character, inv);
+      else if (item.slot === "backpack") updated = addToBackpack(character, inv);
+      else updated = addSpecialItem(character, inv);
+      onChange(updateCharacter(game, updated));
+    } catch (err) {
+      console.error("[handleTakeLoot] No se pudo añadir el objeto:", err);
+    }
   }
 
   // Pantalla de victoria al llegar a la sección final.

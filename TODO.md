@@ -2,7 +2,7 @@
 
 > Última actualización: 2026-06-18. Pasos 1-12 completados, 13.1 completado.
 > 13.2-A (bugs de gameplay) completado. 13.2-B (fidelidad de reglas) completado.
-> 13.2-C (contenido/UX) completado. 13.2-D en curso: R1 completado; pendiente R2, R3, tests backend.
+> 13.2-C (contenido/UX) completado. 13.2-D en curso: R1, R2 completados; pendiente R3 (diferible) y tests backend.
 
 ## Roadmap principal
 
@@ -341,11 +341,12 @@
       el mismo `raw`; el comportamiento probado en tests es ahora idéntico al de producción.
       Fichero: [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx)
 
-- [ ] **R2 · try/catch en `handleTakeLoot`** (~15 min)
-      `addWeapon` / `addToBackpack` lanzan si no hay sitio. `LootPanel` ya deshabilita el
-      botón, pero cualquier desfase entre `canTake` y los límites reales provocaría un crash.
-      Envolver en try/catch o reusar la validación de `canTake` antes de llamar.
-      Fichero: [App.tsx:343](apps/web/src/ui/App.tsx)
+- [x] **R2 · try/catch en `handleTakeLoot`** (~15 min)
+      `handleTakeLoot` envuelto en try/catch con `console.error`. `LootPanel` ya
+      deshabilita el botón cuando no hay sitio, pero si `canTake` y los límites
+      reales divergen en el futuro el jugador no ve un crash — el objeto simplemente
+      no se coge y el error queda en la consola.
+      Fichero: [App.tsx](apps/web/src/ui/App.tsx)
 
 - [ ] **R3 · Parser: modelar listas y tablas como `ContentBlock`** (~2-3 h, diferible)
       `parseData` aplana `ul`/`dl`/`signpost` a párrafo plano, perdiendo la estructura.
