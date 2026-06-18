@@ -21,8 +21,8 @@ git push → GitHub → GitHub Actions ──(CI ✓)──> vercel --prod
                      biome ci                        ▼
                      vitest 88 tests          Vercel (lone-wolf.vercel.app)
                                                ├── /          → web estático (React + Vite)
-                                               ├── /sections/* → api/handler.ts (serverless)
-                                               └── /health     → api/handler.ts (serverless)
+                                               ├── /sections/* → api/handler.js (serverless bundle)
+                                               └── /health     → api/handler.js (serverless bundle)
                                                         │
                                                         ▼
                                                   MongoDB Atlas
@@ -31,7 +31,8 @@ git push → GitHub → GitHub Actions ──(CI ✓)──> vercel --prod
 - **Sin Render.** Sin segundo proveedor.
 - **Sin CORS** en producción (web y API en el mismo origen).
 - **Sin `VITE_API_URL`** en Vercel (fallback a `""` → mismo origen).
-- `@vercel/node` compila TypeScript nativamente — `tsx` no se necesita en prod.
+- `esbuild` empaqueta `apps/api/handler.ts` + todas sus dependencias en `api/handler.js`
+  (CJS, ~4 MB) durante el build — resuelve el conflicto ESM/CJS y el aislamiento pnpm.
 
 ---
 
@@ -75,21 +76,20 @@ la variable, en vez de fallar en la primera query con un error de Mongoose críp
 
 ## Fase 1 — Cambios serverless (5 ficheros)
 
-### S1 · Nuevo fichero: `api/handler.ts` (raíz del monorepo, ~15 min)
+### S1 · Nuevo fichero: `apps/api/handler.ts` (~15 min)
 
-- [x] Crear `api/handler.ts`:
+- [x] Crear `apps/api/handler.ts` (fuente TypeScript; el bundle va a `api/handler.js`):
 
 ```typescript
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import type { Express } from "express";
-import { buildApp } from "../apps/api/src/config/composition-root";
-import { connectToDatabase } from "../apps/api/src/infrastructure/persistence/mongoose";
+import { buildApp } from "./src/config/composition-root";
+import { connectToDatabase } from "./src/infrastructure/persistence/mongoose";
 
-let app: Express | undefined;
+let app: ReturnType<typeof buildApp> | undefined;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  await connectToDatabase();  // sin-op si readyState >= 1 (ver S3)
-  app ??= buildApp();         // se reutiliza en invocaciones calientes
+  await connectToDatabase(); // sin-op si readyState >= 1 (ver S3)
+  app ??= buildApp();        // se reutiliza en invocaciones calientes
   app(req as any, res as any);
 }
 ```
@@ -97,13 +97,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 `buildApp()` y `connectToDatabase()` ya existen y están bien desacoplados; este fichero
 es solo el glue layer entre Vercel y Express.
 
+esbuild empaqueta esta fuente junto con todas las dependencias de `apps/api` en
+`api/handler.js` (CJS ~4 MB) durante el buildCommand de Vercel. El bundle es
+completamente autocontenido — sin dependencias externas en runtime.
+
 ### S2 · Nuevo fichero: `vercel.json` (raíz del monorepo, ~10 min)
 
 - [x] Crear `vercel.json`:
 
 ```json
 {
-  "buildCommand": "pnpm --filter @lone-wolf/web build",
+  "buildCommand": "pnpm build:api && pnpm --filter @lone-wolf/web build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "rewrites": [
@@ -113,8 +117,9 @@ es solo el glue layer entre Vercel y Express.
 }
 ```
 
-Vercel sirve `apps/web/dist` como estático. Antes de buscar fichero estático, las rutas
-`/sections/*` y `/health` se reescriben a la función — el frontend no cambia de URL.
+`pnpm build:api` ejecuta esbuild y genera `api/handler.js` (bundle CJS).
+Vercel sirve `apps/web/dist` como estático; `/sections/*` y `/health` se reescriben
+al bundle — el frontend no cambia de URL.
 
 ### S3 · Edit: `apps/api/src/infrastructure/persistence/mongoose.ts` (+1 línea, ~5 min)
 
@@ -195,15 +200,15 @@ vercel link   # asocia el directorio local con el proyecto de Vercel
 
 ### V3 · Deploy y verificar (~15 min)
 
-- [ ] Primer deploy:
+- [x] Primer deploy:
 
 ```bash
 vercel --prod
 ```
 
-- [ ] Verificar endpoints:
-  - `https://lone-wolf.vercel.app/health` → `{ "status": "ok", "db": "connected" }`
-  - `https://lone-wolf.vercel.app/sections/sect1` → JSON con el contenido de la sección 1
+- [x] Verificar endpoints:
+  - `https://lone-wolf-five.vercel.app/health` → `{ "status": "ok", "db": "connected" }` ✓
+  - `https://lone-wolf-five.vercel.app/sections/sect1` → JSON con el contenido de la sección 1 ✓
 - [ ] Abrir la web, crear un personaje, navegar al menos 3 secciones.
 
 ---
@@ -342,8 +347,8 @@ Fase 5
 
 | Fichero | Tipo | Qué cambia |
 |---|---|---|
-| `api/handler.ts` | Nuevo | Serverless handler — glue entre Vercel y Express |
-| `vercel.json` | Nuevo | Build web + rewrites `/sections/*` y `/health` |
+| `apps/api/handler.ts` | Nuevo | Serverless handler — glue entre Vercel y Express |
+| `vercel.json` | Nuevo | Build web + rewrites `/sections/*` y `/health` (esbuild genera `api/handler.js`) |
 | `biome.json` | Nuevo | Config lint + formato para todo el monorepo |
 | `.github/workflows/ci.yml` | Nuevo | CI gate + deploy condicional |
 | `apps/api/src/config/env.ts` | Edit | Validación MONGODB_URI en producción |
