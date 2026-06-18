@@ -12,6 +12,8 @@ import mongoose from "mongoose";
 import { env, isProduction } from "../../config/env";
 
 export async function connectToDatabase(): Promise<void> {
+  if (mongoose.connection.readyState >= 1) return;
+
   if (!env.mongodbUri) {
     if (isProduction) {
       throw new Error("[db] MONGODB_URI es obligatoria en producción");

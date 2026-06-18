@@ -118,7 +118,7 @@ Vercel sirve `apps/web/dist` como estático. Antes de buscar fichero estático, 
 
 ### S3 · Edit: `apps/api/src/infrastructure/persistence/mongoose.ts` (+1 línea, ~5 min)
 
-- [ ] Añadir guard al inicio de `connectToDatabase()`:
+- [x] Añadir guard al inicio de `connectToDatabase()`:
 
 ```typescript
 export async function connectToDatabase(): Promise<void> {
