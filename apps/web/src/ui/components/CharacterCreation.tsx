@@ -22,6 +22,7 @@ import {
 import { KAI_DISCIPLINE_DESCRIPTIONS } from "../../domain/character/kai-discipline-descriptions";
 import { WEAPON_NAMES, type WeaponType } from "../../domain/character/weapon";
 import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
+import { EquipmentRulesModal } from "./EquipmentRulesModal";
 
 interface Props {
   onCreate: (character: Character) => void;
@@ -55,6 +56,7 @@ export function CharacterCreation({ onCreate }: Props) {
   const [storeroomId, setStoreroomId] = useState<number | null>(null);
   const [selected, setSelected] = useState<KaiDiscipline[]>([]);
   const [focusedDisc, setFocusedDisc] = useState<KaiDiscipline | null>(null);
+  const [showEquipRules, setShowEquipRules] = useState(false);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
   const [conflictChoice, setConflictChoice] = useState<"weaponskill" | "storeroom" | null>(null);
 
@@ -165,6 +167,8 @@ export function CharacterCreation({ onCreate }: Props) {
   }
 
   return (
+    <>
+    {showEquipRules && <EquipmentRulesModal onClose={() => setShowEquipRules(false)} />}
     <main className="creation" data-testid="creation">
       <h1>🐺 Crea a Lobo Solitario</h1>
       <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
@@ -247,6 +251,15 @@ export function CharacterCreation({ onCreate }: Props) {
       <p className="muted small">
         Equipo fijo: Hacha, 1 Comida y Mapa de Sommerlund.
       </p>
+      <div className="sheet-ref-buttons">
+        <button
+          type="button"
+          className="rules-btn"
+          onClick={() => setShowEquipRules(true)}
+        >
+          ¿Cómo funciona el equipo?
+        </button>
+      </div>
 
       <h2>
         Disciplinas del Kai{" "}
@@ -327,5 +340,6 @@ export function CharacterCreation({ onCreate }: Props) {
         Comenzar la aventura
       </button>
     </main>
+    </>
   );
 }

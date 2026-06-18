@@ -303,9 +303,14 @@
       [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) ·
       [index.css](apps/web/src/index.css)
 
-- [ ] **Textos del equipo** (~45 min)
-      Mostrar `howcarry`, `howmuch`, `howuse` antes o durante la selección del almacén.
-      **↳** R3 mejora el resultado.
+- [x] **Textos del equipo** (~45 min)
+      Botón "¿Cómo funciona el equipo?" bajo las tarjetas de stats en `CharacterCreation`.
+      Abre `EquipmentRulesModal` con tres secciones del libro (howcarry, howmuch, howuse)
+      extraídas del XML y formateadas como JSX. Reutiliza los estilos `.modal*`, `.rules-list`,
+      `.rules-section` y añade `.equip-term` para los términos tipo `<dl>`.
+      Ficheros: [EquipmentRulesModal.tsx](apps/web/src/ui/components/EquipmentRulesModal.tsx) ·
+      [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx) ·
+      [index.css](apps/web/src/index.css)
 
 - [ ] **Niveles de entrenamiento Kai** (~30 min)
       Tabla de rangos (sección `kaiwisdm`) como referencia para el jugador en partida.

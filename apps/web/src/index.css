@@ -908,3 +908,22 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
+/* ── Modal de equipo ────────────────────────────────────────────────────── */
+.equip-term {
+  margin-bottom: 0.85rem;
+}
+
+.equip-term strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+
+.equip-term p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
