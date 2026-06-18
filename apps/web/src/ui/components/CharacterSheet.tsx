@@ -18,6 +18,7 @@ import { KAI_DISCIPLINE_NAMES } from "../../domain/character/kai-discipline";
 import { WEAPON_NAMES } from "../../domain/character/weapon";
 import { CombatRulesModal } from "./CombatRulesModal";
 import { KaiDisciplinesModal } from "./KaiDisciplinesModal";
+import { KaiLevelsModal } from "./KaiLevelsModal";
 
 interface Props {
   character: Character;
@@ -31,6 +32,7 @@ const POTION_HEAL = 4;
 export function CharacterSheet({ character, onCharacterChange, combatActive }: Props) {
   const [showRules, setShowRules] = useState(false);
   const [showDisciplines, setShowDisciplines] = useState(false);
+  const [showLevels, setShowLevels] = useState(false);
   const { stats } = character;
   const backpackItems = character.backpack.filter((i) => i.kind !== "meal");
 
@@ -52,6 +54,7 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
   return (
     <>
     {showRules && <CombatRulesModal onClose={() => setShowRules(false)} />}
+    {showLevels && <KaiLevelsModal onClose={() => setShowLevels(false)} />}
     {showDisciplines && (
       <KaiDisciplinesModal
         onClose={() => setShowDisciplines(false)}
@@ -173,6 +176,13 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
           onClick={() => setShowDisciplines(true)}
         >
           Disciplinas del Kai
+        </button>
+        <button
+          type="button"
+          className="rules-btn"
+          onClick={() => setShowLevels(true)}
+        >
+          Niveles de Entrenamiento Kai
         </button>
         <button
           type="button"

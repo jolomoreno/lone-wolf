@@ -909,6 +909,46 @@ body {
   letter-spacing: 0.04em;
 }
 
+/* ── Modal de niveles Kai ───────────────────────────────────────────────── */
+.kai-levels-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: kai-level;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kai-level-item {
+  counter-increment: kai-level;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+}
+
+.kai-level-item::before {
+  content: counter(kai-level) ".";
+  font-size: 0.8rem;
+  color: var(--muted);
+  width: 1.4rem;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.kai-level-item.current {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+}
+
+.kai-level-name {
+  flex: 1;
+}
+
 /* ── Modal de equipo ────────────────────────────────────────────────────── */
 .equip-term {
   margin-bottom: 0.85rem;

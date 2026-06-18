@@ -312,9 +312,14 @@
       [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx) ·
       [index.css](apps/web/src/index.css)
 
-- [ ] **Niveles de entrenamiento Kai** (~30 min)
-      Tabla de rangos (sección `kaiwisdm`) como referencia para el jugador en partida.
-      **↳** R3 mejora el resultado.
+- [x] **Niveles de entrenamiento Kai** (~30 min)
+      Botón "Niveles de Entrenamiento Kai" en la ficha del personaje (junto a Disciplinas y
+      Reglas de combate). Abre `KaiLevelsModal`: lista de 10 rangos (Postulante → Maestro)
+      con el rango 5 (Iniciado, el del Libro 1) resaltado con badge "TU RANGO" y borde dorado.
+      Texto introductorio y párrafo sobre el Magnakai extraídos del XML (sección `levels`).
+      Ficheros: [KaiLevelsModal.tsx](apps/web/src/ui/components/KaiLevelsModal.tsx) ·
+      [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx) ·
+      [index.css](apps/web/src/index.css)
 
 - [ ] **Mapa de Sommerlund** (~1-1.5 h)
       Mostrar el mapa del Libro 1 desde Project Aon en dos modos: miniatura integrada
