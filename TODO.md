@@ -259,14 +259,17 @@
       en `apps/web/index.html`. Directorio `public/` creado.
 
 - [x] **Revisar imágenes de Project Aon** (~30-45 min)
-      Auditoría completa (2026-06-18): todas las ilustraciones de partida (ill1-ill20,
+      Auditoría completa (2026-06-18): todas las ilustraciones estándar (ill1-ill20,
       small1-small34) y las imágenes de equipo cargan correctamente (HTTP 200) desde
       `https://www.projectaon.org/data/trunk/en/png/lw/01fftd/ill/chalk/`.
-      `tssf.png` → 404 en todas las rutas de Project Aon (es una ilustración de la edición
-      Álvarez no distribuida digitalmente); sin impacto en la UI ya que `IntroScreen` tiene
-      texto hardcodeado y no carga imágenes de la API.
-      Hallazgo: `map.png` (1024×793 px, 1.2 MB) existe en el mismo directorio chalk y puede
-      usarse directamente para el mapa de Sommerlund (ver tarea más abajo).
+      Hallazgo adicional: existen 36 imágenes `{número}.png` (p.ej. `267.png`, `350.png`…)
+      específicas de la edición Álvarez que NO están en Project Aon. Se producían en secciones
+      con doble ilustración (Álvarez + Chalk) y mostraban el placeholder `🖼️`.
+      **Corrección**: `Illustration` en `SectionView.tsx` devuelve `null` cuando la imagen
+      falla — se omite silenciosamente en vez de mostrar el placeholder roto. La ilustración
+      de Chalk de la misma sección sigue cargando correctamente.
+      `tssf.png` → 404 en todas las rutas (sin impacto: `IntroScreen` no carga desde la API).
+      Hallazgo: `map.png` (1024×793 px, 1.2 MB) disponible en chalk para el mapa de Sommerlund.
 
 - [x] **Reglas de combate como referencia** (~1 h)
       `CombatRulesModal.tsx`: modal accesible con botón "Reglas de combate" al pie de

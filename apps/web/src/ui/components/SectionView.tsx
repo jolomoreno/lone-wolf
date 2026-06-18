@@ -12,18 +12,14 @@ import { illustrationUrl } from "../../config/project-aon";
 
 /**
  * Ilustración de Project Aon enlazada desde su servidor. Si la imagen no carga
- * (p.ej. fichero inexistente o sin conexión), cae a un marcador de posición.
+ * (p.ej. fichero inexistente — como las ilustraciones de la edición Álvarez no
+ * disponibles en Project Aon), se omite silenciosamente sin mostrar placeholder.
  */
 function Illustration({ src, alt }: { src: string; alt?: string }) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
-    return (
-      <figure className="illustration">
-        <span aria-hidden>🖼️</span>
-        <span className="muted small">{alt ?? "Ilustración"}</span>
-      </figure>
-    );
+    return null;
   }
 
   return (
