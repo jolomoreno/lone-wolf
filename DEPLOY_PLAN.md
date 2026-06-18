@@ -150,11 +150,7 @@ En producción Vercel `VITE_API_URL` no se define → `""` → las llamadas van 
 
 ### S5 · Añadir `@vercel/node` (~5 min)
 
-- [ ] Instalar:
-
-```bash
-pnpm add -Dw @vercel/node
-```
+- [x] Instalar: `pnpm add -Dw @vercel/node` (v5.8.17, instalado junto con S1)
 
 Solo tipos y runtime helper de Vercel. No afecta al bundle de producción.
 

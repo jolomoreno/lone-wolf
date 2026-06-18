@@ -400,7 +400,7 @@
 - [x] **S2** · Nuevo `vercel.json` — build web + rewrites `/sections/*` y `/health` (~10 min)
 - [x] **S3** · `mongoose.ts` — añadir guard `readyState >= 1` al inicio de `connectToDatabase` (~5 min)
 - [x] **S4** · `apps/web/src/config/composition-root.ts` — fallback `apiUrl`: `"http://localhost:4000"` → `""` (~5 min)
-- [ ] **S5** · `pnpm add -Dw @vercel/node` (~5 min)
+- [x] **S5** · `pnpm add -Dw @vercel/node` (~5 min) — instalado junto con S1
 
 ### Fase 2 — MongoDB Atlas
 
