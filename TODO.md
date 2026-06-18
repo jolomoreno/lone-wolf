@@ -23,9 +23,8 @@
 - [x] **12. Tiradas animadas** — dados en la creación del personaje con revelación
       progresiva y animación.
 - [~] **13. Refactors / deuda técnica** — 13.1 completado (helmet, contratos,
-      UI fixes, CORS, claves estables). 13.2 pendiente: tests backend, lint, build prod.
-      13.3: log temporal del análisis exhaustivo del 2026-06-17 (4 bugs, 4 huecos de
-      fidelidad, 3 refactors) pendiente de triar.
+      UI fixes, CORS, claves estables). 13.2 pendiente: bugs de gameplay, infra de
+      despliegue, fidelidad de reglas, contenido/UX y deuda técnica (plan unificado).
 - [ ] **14. Despliegue + CI/CD** — Atlas + Render + Vercel + GitHub Actions.
 
 ---
@@ -177,146 +176,161 @@
       antes de la creación del personaje; `KaiWisdomScreen` ("La Sabiduría del Kai",
       `kaiwisdm`) entre la creación y sect1.
 
-### 13.2 — Tareas pendientes
+### 13.2 — Plan de acción unificado
 
-- [ ] **Tests del backend** — `parse-gamebook-xml.ts`, `section.mapper.ts`, caso de uso
-      `GetSection` (back y front con un `ContentPort` falso). (~3-4 h)
-- [ ] **Lint y formato** — no hay ESLint/Prettier/Biome; `pnpm lint` (raíz) no hace nada.
-      (~1-1.5 h)
-- [ ] **Estrategia build para Render** — dev y `start` usan `tsx`; decidir si compilar o
-      usar `tsx` en prod; `@lone-wolf/shared` exporta `.ts`. Bloquea el Paso 14. (~1 h)
-- [ ] **Endurecer API** — rate-limit y validación explícita de variables de entorno al
-      arrancar (helmet ya hecho). (~30 min)
-- [ ] **Revisar imágenes del juego** — auditar qué ilustraciones cargan correctamente
-      desde Project Aon y cuáles caen al placeholder; corregir rutas o buscar alternativas.
-- [ ] **Textos de disciplinas del Kai** — mostrar la descripción completa de cada
-      disciplina (secciones `camflage`, `hunting`, `sixthsns`, `tracking`, `healing`,
-      `wepnskll`, `mindshld`, `mndblst`, `anmlknsp`, `mindomtr` del XML) durante la
-      selección en `CharacterCreation` y/o como referencia en partida.
-- [ ] **Textos del equipo** — mostrar las reglas de cómo llevar el equipo (`howcarry`,
-      `howmuch`, `howuse`) antes o durante la selección del almacén.
-- [ ] **Niveles de entrenamiento Kai** — mostrar la tabla de rangos (`kaiwisdm` o
-      sección equivalente) como referencia al jugador.
-- [ ] **Reglas de combate** — mostrar las reglas del sistema de combate (tabla de
-      resultados, elusión, etc.) como pantalla de referencia accesible durante la partida.
-- [ ] **Añadir texto reglas de juego** — mostrar la explicación de la Resistencia y la
-      Destreza en el Combate tal como aparece en el XML de Project Aon (sección
-      `combat` o equivalente): qué representan, cómo se calculan, cómo interactúan
-      con la Tabla de Resultados. Incorporarlo como pantalla de referencia accesible
-      durante la partida (p.ej. un modal o pestaña en la ficha del personaje).
-- [ ] **Añadir favicon** — incluir un favicon (`.ico` o `.png`) para que la pestaña
-      del navegador muestre el icono del juego en vez del genérico de Vite.
-      Añadirlo en `apps/web/public/` y referenciarlo en `apps/web/index.html`.
-- [ ] **Añadir mapa de Sommerlund** — mostrar el mapa del Libro 1 desde Project Aon
-      (https://www.projectaon.org/es/xhtml/ls/01hdlo/map.htm) con dos modos de
-      visualización: versión normal (miniatura integrada en la UI) y versión ampliada
-      (modal o página completa para explorar el detalle). Hotlink igual que las
-      ilustraciones (sin redistribuir, cumple la licencia).
+> Fusión del backlog de 13.2 y el análisis exhaustivo del 2026-06-17 (bugs B1-B4,
+> huecos de fidelidad F1-F4, refactors R1-R3). Ordenado por impacto/coste:
+> primero bugs que rompen el juego, luego infraestructura (desbloquea paso 14),
+> luego fidelidad de reglas, luego contenido/UX, finalmente deuda técnica pura.
+> Las dependencias entre tareas se indican con **↳**.
 
----
+#### A · Bugs de gameplay — corregir primero
 
-## 13.3 — Análisis exhaustivo (TEMPORAL · 2026-06-17)
+- [ ] **B2 · Efectos de entrada no son idempotentes** (~20 min)
+      `applyEntryEffect` (daño narrativo + comidas obligatorias en `SECTION_ENTRY_EFFECTS`)
+      se aplica **cada vez** que se entra a la sección; en cualquier bucle del libro
+      el daño o la pérdida de comida se vuelve a aplicar. Solo el oro tiene flag.
+      Arreglo: guardar `entry:<sectionId>` en el `GameState` igual que `gold:<sectionId>`.
+      Ficheros: [App.tsx](apps/web/src/ui/App.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
 
-> Log escrito al cerrar la sesión del 2026-06-17 tras una revisión completa de la app
-> (dominio web, UI, backend, parser) cruzada con las reglas oficiales del Libro 1 de
-> Project Aon. Es una lista de trabajo para próximas sesiones; **ninguno está corregido
-> todavía**. Marcado "(temporal)" porque, una vez triados y movidos a sus pasos
-> definitivos (13.2 / 14 / nice-to-have), esta sección puede borrarse.
->
-> Orden sugerido de ataque: primero los BUGS de fidelidad (B1–B4), luego refactors
-> de bajo riesgo (R1–R3), luego huecos de reglas (F1–F4).
+- [ ] **B1 · Weaponskill +2 no se aplica a armas de botín** (~30 min)
+      `hasWeaponskillBonus` compara `w.id === character.weaponskillWeapon` pero los ids de
+      botín son `"loot-dagger"`, `"loot-spear"`, `"short-sword"` — no coinciden con el
+      `WeaponType`. Arreglo: añadir campo `weaponType` a `InventoryItem` y comparar por él.
+      Ficheros: [CombatPanel.tsx:32](apps/web/src/ui/components/CombatPanel.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
+      **↳** Beneficio extra si se resuelve R1 a la vez (lógica centralizada).
 
-### Bugs detectados
+- [ ] **B4 · Sesgo de probabilidad en el almacén + lógica duplicada** (~30 min)
+      `(raw % 9) + 1` sobre tirada 0-9 da doble probabilidad a la Espada (raw 0 y raw 9
+      producen el mismo id). La regla además está duplicada en dominio y en
+      `CharacterCreation`. Arreglo: tabla explícita 0→"sword"…8→último; UI llama a
+      `rollStoreroomChoiceId` del dominio en vez de reimplementar con `Math.random()`.
+      Ficheros: [equipment.ts:72](apps/web/src/domain/character/equipment.ts) · [CharacterCreation.tsx:97](apps/web/src/ui/components/CharacterCreation.tsx)
+      **↳** Requiere R1 para eliminar la duplicación.
 
-- [ ] **B1 · Weaponskill +2 no se aplica a armas de botín.**
-      `hasWeaponskillBonus` ([CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx:32))
-      compara `w.id === character.weaponskillWeapon`, donde `weaponskillWeapon` es un
-      `WeaponType` (`"dagger"`, `"spear"`, `"shortSword"`…). Pero los ids de las armas de
-      botín en [section-rules.ts](apps/web/src/domain/game/section-rules.ts) son
-      `"loot-dagger"`, `"loot-spear"`, `"short-sword"` → **no coinciden**. Un jugador con
-      Dominio de las Armas (Daga) que recoge la daga de sect291 no recibe el +2.
-      Las armas iniciales (Hacha `"axe"`, y las del almacén `"sword"`/`"mace"`/`"spear"`)
-      sí coinciden por casualidad. Arreglo: que la igualdad se base en un campo
-      `weaponType` del `InventoryItem`, no en el `id` de instancia.
+- [ ] **F4 · Curación silenciosa** (~15 min)
+      El +1 de Resistencia por la disciplina Curación no genera mensaje en
+      `entryMessages`, a diferencia del resto de efectos de entrada.
+      Añadir aviso. Verificar también que la condición es "sección que se ENTRA
+      no tiene combate", no la que se deja.
+      Fichero: [App.tsx:293](apps/web/src/ui/App.tsx)
 
-- [ ] **B2 · Los efectos de entrada NO son idempotentes (contradicen su comentario).**
-      `applyEntryEffect` (daño narrativo + comidas obligatorias) se aplica en `navigateTo`
-      ([App.tsx](apps/web/src/ui/App.tsx:303)) **cada vez** que se entra a la sección.
-      Solo el oro de botín está protegido por flag (`gold:<id>`). El comentario de
-      `SECTION_ENTRY_EFFECTS` dice "se aplican UNA vez al entrar", pero el código no lo
-      garantiza: en cualquier bucle del libro (volver a una sección) el daño/comida se
-      vuelve a aplicar. Arreglo: guardar un flag `entry:<id>` igual que con el oro.
+#### B · Infraestructura para el despliegue — desbloquea el paso 14
 
-- [ ] **B3 · El combate en curso no se persiste en el GameState.**
-      `CombatState` (Resistencia del enemigo, asaltos) vive solo en el estado local de
-      [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx:74). El autoguardado
-      solo persiste la Resistencia del jugador vía `onEnduranceChange`. Si el jugador
-      recarga la página a mitad de combate, el enemigo revive a Resistencia plena mientras
-      el jugador conserva la suya mermada → estado inconsistente y explotable. Arreglo:
-      o bien serializar el combate en `GameState`, o impedir la recarga limpia (avisar).
+- [ ] **Estrategia de build para Render** (~1 h) · **Bloquea el paso 14**
+      Dev y `start` usan `tsx`; `@lone-wolf/shared` exporta `.ts` sin compilar.
+      Decidir y configurar: compilar con `tsc`/`esbuild` antes de arrancar en prod,
+      o mantener `tsx` en prod (arranque levemente más lento pero sin paso de build).
 
-- [ ] **B4 · Sesgo de probabilidad y lógica duplicada en el objeto del almacén.**
-      `rollStoreroomChoiceId` ([equipment.ts](apps/web/src/domain/character/equipment.ts:72))
-      y `rollStore()` ([CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx:97))
-      hacen `(raw % 9) + 1` sobre una tirada 0-9. `raw=0` y `raw=9` dan ambos id 1 (Espada):
-      la Espada sale con **doble probabilidad** y el resto del reparto queda sesgado.
-      Además la regla está **duplicada** (dominio + UI) y pueden divergir. Arreglo: mapear
-      0-8 → 1-9 descartando/re-tirando el 9, o usar una tabla explícita; y que la UI use
-      la función del dominio en vez de reimplementarla con `Math.random()`.
+- [ ] **Lint y formato** (~1-1.5 h) · Recomendado antes del CI/CD
+      No hay ESLint/Prettier/Biome configurado; `pnpm lint` en raíz no hace nada.
+      Añadir Biome (recomendado: monorepo, rápido, zero-config) o ESLint + Prettier
+      con reglas básicas y el script `pnpm lint` funcional en los tres paquetes.
 
-### Huecos de fidelidad vs reglas oficiales (Libro 1)
+- [ ] **Endurecer API** (~30 min)
+      Añadir `express-rate-limit` y validación explícita de `PORT`, `MONGODB_URI` y
+      `CORS_ORIGIN` al arrancar (fallar rápido en prod si falta alguna). Helmet ya hecho.
 
-- [ ] **F1 · Regla "sin arma en combate: −4 a la Destreza".** Si Lobo Solitario pelea
-      desarmado (perdió el equipo con el Kraan en sect188, o soltó todas sus armas con los
-      botones ✕ de la ficha) las reglas oficiales restan 4 a la Destreza en el Combate.
-      No está implementado: `startCombat` no penaliza por `weapons.length === 0`.
+#### C · Fidelidad de reglas
 
-- [ ] **F2 · "Objeto del almacén por tirada" es ya una desviación.** En las reglas
-      oficiales el jugador **elige** el objeto del almacén; aquí se decide por tirada
-      (documentado como decisión de diseño en el README). Revisar si se quiere ofrecer
-      elección manual como alternativa fiel.
+- [ ] **F1 · Penalización −4 a Destreza sin arma** (~30 min)
+      Si `character.weapons.length === 0` al iniciar combate, restar 4 a la Destreza
+      efectiva. No implementado en `startCombat`.
+      Fichero: [CombatPanel.tsx](apps/web/src/ui/components/CombatPanel.tsx)
 
-- [ ] **F3 · Poción Curativa (Laumspur) usable en cualquier momento.** La regla la
-      restringe a beberse **después del combate** (+4 Resistencia). La ficha permite usarla
-      siempre que `enduranceCurrent < max`. Desviación menor; decidir si se acota.
+- [ ] **F3 · Poción Curativa: restringir a después del combate** (~20 min)
+      La ficha permite usar la poción siempre que `enduranceCurrent < max`; las reglas
+      la restringen a después del combate. Decidir si se acota con una condición en
+      el botón "Usar" (p.ej. deshabilitar si `combatState` está activo).
+      Fichero: [CharacterSheet.tsx](apps/web/src/ui/components/CharacterSheet.tsx)
 
-- [ ] **F4 · Curación silenciosa.** El +1 de Resistencia por pasar por secciones sin
-      combate (`navigateTo`, [App.tsx](apps/web/src/ui/App.tsx:293)) no genera mensaje en
-      `entryMessages`, a diferencia del resto de efectos. El jugador no ve por qué sube su
-      Resistencia. Añadir aviso. (Verificar también que la condición correcta es "la
-      sección que se ENTRA no tiene combate", no la que se deja.)
+- [ ] **B3 · Combate en curso no se persiste en el GameState** (~2-3 h, puede diferirse)
+      `CombatState` vive solo en el estado local de `CombatPanel`. Al recargar, el enemigo
+      revive con Resistencia plena mientras el jugador conserva la suya mermada.
+      Opción A: serializar `CombatState` en `GameState` (requiere bump de `SAVE_FORMAT_VERSION`).
+      Opción B: mostrar aviso al intentar navegar/recargar mid-combat.
+      Fichero: [CombatPanel.tsx:74](apps/web/src/ui/components/CombatPanel.tsx)
 
-### Refactors / deuda técnica
+- [ ] **F2 · Almacén por tirada vs. elección libre** (decisión de diseño, ~1-2 h si se cambia)
+      En las reglas el jugador elige; aquí es por tirada (documentado en README y decisión
+      de diseño consciente). Bajo impacto mientras sea la única forma conocida por el
+      jugador. Revisar solo si se quiere mayor fidelidad.
 
-- [ ] **R1 · La UI de creación no usa las funciones de dominio.** `CharacterCreation`
-      reimplementa las tiradas con `Math.floor(Math.random()*10)` en vez de usar
-      `rollCombatSkill` / `rollEndurance` / `rollStartingGold` / `rollWeaponskillWeapon` /
-      `rollStoreroomChoiceId` (que son testables vía `RandomNumber`). Centralizar para que
-      el comportamiento probado sea el mismo que el de producción (ligado a B4).
+#### D · Contenido y UX
 
-- [ ] **R2 · Sin red de seguridad ante inventario lleno al coger botín.**
-      `handleTakeLoot` ([App.tsx](apps/web/src/ui/App.tsx:343)) llama a `addWeapon` /
-      `addToBackpack`, que **lanzan** si no hay sitio. Hoy `LootPanel` deshabilita el botón
-      cuando está lleno, así que no peta en la práctica, pero es frágil: cualquier desfase
-      entre `canTake` y los límites reales sería un crash sin Error Boundary (ver
-      nice-to-have). Envolver en try/catch o reusar la validación.
+- [ ] **Favicon** (~15 min)
+      Añadir `.ico` o `.png` en `apps/web/public/` y referenciar en `apps/web/index.html`.
 
-- [ ] **R3 · El parser aplana `ul`/`dl`/`signpost` a párrafo.**
-      `parseData` ([parse-gamebook-xml.ts](apps/api/src/infrastructure/import/parse-gamebook-xml.ts:176))
-      colapsa listas y tablas a texto plano. Para las secciones de referencia que quiere
-      mostrar 13.2 (equipo `howcarry`, disciplinas, rangos `kaiwisdm`) esto degrada el
-      contenido (se pierden viñetas/estructura). Si esos textos se incorporan, conviene
-      modelar listas en `ContentBlock`.
+- [ ] **Revisar imágenes de Project Aon** (~30-45 min)
+      Auditar qué ilustraciones cargan correctamente y cuáles caen al placeholder;
+      corregir rutas. Incluye localizar `tssf.png` (portada edición Álvarez).
 
-### Notas verificadas (no son bugs, dejar constancia)
+- [ ] **Reglas de combate como referencia** (~1 h)
+      Modal o pantalla con las reglas del sistema de combate (tabla de resultados, elusión,
+      Mindblast, etc.) accesible durante la partida desde la ficha del personaje.
+      **↳** R3 mejora el resultado si el texto viene del XML con estructura fiel.
 
-- La Tabla de Resultados de Combate y `combatRatioColumn` se revisaron celda a celda
-  contra la tabla canónica: correctas (incluida la fila "sacas 0" sin daño al jugador y
-  las "K").
-- El equipo fijo (Hacha + 1 Comida + Mapa) y los bonus de Resistencia del almacén
-  (Casco +2, Cota de Malla +4) son fieles al Libro 1.
-- Las condiciones de elección, inmunidades al Mindblast, modificadores CS (Vordak/Kraan)
-  y elusiones cruzan bien con el texto; no se detectaron secciones mal mapeadas en esta pasada.
+- [ ] **Reglas de Resistencia y Destreza** (~45 min)
+      Incorporar la explicación del XML (sección `combat` o equivalente) como referencia
+      accesible (modal o pestaña de la ficha). Qué representan, cómo interactúan con la
+      Tabla de Resultados.
+      **↳** R3 mejora el resultado.
+
+- [ ] **Textos de disciplinas del Kai** (~1-1.5 h)
+      Mostrar la descripción completa de cada disciplina durante la selección en
+      `CharacterCreation` y como referencia en partida. Secciones del XML:
+      `camflage`, `hunting`, `sixthsns`, `tracking`, `healing`, `wepnskll`,
+      `mindshld`, `mndblst`, `anmlknsp`, `mindomtr`.
+      **↳** R3 mejora el resultado (texto con viñetas en vez de párrafo aplanado).
+
+- [ ] **Textos del equipo** (~45 min)
+      Mostrar `howcarry`, `howmuch`, `howuse` antes o durante la selección del almacén.
+      **↳** R3 mejora el resultado.
+
+- [ ] **Niveles de entrenamiento Kai** (~30 min)
+      Tabla de rangos (sección `kaiwisdm`) como referencia para el jugador en partida.
+      **↳** R3 mejora el resultado.
+
+- [ ] **Mapa de Sommerlund** (~1-1.5 h)
+      Mostrar el mapa del Libro 1 desde Project Aon en dos modos: miniatura integrada
+      en la UI y versión ampliada en modal. Hotlink igual que las ilustraciones
+      (sin redistribuir, cumple la licencia).
+
+#### E · Deuda técnica / refactors
+
+- [ ] **R1 · CharacterCreation debe usar las funciones de dominio** (~45 min)
+      El componente reimplementa tiradas con `Math.floor(Math.random()*10)` en vez de
+      llamar a `rollCombatSkill` / `rollEndurance` / `rollStartingGold` /
+      `rollWeaponskillWeapon` / `rollStoreroomChoiceId`. Centralizar para que el
+      comportamiento probado en tests sea el mismo que corre en producción.
+      Fichero: [CharacterCreation.tsx](apps/web/src/ui/components/CharacterCreation.tsx)
+      **↳** Prerequisito para corregir B4 completamente.
+
+- [ ] **R2 · try/catch en `handleTakeLoot`** (~15 min)
+      `addWeapon` / `addToBackpack` lanzan si no hay sitio. `LootPanel` ya deshabilita el
+      botón, pero cualquier desfase entre `canTake` y los límites reales provocaría un crash.
+      Envolver en try/catch o reusar la validación de `canTake` antes de llamar.
+      Fichero: [App.tsx:343](apps/web/src/ui/App.tsx)
+
+- [ ] **R3 · Parser: modelar listas y tablas como `ContentBlock`** (~2-3 h, diferible)
+      `parseData` aplana `ul`/`dl`/`signpost` a párrafo plano, perdiendo la estructura.
+      Modelar un `ContentBlock` de tipo `list` para preservar viñetas y mejorar la
+      legibilidad de las secciones de referencia (disciplinas, equipo, rangos Kai).
+      Fichero: [parse-gamebook-xml.ts:176](apps/api/src/infrastructure/import/parse-gamebook-xml.ts)
+      Solo prioritario si D · Contenido resulta ilegible en texto plano.
+
+- [ ] **Tests del backend** (~3-4 h)
+      Tests de `parse-gamebook-xml.ts`, `section.mapper.ts` y caso de uso `GetSection`
+      (back y front con un `ContentPort` falso). Sin urgencia de gameplay; aporta
+      confianza antes del despliegue.
+
+#### Notas verificadas (no son bugs)
+
+- Tabla de Resultados de Combate revisada celda a celda contra la canónica: correcta
+  (incluida la fila "sacas 0" sin daño al jugador y las "K").
+- Equipo fijo (Hacha + 1 Comida + Mapa) y bonus del almacén (Casco +2, Cota +4): fieles.
+- Condiciones de elección, inmunidades Mindblast, modificadores CS (Vordak/Kraan) y
+  elusiones: correctos; no se detectaron secciones mal mapeadas en la revisión del 2026-06-17.
 
 ---
 
