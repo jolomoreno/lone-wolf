@@ -263,7 +263,7 @@ export function CharacterCreation({ onCreate }: Props) {
             <button
               key={discipline}
               type="button"
-              className={`discipline-toggle${active ? " active" : ""}${focusedDisc === discipline ? " focused" : ""}`}
+              className={`discipline-toggle${active ? " active" : ""}`}
               aria-pressed={active}
               disabled={!active && isFull}
               onClick={() => { toggle(discipline); setFocusedDisc(discipline); }}

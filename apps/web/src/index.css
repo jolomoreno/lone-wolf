@@ -491,11 +491,6 @@ body {
   cursor: not-allowed;
 }
 
-.discipline-toggle.focused {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
 /* Panel de descripción de disciplina en la creación del personaje */
 .disc-description-panel {
   margin-top: 1rem;
