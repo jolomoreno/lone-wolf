@@ -7,6 +7,9 @@ dist/
 build/
 *.tsbuildinfo
 
+# Bundle serverless generado por esbuild (artefacto de build, no se versiona)
+api/handler.js
+
 # Variables de entorno (¡nunca subir secretos!)
 .env
 .env.*
