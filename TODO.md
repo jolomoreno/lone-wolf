@@ -25,7 +25,7 @@
 - [~] **13. Refactors / deuda técnica** — 13.1 completado (helmet, contratos,
       UI fixes, CORS, claves estables). 13.2 pendiente: bugs de gameplay, infra de
       despliegue, fidelidad de reglas, contenido/UX y deuda técnica (plan unificado).
-- [ ] **14. Despliegue + CI/CD** — Atlas + Render + Vercel + GitHub Actions.
+- [ ] **14. Despliegue + CI/CD** — prerequisitos (lint, build, endurecer API) + Atlas + Render + Vercel + GitHub Actions.
 
 ---
 
@@ -179,9 +179,11 @@
 ### 13.2 — Plan de acción unificado
 
 > Fusión del backlog de 13.2 y el análisis exhaustivo del 2026-06-17 (bugs B1-B4,
-> huecos de fidelidad F1-F4, refactors R1-R3). Ordenado por impacto/coste:
-> primero bugs que rompen el juego, luego infraestructura (desbloquea paso 14),
-> luego fidelidad de reglas, luego contenido/UX, finalmente deuda técnica pura.
+> huecos de fidelidad F1-F4, refactors R1-R3). La infraestructura de despliegue
+> (lint, build, endurecer API) se mueve al **Paso 14** como prerequisito.
+>
+> Grupos A–D son mayormente independientes entre sí; el orden refleja prioridad,
+> no prerequisito estricto. Excepción: **R1 (grupo D) es prerequisito de B4 (grupo A)**.
 > Las dependencias entre tareas se indican con **↳**.
 
 #### A · Bugs de gameplay — corregir primero
@@ -198,7 +200,7 @@
       botín son `"loot-dagger"`, `"loot-spear"`, `"short-sword"` — no coinciden con el
       `WeaponType`. Arreglo: añadir campo `weaponType` a `InventoryItem` y comparar por él.
       Ficheros: [CombatPanel.tsx:32](apps/web/src/ui/components/CombatPanel.tsx) · [section-rules.ts](apps/web/src/domain/game/section-rules.ts)
-      **↳** Beneficio extra si se resuelve R1 a la vez (lógica centralizada).
+      **↳** Beneficio extra si se resuelve R1 (grupo D) a la vez (lógica centralizada).
 
 - [ ] **B4 · Sesgo de probabilidad en el almacén + lógica duplicada** (~30 min)
       `(raw % 9) + 1` sobre tirada 0-9 da doble probabilidad a la Espada (raw 0 y raw 9
@@ -206,7 +208,7 @@
       `CharacterCreation`. Arreglo: tabla explícita 0→"sword"…8→último; UI llama a
       `rollStoreroomChoiceId` del dominio en vez de reimplementar con `Math.random()`.
       Ficheros: [equipment.ts:72](apps/web/src/domain/character/equipment.ts) · [CharacterCreation.tsx:97](apps/web/src/ui/components/CharacterCreation.tsx)
-      **↳** Requiere R1 para eliminar la duplicación.
+      **↳** Requiere R1 (grupo D) para eliminar la duplicación.
 
 - [ ] **F4 · Curación silenciosa** (~15 min)
       El +1 de Resistencia por la disciplina Curación no genera mensaje en
@@ -215,23 +217,7 @@
       no tiene combate", no la que se deja.
       Fichero: [App.tsx:293](apps/web/src/ui/App.tsx)
 
-#### B · Infraestructura para el despliegue — desbloquea el paso 14
-
-- [ ] **Estrategia de build para Render** (~1 h) · **Bloquea el paso 14**
-      Dev y `start` usan `tsx`; `@lone-wolf/shared` exporta `.ts` sin compilar.
-      Decidir y configurar: compilar con `tsc`/`esbuild` antes de arrancar en prod,
-      o mantener `tsx` en prod (arranque levemente más lento pero sin paso de build).
-
-- [ ] **Lint y formato** (~1-1.5 h) · Recomendado antes del CI/CD
-      No hay ESLint/Prettier/Biome configurado; `pnpm lint` en raíz no hace nada.
-      Añadir Biome (recomendado: monorepo, rápido, zero-config) o ESLint + Prettier
-      con reglas básicas y el script `pnpm lint` funcional en los tres paquetes.
-
-- [ ] **Endurecer API** (~30 min)
-      Añadir `express-rate-limit` y validación explícita de `PORT`, `MONGODB_URI` y
-      `CORS_ORIGIN` al arrancar (fallar rápido en prod si falta alguna). Helmet ya hecho.
-
-#### C · Fidelidad de reglas
+#### B · Fidelidad de reglas
 
 - [ ] **F1 · Penalización −4 a Destreza sin arma** (~30 min)
       Si `character.weapons.length === 0` al iniciar combate, restar 4 a la Destreza
@@ -256,7 +242,7 @@
       de diseño consciente). Bajo impacto mientras sea la única forma conocida por el
       jugador. Revisar solo si se quiere mayor fidelidad.
 
-#### D · Contenido y UX
+#### C · Contenido y UX
 
 - [ ] **Favicon** (~15 min)
       Añadir `.ico` o `.png` en `apps/web/public/` y referenciar en `apps/web/index.html`.
@@ -296,7 +282,7 @@
       en la UI y versión ampliada en modal. Hotlink igual que las ilustraciones
       (sin redistribuir, cumple la licencia).
 
-#### E · Deuda técnica / refactors
+#### D · Deuda técnica / refactors
 
 - [ ] **R1 · CharacterCreation debe usar las funciones de dominio** (~45 min)
       El componente reimplementa tiradas con `Math.floor(Math.random()*10)` en vez de
@@ -335,6 +321,24 @@
 ---
 
 ## Paso 14 — Despliegue + CI/CD
+
+### Prerequisitos (hacer antes de desplegar)
+
+- [ ] **Estrategia de build para Render** (~1 h)
+      Dev y `start` usan `tsx`; `@lone-wolf/shared` exporta `.ts` sin compilar.
+      Decidir y configurar: compilar con `tsc`/`esbuild` antes de arrancar en prod,
+      o mantener `tsx` en prod (arranque levemente más lento pero sin paso de build).
+
+- [ ] **Lint y formato** (~1-1.5 h)
+      No hay ESLint/Prettier/Biome configurado; `pnpm lint` en raíz no hace nada.
+      Añadir Biome (recomendado: monorepo, rápido, zero-config) o ESLint + Prettier
+      con reglas básicas y el script `pnpm lint` funcional en los tres paquetes.
+
+- [ ] **Endurecer API** (~30 min)
+      Añadir `express-rate-limit` y validación explícita de `PORT`, `MONGODB_URI` y
+      `CORS_ORIGIN` al arrancar (fallar rápido en prod si falta alguna). Helmet ya hecho.
+
+### Despliegue
 
 - [ ] `CORS_ORIGIN` apuntando a la URL desplegada del front (Vercel).
 - [ ] Configurar monorepo pnpm en Vercel/Render (root dir, install/build), Node 22
