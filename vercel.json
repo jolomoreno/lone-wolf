@@ -2,8 +2,11 @@
   "buildCommand": "pnpm --filter @lone-wolf/web build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install --frozen-lockfile",
+  "functions": {
+    "apps/api/handler.ts": {}
+  },
   "rewrites": [
-    { "source": "/sections/:path*", "destination": "/api/handler" },
-    { "source": "/health", "destination": "/api/handler" }
+    { "source": "/sections/:path*", "destination": "/apps/api/handler" },
+    { "source": "/health", "destination": "/apps/api/handler" }
   ]
 }
