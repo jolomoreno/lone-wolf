@@ -3,7 +3,7 @@
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "functions": {
-    "apps/api/handler.ts": {}
+    "apps/api/handler.ts": { "maxDuration": 10 }
   },
   "rewrites": [
     { "source": "/sections/:path*", "destination": "/apps/api/handler" },
