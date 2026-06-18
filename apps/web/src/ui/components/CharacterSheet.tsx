@@ -183,6 +183,7 @@ export function CharacterSheet({ character, onCharacterChange, combatActive }: P
         </>
       )}
 
+      <h3>Reglas</h3>
       <div className="sheet-ref-buttons">
         <button
           type="button"
