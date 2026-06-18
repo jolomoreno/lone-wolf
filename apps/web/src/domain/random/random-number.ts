@@ -7,4 +7,5 @@
 
 export type RandomNumber = () => number;
 
-export const defaultRandomNumber: RandomNumber = () => Math.floor(Math.random() * 10);
+export const defaultRandomNumber: RandomNumber = () =>
+  Math.floor(Math.random() * 10);

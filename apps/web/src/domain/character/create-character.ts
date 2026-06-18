@@ -11,6 +11,10 @@
  */
 
 import {
+  defaultRandomNumber,
+  type RandomNumber,
+} from "../random/random-number";
+import {
   BASE_COMBAT_SKILL,
   BASE_ENDURANCE,
   type Character,
@@ -19,20 +23,28 @@ import {
   MAX_GOLD,
   MAX_WEAPONS,
 } from "./character";
-import { KAI_DISCIPLINES_TO_CHOOSE, type KaiDiscipline } from "./kai-discipline";
+import {
+  KAI_DISCIPLINES_TO_CHOOSE,
+  type KaiDiscipline,
+} from "./kai-discipline";
 import type { WeaponType } from "./weapon";
-import { defaultRandomNumber, type RandomNumber } from "../random/random-number";
 
-export function rollCombatSkill(random: RandomNumber = defaultRandomNumber): number {
+export function rollCombatSkill(
+  random: RandomNumber = defaultRandomNumber,
+): number {
   return BASE_COMBAT_SKILL + random();
 }
 
-export function rollEndurance(random: RandomNumber = defaultRandomNumber): number {
+export function rollEndurance(
+  random: RandomNumber = defaultRandomNumber,
+): number {
   return BASE_ENDURANCE + random();
 }
 
 /** Tira las Coronas de Oro iniciales (0-9) en la Tabla de la Suerte. */
-export function rollStartingGold(random: RandomNumber = defaultRandomNumber): number {
+export function rollStartingGold(
+  random: RandomNumber = defaultRandomNumber,
+): number {
   return random();
 }
 
@@ -41,16 +53,16 @@ export function rollStartingGold(random: RandomNumber = defaultRandomNumber): nu
  * El 0 y el 9 dan Daga (igual que en las reglas impresas).
  */
 const WEAPONSKILL_TABLE: WeaponType[] = [
-  "dagger",       // 0
-  "spear",        // 1
-  "mace",         // 2
-  "shortSword",   // 3
-  "warhammer",    // 4
-  "sword",        // 5
-  "axe",          // 6
+  "dagger", // 0
+  "spear", // 1
+  "mace", // 2
+  "shortSword", // 3
+  "warhammer", // 4
+  "sword", // 5
+  "axe", // 6
   "quarterstaff", // 7
-  "broadsword",   // 8
-  "dagger",       // 9
+  "broadsword", // 8
+  "dagger", // 9
 ];
 
 export function rollWeaponskillWeapon(
@@ -95,13 +107,17 @@ export function createCharacter(params: CreateCharacterParams): Character {
     throw new Error("No puedes repetir disciplinas.");
   }
   if (disciplines.includes("weaponskill") && !weaponskillWeapon) {
-    throw new Error('La disciplina "Dominio de las Armas" requiere elegir un arma.');
+    throw new Error(
+      'La disciplina "Dominio de las Armas" requiere elegir un arma.',
+    );
   }
   if (weapons.length > MAX_WEAPONS) {
     throw new Error(`No puedes empezar con más de ${MAX_WEAPONS} armas.`);
   }
   if (backpack.length > MAX_BACKPACK_ITEMS) {
-    throw new Error(`La mochila admite como máximo ${MAX_BACKPACK_ITEMS} objetos.`);
+    throw new Error(
+      `La mochila admite como máximo ${MAX_BACKPACK_ITEMS} objetos.`,
+    );
   }
   if (gold < 0 || gold > MAX_GOLD) {
     throw new Error(`El oro debe estar entre 0 y ${MAX_GOLD} coronas.`);

@@ -8,8 +8,8 @@
  * futuros controllers de dominio (que recibirán sus casos de uso por inyección).
  */
 
-import { Router } from "express";
 import { API_CONTRACT_VERSION } from "@lone-wolf/shared";
+import { Router } from "express";
 import { databaseStatus } from "../persistence/mongoose";
 
 export function createHealthRouter(): Router {

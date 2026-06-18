@@ -24,15 +24,17 @@ export function KaiLevelsModal({ onClose }: Props) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Niveles de Entrenamiento Kai</h2>
-          <button type="button" className="modal-close" onClick={onClose}>✕</button>
+          <button type="button" className="modal-close" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <p className="rules-intro">
           El cuadro de más abajo indica los distintos rangos y títulos otorgados
           a los Señores del Kai en cada etapa de su entrenamiento. Cada vez que
-          completes con éxito una aventura de la serie Lobo Solitario, conseguirás
-          una Disciplina Kai suplementaria y podrás ascender progresivamente hacia
-          el dominio completo de las diez Disciplinas Kai.
+          completes con éxito una aventura de la serie Lobo Solitario,
+          conseguirás una Disciplina Kai suplementaria y podrás ascender
+          progresivamente hacia el dominio completo de las diez Disciplinas Kai.
         </p>
 
         <ol className="kai-levels-list">
@@ -40,11 +42,12 @@ export function KaiLevelsModal({ onClose }: Props) {
             const rank = i + 1;
             const isPlayer = rank === PLAYER_LEVEL;
             return (
-              <li key={rank} className={`kai-level-item${isPlayer ? " current" : ""}`}>
+              <li
+                key={rank}
+                className={`kai-level-item${isPlayer ? " current" : ""}`}
+              >
                 <span className="kai-level-name">{name}</span>
-                {isPlayer && (
-                  <span className="kai-disc-badge">TU RANGO</span>
-                )}
+                {isPlayer && <span className="kai-disc-badge">TU RANGO</span>}
               </li>
             );
           })}
@@ -52,9 +55,9 @@ export function KaiLevelsModal({ onClose }: Props) {
 
         <p className="rules-intro" style={{ marginTop: "1.25rem" }}>
           Tras estas diez disciplinas Kai básicas existen otras Disciplinas Kai
-          secretas, de orden superior, llamadas Magnakai. Adquiriendo la sabiduría
-          del Magnakai, un Señor del Kai puede progresar hacia el dominio supremo
-          y convertirse en un Gran Señor del Kai.
+          secretas, de orden superior, llamadas Magnakai. Adquiriendo la
+          sabiduría del Magnakai, un Señor del Kai puede progresar hacia el
+          dominio supremo y convertirse en un Gran Señor del Kai.
         </p>
       </div>
     </div>

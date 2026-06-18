@@ -11,7 +11,9 @@ export class HttpContentAdapter implements ContentPort {
   constructor(private readonly baseUrl: string) {}
 
   async getSection(id: string): Promise<SectionDTO> {
-    const response = await fetch(`${this.baseUrl}/sections/${encodeURIComponent(id)}`);
+    const response = await fetch(
+      `${this.baseUrl}/sections/${encodeURIComponent(id)}`,
+    );
     if (response.status === 404) {
       throw new Error(`No existe la sección ${id}`);
     }

@@ -3,8 +3,8 @@
  * construye la app vía composition root y se pone a escuchar.
  */
 
-import { env } from "./config/env";
 import { buildApp } from "./config/composition-root";
+import { env } from "./config/env";
 import { connectToDatabase } from "./infrastructure/persistence/mongoose";
 
 async function main(): Promise<void> {

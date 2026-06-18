@@ -6,11 +6,11 @@
  * sin instanciar adaptadores por su cuenta.
  */
 
+import type { SavePort } from "../application/ports/save.port";
 import { CheckApiHealth } from "../application/use-cases/check-api-health";
 import { GetSection } from "../application/use-cases/get-section";
-import type { SavePort } from "../application/ports/save.port";
-import { HttpHealthAdapter } from "../infrastructure/http/http-health.adapter";
 import { HttpContentAdapter } from "../infrastructure/http/http-content.adapter";
+import { HttpHealthAdapter } from "../infrastructure/http/http-health.adapter";
 import { LocalStorageSaveAdapter } from "../infrastructure/storage/local-storage-save.adapter";
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";

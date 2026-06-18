@@ -12,7 +12,6 @@ import {
   rollStartingGold,
   rollWeaponskillWeapon,
 } from "../../domain/character/create-character";
-import { defaultRandomNumber } from "../../domain/random/random-number";
 import {
   createStartingCharacter,
   rollStoreroomChoiceId,
@@ -26,6 +25,7 @@ import {
   type KaiDiscipline,
 } from "../../domain/character/kai-discipline";
 import { WEAPON_NAMES, type WeaponType } from "../../domain/character/weapon";
+import { defaultRandomNumber } from "../../domain/random/random-number";
 import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
 import { EquipmentRulesModal } from "./EquipmentRulesModal";
 import { KaiDisciplinesModal } from "./KaiDisciplinesModal";
@@ -64,7 +64,9 @@ export function CharacterCreation({ onCreate }: Props) {
   const [showEquipRules, setShowEquipRules] = useState(false);
   const [showDiscModal, setShowDiscModal] = useState(false);
   const [weapon, setWeapon] = useState<WeaponType | null>(null);
-  const [conflictChoice, setConflictChoice] = useState<"weaponskill" | "storeroom" | null>(null);
+  const [conflictChoice, setConflictChoice] = useState<
+    "weaponskill" | "storeroom" | null
+  >(null);
 
   const dieCs = useRef<DiceRollHandle>(null);
   const dieEnd = useRef<DiceRollHandle>(null);
@@ -78,14 +80,18 @@ export function CharacterCreation({ onCreate }: Props) {
   // Hay conflicto cuando: el almacén dio un arma, el jugador tiene Dominio de las Armas
   // con un arma diferente y la Hacha no la cubre — los dos huecos quedarían llenos.
   const storeroomWeaponName =
-    storeroomItem?.grant.kind === "weapon" ? storeroomItem.grant.item.name : null;
+    storeroomItem?.grant.kind === "weapon"
+      ? storeroomItem.grant.item.name
+      : null;
   const storeroomWeaponId =
     storeroomItem?.grant.kind === "weapon" ? storeroomItem.grant.item.id : null;
   const isConflict = !!(
-    weapon &&
-    storeroomWeaponId &&
-    weapon !== "axe" &&          // la Hacha ya cubre el dominio de hacha
-    storeroomWeaponId !== weapon  // el arma del almacén no es la de dominio
+    (
+      weapon &&
+      storeroomWeaponId &&
+      weapon !== "axe" && // la Hacha ya cubre el dominio de hacha
+      storeroomWeaponId !== weapon
+    ) // el arma del almacén no es la de dominio
   );
 
   const ready =
@@ -174,185 +180,204 @@ export function CharacterCreation({ onCreate }: Props) {
 
   return (
     <>
-    {showEquipRules && <EquipmentRulesModal onClose={() => setShowEquipRules(false)} />}
-    {showDiscModal && (
-      <KaiDisciplinesModal
-        onClose={() => setShowDiscModal(false)}
-        activeDisciplines={selected}
-        weaponskillWeapon={weapon}
-      />
-    )}
-    <main className="creation" data-testid="creation">
-      <h1>🐺 Crea a Lobo Solitario</h1>
-      <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
+      {showEquipRules && (
+        <EquipmentRulesModal onClose={() => setShowEquipRules(false)} />
+      )}
+      {showDiscModal && (
+        <KaiDisciplinesModal
+          onClose={() => setShowDiscModal(false)}
+          activeDisciplines={selected}
+          weaponskillWeapon={weapon}
+        />
+      )}
+      <main className="creation" data-testid="creation">
+        <h1>🐺 Crea a Lobo Solitario</h1>
+        <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
 
-      <section className="stat-cards">
-        <div className={`stat-card${combatSkill !== null ? " stat-card--done" : ""}`}>
-          <span className="stat-label">Destreza</span>
-          <DiceRoll ref={dieCs} size="sm" />
-          <span className="stat-value" data-testid="stat-combat-skill">
-            {combatSkill ?? "—"}
-          </span>
-          <button
-            type="button"
-            className="primary die-roll-btn"
-            disabled={step !== "cs" || rolling}
-            onClick={rollCs}
+        <section className="stat-cards">
+          <div
+            className={`stat-card${combatSkill !== null ? " stat-card--done" : ""}`}
           >
-            Tirar
-          </button>
-        </div>
-
-        <div className={`stat-card${enduranceMax !== null ? " stat-card--done" : ""}`}>
-          <span className="stat-label">Resistencia</span>
-          <DiceRoll ref={dieEnd} size="sm" />
-          <span className="stat-value" data-testid="stat-endurance">
-            {enduranceMax ?? "—"}
-          </span>
-          <button
-            type="button"
-            className="primary die-roll-btn"
-            disabled={step !== "end" || rolling}
-            onClick={rollEnd}
-          >
-            Tirar
-          </button>
-        </div>
-
-        <div className={`stat-card${gold !== null ? " stat-card--done" : ""}`}>
-          <span className="stat-label">Oro inicial</span>
-          <DiceRoll ref={dieGold} size="sm" />
-          <span className="stat-value" data-testid="stat-gold">
-            {gold !== null ? gold : "—"}
-          </span>
-          <button
-            type="button"
-            className="primary die-roll-btn"
-            disabled={step !== "gold" || rolling}
-            onClick={rollGold}
-          >
-            Tirar
-          </button>
-        </div>
-
-        <div className={`stat-card${storeroomItem ? " stat-card--done" : ""}`}>
-          <span className="stat-label">Almacén</span>
-          <DiceRoll ref={dieStore} size="sm" />
-          {storeroomItem ? (
-            <div
-              className="stat-value--item"
-              data-testid="storeroom-item"
-              data-store={storeroomId}
-            >
-              <strong>{storeroomItem.name}</strong>
-              <span className="muted small">{storeroomHint(storeroomItem.grant)}</span>
-            </div>
-          ) : (
-            <span className="stat-value">—</span>
-          )}
-          <button
-            type="button"
-            className="primary die-roll-btn"
-            disabled={step !== "store" || rolling}
-            onClick={rollStore}
-          >
-            Tirar
-          </button>
-        </div>
-      </section>
-
-      <p className="muted small">
-        Equipo fijo: Hacha, 1 Comida y Mapa de Sommerlund.
-      </p>
-      <div className="sheet-ref-buttons">
-        <button
-          type="button"
-          className="rules-btn"
-          onClick={() => setShowEquipRules(true)}
-        >
-          ¿Cómo funciona el equipo?
-        </button>
-        <button
-          type="button"
-          className="rules-btn"
-          onClick={() => setShowDiscModal(true)}
-        >
-          ¿Cómo funcionan las disciplinas?
-        </button>
-      </div>
-
-      <h2>
-        Disciplinas del Kai{" "}
-        <span className="muted small" data-testid="discipline-count">
-          ({selected.length}/{KAI_DISCIPLINES_TO_CHOOSE})
-        </span>
-      </h2>
-      <p className="muted small">Elige 5. Te acompañarán toda la aventura.</p>
-
-      <div className="discipline-grid">
-        {ALL_KAI_DISCIPLINES.map((discipline) => {
-          const active = selected.includes(discipline);
-          return (
-            <button
-              key={discipline}
-              type="button"
-              className={`discipline-toggle${active ? " active" : ""}`}
-              aria-pressed={active}
-              disabled={!active && isFull}
-              onClick={() => toggle(discipline)}
-            >
-              {KAI_DISCIPLINE_NAMES[discipline]}
-              {discipline === "weaponskill" && weapon
-                ? ` · ${WEAPON_NAMES[weapon]}`
-                : ""}
-            </button>
-          );
-        })}
-      </div>
-
-      {isConflict && weapon && storeroomWeaponName && (
-        <div className="rolled-item" style={{ marginTop: "1.5rem" }}>
-          <span className="muted small">⚔️ Conflicto de armas</span>
-          <p className="small" style={{ margin: "0.5rem 0 0.75rem" }}>
-            Los dos huecos de arma están ocupados. ¿Con cuál te quedas junto a la Hacha?
-          </p>
-          <div className="discipline-grid">
+            <span className="stat-label">Destreza</span>
+            <DiceRoll ref={dieCs} size="sm" />
+            <span className="stat-value" data-testid="stat-combat-skill">
+              {combatSkill ?? "—"}
+            </span>
             <button
               type="button"
-              className={`discipline-toggle${conflictChoice === "weaponskill" ? " active" : ""}`}
-              aria-pressed={conflictChoice === "weaponskill"}
-              onClick={() => setConflictChoice("weaponskill")}
+              className="primary die-roll-btn"
+              disabled={step !== "cs" || rolling}
+              onClick={rollCs}
             >
-              {WEAPON_NAMES[weapon]}
-              <span className="muted small" style={{ display: "block", fontSize: "0.75rem" }}>
-                Dominio de las Armas (+2 DC)
-              </span>
-            </button>
-            <button
-              type="button"
-              className={`discipline-toggle${conflictChoice === "storeroom" ? " active" : ""}`}
-              aria-pressed={conflictChoice === "storeroom"}
-              onClick={() => setConflictChoice("storeroom")}
-            >
-              {storeroomWeaponName}
-              <span className="muted small" style={{ display: "block", fontSize: "0.75rem" }}>
-                del almacén
-              </span>
+              Tirar
             </button>
           </div>
-        </div>
-      )}
 
-      <button
-        type="button"
-        className="primary"
-        data-testid="start-adventure"
-        disabled={!ready}
-        onClick={start}
-      >
-        Comenzar la aventura
-      </button>
-    </main>
+          <div
+            className={`stat-card${enduranceMax !== null ? " stat-card--done" : ""}`}
+          >
+            <span className="stat-label">Resistencia</span>
+            <DiceRoll ref={dieEnd} size="sm" />
+            <span className="stat-value" data-testid="stat-endurance">
+              {enduranceMax ?? "—"}
+            </span>
+            <button
+              type="button"
+              className="primary die-roll-btn"
+              disabled={step !== "end" || rolling}
+              onClick={rollEnd}
+            >
+              Tirar
+            </button>
+          </div>
+
+          <div
+            className={`stat-card${gold !== null ? " stat-card--done" : ""}`}
+          >
+            <span className="stat-label">Oro inicial</span>
+            <DiceRoll ref={dieGold} size="sm" />
+            <span className="stat-value" data-testid="stat-gold">
+              {gold !== null ? gold : "—"}
+            </span>
+            <button
+              type="button"
+              className="primary die-roll-btn"
+              disabled={step !== "gold" || rolling}
+              onClick={rollGold}
+            >
+              Tirar
+            </button>
+          </div>
+
+          <div
+            className={`stat-card${storeroomItem ? " stat-card--done" : ""}`}
+          >
+            <span className="stat-label">Almacén</span>
+            <DiceRoll ref={dieStore} size="sm" />
+            {storeroomItem ? (
+              <div
+                className="stat-value--item"
+                data-testid="storeroom-item"
+                data-store={storeroomId}
+              >
+                <strong>{storeroomItem.name}</strong>
+                <span className="muted small">
+                  {storeroomHint(storeroomItem.grant)}
+                </span>
+              </div>
+            ) : (
+              <span className="stat-value">—</span>
+            )}
+            <button
+              type="button"
+              className="primary die-roll-btn"
+              disabled={step !== "store" || rolling}
+              onClick={rollStore}
+            >
+              Tirar
+            </button>
+          </div>
+        </section>
+
+        <p className="muted small">
+          Equipo fijo: Hacha, 1 Comida y Mapa de Sommerlund.
+        </p>
+        <div className="sheet-ref-buttons">
+          <button
+            type="button"
+            className="rules-btn"
+            onClick={() => setShowEquipRules(true)}
+          >
+            ¿Cómo funciona el equipo?
+          </button>
+          <button
+            type="button"
+            className="rules-btn"
+            onClick={() => setShowDiscModal(true)}
+          >
+            ¿Cómo funcionan las disciplinas?
+          </button>
+        </div>
+
+        <h2>
+          Disciplinas del Kai{" "}
+          <span className="muted small" data-testid="discipline-count">
+            ({selected.length}/{KAI_DISCIPLINES_TO_CHOOSE})
+          </span>
+        </h2>
+        <p className="muted small">Elige 5. Te acompañarán toda la aventura.</p>
+
+        <div className="discipline-grid">
+          {ALL_KAI_DISCIPLINES.map((discipline) => {
+            const active = selected.includes(discipline);
+            return (
+              <button
+                key={discipline}
+                type="button"
+                className={`discipline-toggle${active ? " active" : ""}`}
+                aria-pressed={active}
+                disabled={!active && isFull}
+                onClick={() => toggle(discipline)}
+              >
+                {KAI_DISCIPLINE_NAMES[discipline]}
+                {discipline === "weaponskill" && weapon
+                  ? ` · ${WEAPON_NAMES[weapon]}`
+                  : ""}
+              </button>
+            );
+          })}
+        </div>
+
+        {isConflict && weapon && storeroomWeaponName && (
+          <div className="rolled-item" style={{ marginTop: "1.5rem" }}>
+            <span className="muted small">⚔️ Conflicto de armas</span>
+            <p className="small" style={{ margin: "0.5rem 0 0.75rem" }}>
+              Los dos huecos de arma están ocupados. ¿Con cuál te quedas junto a
+              la Hacha?
+            </p>
+            <div className="discipline-grid">
+              <button
+                type="button"
+                className={`discipline-toggle${conflictChoice === "weaponskill" ? " active" : ""}`}
+                aria-pressed={conflictChoice === "weaponskill"}
+                onClick={() => setConflictChoice("weaponskill")}
+              >
+                {WEAPON_NAMES[weapon]}
+                <span
+                  className="muted small"
+                  style={{ display: "block", fontSize: "0.75rem" }}
+                >
+                  Dominio de las Armas (+2 DC)
+                </span>
+              </button>
+              <button
+                type="button"
+                className={`discipline-toggle${conflictChoice === "storeroom" ? " active" : ""}`}
+                aria-pressed={conflictChoice === "storeroom"}
+                onClick={() => setConflictChoice("storeroom")}
+              >
+                {storeroomWeaponName}
+                <span
+                  className="muted small"
+                  style={{ display: "block", fontSize: "0.75rem" }}
+                >
+                  del almacén
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          className="primary"
+          data-testid="start-adventure"
+          disabled={!ready}
+          onClick={start}
+        >
+          Comenzar la aventura
+        </button>
+      </main>
     </>
   );
 }

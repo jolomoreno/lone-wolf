@@ -9,8 +9,12 @@
  * del pie de página.
  */
 
-import { useEffect, useRef, useState } from "react";
 import type { ContentBlockDTO } from "@lone-wolf/shared";
+import { useEffect, useRef, useState } from "react";
+import {
+  PROJECT_AON_ATTRIBUTION,
+  PROJECT_AON_URL,
+} from "../config/project-aon";
 import type { Character } from "../domain/character/character";
 import { isDead } from "../domain/character/character";
 import {
@@ -44,10 +48,6 @@ import {
   SECTION_LOOT,
   SECTION_ROLL_TABLES,
 } from "../domain/game/section-rules";
-import {
-  PROJECT_AON_ATTRIBUTION,
-  PROJECT_AON_URL,
-} from "../config/project-aon";
 import { CharacterCreation } from "./components/CharacterCreation";
 import { CharacterSheet } from "./components/CharacterSheet";
 import { CombatPanel } from "./components/CombatPanel";
@@ -78,10 +78,14 @@ type PreGameScreen = "intro" | "creation" | "wisdom";
 
 export function App() {
   const { save } = useContainer();
-  const [savedState, setSavedState] = useState<GameState | null>(() => save.load());
+  const [savedState, setSavedState] = useState<GameState | null>(() =>
+    save.load(),
+  );
   const [game, setGame] = useState<GameState | null>(null);
   const [screen, setScreen] = useState<PreGameScreen>("intro");
-  const [pendingCharacter, setPendingCharacter] = useState<Character | null>(null);
+  const [pendingCharacter, setPendingCharacter] = useState<Character | null>(
+    null,
+  );
 
   // Autoguardado en cada cambio. Los estados terminales (muerte/victoria) se
   // borran del guardado para que "Continuar" no lleve a una partida ya acabada.
@@ -191,8 +195,9 @@ function StartScreen({
           Partida guardada · {formatSavedAt(saved.updatedAt)}
         </span>
         <span>
-          Sección <strong>{sectionLabel(saved.currentSection)}</strong> · Resistencia{" "}
-          {saved.character.stats.enduranceCurrent}/{saved.character.stats.enduranceMax}
+          Sección <strong>{sectionLabel(saved.currentSection)}</strong> ·
+          Resistencia {saved.character.stats.enduranceCurrent}/
+          {saved.character.stats.enduranceMax}
         </span>
       </div>
       <div className="start-actions">
@@ -217,14 +222,22 @@ interface AdventureProps {
 
 type CombatBlock = Extract<ContentBlockDTO, { type: "combat" }>;
 
-function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: AdventureProps) {
+function Adventure({
+  game,
+  onChange,
+  onSave,
+  onReturnToMenu,
+  onGameOver,
+}: AdventureProps) {
   const character: Character = game.character;
   const sectionId = game.currentSection;
-  const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(() => {
-    // Restaura el estado "ganado" si el jugador recargó tras vencer pero antes de navegar.
-    if (game.flags[`combat-won:${game.currentSection}`]) return "won";
-    return null;
-  });
+  const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(
+    () => {
+      // Restaura el estado "ganado" si el jugador recargó tras vencer pero antes de navegar.
+      if (game.flags[`combat-won:${game.currentSection}`]) return "won";
+      return null;
+    },
+  );
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [entryMessages, setEntryMessages] = useState<string[]>([]);
   const savedAtTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -292,7 +305,10 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
    *  3. Aplica sus efectos de entrada (daño narrativo, comidas) una sola vez.
    *  4. Cobra el oro del botín de la sección destino (una sola vez, anti-farmeo).
    */
-  function navigateTo(fromGame: GameState, targetId: string): {
+  function navigateTo(
+    fromGame: GameState,
+    targetId: string,
+  ): {
     game: GameState;
     messages: string[];
   } {
@@ -371,7 +387,11 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
     const fromGame = updateCharacter(game, applied.character);
     const { game: next, messages } = navigateTo(fromGame, outcome.target);
 
-    setEntryMessages([`🎲 Sacas un ${roll}.`, ...applied.messages, ...messages]);
+    setEntryMessages([
+      `🎲 Sacas un ${roll}.`,
+      ...applied.messages,
+      ...messages,
+    ]);
     onChange(next);
   }
 
@@ -381,7 +401,8 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
       const inv = lootToInventoryItem(item);
       let updated = character;
       if (item.slot === "weapon") updated = addWeapon(character, inv);
-      else if (item.slot === "backpack") updated = addToBackpack(character, inv);
+      else if (item.slot === "backpack")
+        updated = addToBackpack(character, inv);
       else updated = addSpecialItem(character, inv);
       onChange(updateCharacter(game, updated));
     } catch (err) {
@@ -396,8 +417,8 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
         <h1>🐺 ¡Victoria!</h1>
         <p>Has completado el Libro 1 — Huida de la Oscuridad.</p>
         <p className="muted small">
-          Lobo Solitario ha escapado con el Libro de Plenitud del Kai.
-          El Maestro de las Tinieblas conocerá su nombre.
+          Lobo Solitario ha escapado con el Libro de Plenitud del Kai. El
+          Maestro de las Tinieblas conocerá su nombre.
         </p>
         <div className="start-actions">
           <button type="button" className="primary" onClick={onGameOver}>
@@ -430,7 +451,9 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
     return (
       <main className="creation">
         <h1>🐺 Fin de la aventura</h1>
-        <p className="status-bad">Has caído en combate. Tu aventura termina aquí.</p>
+        <p className="status-bad">
+          Has caído en combate. Tu aventura termina aquí.
+        </p>
         <div className="start-actions">
           <button type="button" className="primary" onClick={onGameOver}>
             Nueva partida
@@ -461,7 +484,9 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
         <CharacterSheet
           character={character}
           combatActive={!!enemy && combatOutcome === null}
-          onCharacterChange={(updated) => onChange(updateCharacter(game, updated))}
+          onCharacterChange={(updated) =>
+            onChange(updateCharacter(game, updated))
+          }
         />
 
         <div className="reader">
@@ -475,8 +500,8 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
             <>
               {entryMessages.length > 0 && (
                 <div className="entry-messages" data-testid="entry-messages">
-                  {entryMessages.map((msg, i) => (
-                    <p key={i}>{msg}</p>
+                  {entryMessages.map((msg) => (
+                    <p key={msg}>{msg}</p>
                   ))}
                 </div>
               )}
@@ -514,17 +539,24 @@ function Adventure({ game, onChange, onSave, onReturnToMenu, onGameOver }: Adven
               )}
 
               {showChoices && rollTable && (
-                <RollPanel key={sectionId} table={rollTable} onResolve={handleRoll} />
+                <RollPanel
+                  key={sectionId}
+                  table={rollTable}
+                  onResolve={handleRoll}
+                />
               )}
 
               {section.data.choices.length === 0 && !rollTable && !enemy && (
                 <div className="start-actions" style={{ marginTop: "1.5rem" }}>
-                  <button type="button" className="primary" onClick={onGameOver}>
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={onGameOver}
+                  >
                     Nueva partida
                   </button>
                 </div>
               )}
-
             </>
           )}
         </div>

@@ -6,7 +6,7 @@
  * entero y lo servimos. Indexamos `sectionId` y `number` para buscar rápido.
  */
 
-import { Schema, model } from "mongoose";
+import { model, Schema } from "mongoose";
 import type { Choice, ContentBlock } from "../../domain/section/section";
 
 /** Forma del documento, para que Mongoose tipe bien las operaciones. */

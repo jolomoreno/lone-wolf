@@ -1,9 +1,9 @@
-import { KAI_DISCIPLINE_DESCRIPTIONS } from "../../domain/character/kai-discipline-descriptions";
+import type { KaiDiscipline } from "../../domain/character/kai-discipline";
 import {
   ALL_KAI_DISCIPLINES,
   KAI_DISCIPLINE_NAMES,
 } from "../../domain/character/kai-discipline";
-import type { KaiDiscipline } from "../../domain/character/kai-discipline";
+import { KAI_DISCIPLINE_DESCRIPTIONS } from "../../domain/character/kai-discipline-descriptions";
 import { WEAPON_NAMES } from "../../domain/character/weapon";
 
 interface Props {
@@ -44,8 +44,8 @@ export function KaiDisciplinesModal({
 
         <div className="modal-body">
           <p className="rules-intro">
-            Los Señores del Kai dominan diez disciplinas ancestrales. Al comenzar
-            la aventura, el jugador posee cinco de ellas.
+            Los Señores del Kai dominan diez disciplinas ancestrales. Al
+            comenzar la aventura, el jugador posee cinco de ellas.
           </p>
 
           <ul className="kai-disc-list">
@@ -56,11 +56,18 @@ export function KaiDisciplinesModal({
                   ? ` (${WEAPON_NAMES[weaponskillWeapon as keyof typeof WEAPON_NAMES] ?? weaponskillWeapon})`
                   : "";
               return (
-                <li key={disc} className={active ? "kai-disc-item active" : "kai-disc-item"}>
+                <li
+                  key={disc}
+                  className={active ? "kai-disc-item active" : "kai-disc-item"}
+                >
                   <h3>
                     {KAI_DISCIPLINE_NAMES[disc]}
-                    {weaponLabel && <span className="muted"> {weaponLabel}</span>}
-                    {active && <span className="kai-disc-badge">Tu disciplina</span>}
+                    {weaponLabel && (
+                      <span className="muted"> {weaponLabel}</span>
+                    )}
+                    {active && (
+                      <span className="kai-disc-badge">Tu disciplina</span>
+                    )}
                   </h3>
                   <p>{KAI_DISCIPLINE_DESCRIPTIONS[disc]}</p>
                 </li>

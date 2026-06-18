@@ -6,11 +6,11 @@
  * los inyectaremos en los casos de uso, y estos en los controllers HTTP.
  */
 
-import { type Express } from "express";
-import { createHttpServer } from "../infrastructure/http/server";
+import type { Express } from "express";
+import { GetSection } from "../application/section/get-section.use-case";
 import { createHealthRouter } from "../infrastructure/http/health.controller";
 import { createSectionRouter } from "../infrastructure/http/section.controller";
-import { GetSection } from "../application/section/get-section.use-case";
+import { createHttpServer } from "../infrastructure/http/server";
 import { MongoSectionRepository } from "../infrastructure/persistence/mongo-section.repository";
 
 export function buildApp(): Express {

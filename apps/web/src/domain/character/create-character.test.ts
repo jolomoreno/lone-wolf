@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { RandomNumber } from "../random/random-number";
 import {
   createCharacter,
   rollCombatSkill,
@@ -7,10 +8,12 @@ import {
 } from "./create-character";
 import type { KaiDiscipline } from "./kai-discipline";
 import { WEAPON_NAMES } from "./weapon";
-import type { RandomNumber } from "../random/random-number";
 
 /** RandomNumber que siempre devuelve el mismo número. */
-const fixed = (n: number): RandomNumber => () => n;
+const fixed =
+  (n: number): RandomNumber =>
+  () =>
+    n;
 
 const fiveDisciplines: KaiDiscipline[] = [
   "camouflage",
@@ -69,7 +72,11 @@ describe("createCharacter", () => {
       "healing",
     ];
     expect(() =>
-      createCharacter({ combatSkill: 15, enduranceMax: 25, disciplines: repeated }),
+      createCharacter({
+        combatSkill: 15,
+        enduranceMax: 25,
+        disciplines: repeated,
+      }),
     ).toThrow(/repetir/);
   });
 

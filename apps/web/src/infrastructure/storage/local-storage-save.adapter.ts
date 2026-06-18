@@ -6,7 +6,10 @@
  */
 
 import type { SavePort } from "../../application/ports/save.port";
-import { type GameState, SAVE_FORMAT_VERSION } from "../../domain/game/game-state";
+import {
+  type GameState,
+  SAVE_FORMAT_VERSION,
+} from "../../domain/game/game-state";
 
 /** Subconjunto de la Web Storage API que usamos (facilita los tests). */
 export interface KeyValueStorage {
@@ -18,7 +21,9 @@ export interface KeyValueStorage {
 const STORAGE_KEY = "lone-wolf:save";
 
 export class LocalStorageSaveAdapter implements SavePort {
-  constructor(private readonly storage: KeyValueStorage = window.localStorage) {}
+  constructor(
+    private readonly storage: KeyValueStorage = window.localStorage,
+  ) {}
 
   load(): GameState | null {
     const raw = this.storage.getItem(STORAGE_KEY);

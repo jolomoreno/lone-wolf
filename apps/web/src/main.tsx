@@ -5,8 +5,8 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { DependencyProvider } from "./ui/DependencyProvider";
 import { App } from "./ui/App";
+import { DependencyProvider } from "./ui/DependencyProvider";
 import "./index.css";
 
 const rootElement = document.getElementById("root");

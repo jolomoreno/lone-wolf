@@ -14,7 +14,10 @@ import {
 /** Resta Resistencia (nunca baja de 0). */
 export function applyDamage(character: Character, amount: number): Character {
   const damage = Math.max(0, amount);
-  const enduranceCurrent = Math.max(0, character.stats.enduranceCurrent - damage);
+  const enduranceCurrent = Math.max(
+    0,
+    character.stats.enduranceCurrent - damage,
+  );
   return { ...character, stats: { ...character.stats, enduranceCurrent } };
 }
 
@@ -34,7 +37,9 @@ export function addToBackpack(
   item: InventoryItem,
 ): Character {
   if (character.backpack.length >= MAX_BACKPACK_ITEMS) {
-    throw new Error(`La mochila está llena (máximo ${MAX_BACKPACK_ITEMS} objetos).`);
+    throw new Error(
+      `La mochila está llena (máximo ${MAX_BACKPACK_ITEMS} objetos).`,
+    );
   }
   return { ...character, backpack: [...character.backpack, item] };
 }
@@ -51,7 +56,10 @@ export function removeFromBackpack(
 }
 
 /** Añade un arma (lanza si ya lleva el máximo). */
-export function addWeapon(character: Character, weapon: InventoryItem): Character {
+export function addWeapon(
+  character: Character,
+  weapon: InventoryItem,
+): Character {
   if (character.weapons.length >= MAX_WEAPONS) {
     throw new Error(`No puedes llevar más de ${MAX_WEAPONS} armas.`);
   }
@@ -59,7 +67,10 @@ export function addWeapon(character: Character, weapon: InventoryItem): Characte
 }
 
 /** Suelta un arma por id. */
-export function removeWeapon(character: Character, weaponId: string): Character {
+export function removeWeapon(
+  character: Character,
+  weaponId: string,
+): Character {
   return {
     ...character,
     weapons: character.weapons.filter((w) => w.id !== weaponId),
@@ -90,7 +101,10 @@ export function changeGold(character: Character, delta: number): Character {
 }
 
 /** Fija la Resistencia actual a un valor (acotado entre 0 y el máximo). */
-export function setEnduranceCurrent(character: Character, value: number): Character {
+export function setEnduranceCurrent(
+  character: Character,
+  value: number,
+): Character {
   const enduranceCurrent = Math.max(
     0,
     Math.min(character.stats.enduranceMax, value),

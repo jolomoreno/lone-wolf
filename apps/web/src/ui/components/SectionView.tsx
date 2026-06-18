@@ -6,8 +6,8 @@
  * atenuadas y deshabilitadas si la condición no se cumple.
  */
 
-import { useState } from "react";
 import type { SectionDTO } from "@lone-wolf/shared";
+import { useState } from "react";
 import { illustrationUrl } from "../../config/project-aon";
 
 /**
@@ -69,7 +69,9 @@ export function SectionView({
                 </ul>
               );
             case "illustration":
-              return <Illustration key={block.src} src={block.src} alt={block.alt} />;
+              return (
+                <Illustration key={block.src} src={block.src} alt={block.alt} />
+              );
             case "combat":
               return null;
             default:

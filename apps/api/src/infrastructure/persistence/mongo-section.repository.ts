@@ -7,7 +7,7 @@
 
 import type { Section } from "../../domain/section/section";
 import type { SectionRepository } from "../../domain/section/section-repository";
-import { SectionModel, type SectionDoc } from "./section.schema";
+import { type SectionDoc, SectionModel } from "./section.schema";
 
 function toDomain(doc: SectionDoc): Section {
   return {
@@ -20,7 +20,9 @@ function toDomain(doc: SectionDoc): Section {
 
 export class MongoSectionRepository implements SectionRepository {
   async findByNumber(number: number): Promise<Section | null> {
-    const doc = await SectionModel.findOne({ number }).lean<SectionDoc>().exec();
+    const doc = await SectionModel.findOne({ number })
+      .lean<SectionDoc>()
+      .exec();
     return doc ? toDomain(doc) : null;
   }
 

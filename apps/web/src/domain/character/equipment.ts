@@ -7,11 +7,14 @@
  * Además, el jugador elige UN objeto del almacén del monasterio (lista de 9).
  */
 
+import {
+  defaultRandomNumber,
+  type RandomNumber,
+} from "../random/random-number";
 import { type Character, type InventoryItem, MAX_WEAPONS } from "./character";
 import { createCharacter } from "./create-character";
 import type { KaiDiscipline } from "./kai-discipline";
 import { WEAPON_NAMES, type WeaponType } from "./weapon";
-import { defaultRandomNumber, type RandomNumber } from "../random/random-number";
 
 /** Cómo afecta un objeto del almacén al personaje. */
 export type StoreroomGrant =
@@ -31,7 +34,11 @@ export interface StoreroomChoice {
 
 /** Los 9 objetos del almacén del Libro 1 (eliges uno). */
 export const STOREROOM: StoreroomChoice[] = [
-  { id: 1, name: "Espada", grant: { kind: "weapon", item: { id: "sword", name: "Espada" } } },
+  {
+    id: 1,
+    name: "Espada",
+    grant: { kind: "weapon", item: { id: "sword", name: "Espada" } },
+  },
   {
     id: 2,
     name: "Casco",
@@ -51,7 +58,11 @@ export const STOREROOM: StoreroomChoice[] = [
       enduranceBonus: 4,
     },
   },
-  { id: 5, name: "Maza", grant: { kind: "weapon", item: { id: "mace", name: "Maza" } } },
+  {
+    id: 5,
+    name: "Maza",
+    grant: { kind: "weapon", item: { id: "mace", name: "Maza" } },
+  },
   {
     id: 6,
     name: "Poción Curativa",
@@ -60,8 +71,16 @@ export const STOREROOM: StoreroomChoice[] = [
       item: { id: "laumspur-potion", name: "Poción Curativa", kind: "potion" },
     },
   },
-  { id: 7, name: "Estaca", grant: { kind: "weapon", item: { id: "stake", name: "Estaca" } } },
-  { id: 8, name: "Lanza", grant: { kind: "weapon", item: { id: "spear", name: "Lanza" } } },
+  {
+    id: 7,
+    name: "Estaca",
+    grant: { kind: "weapon", item: { id: "stake", name: "Estaca" } },
+  },
+  {
+    id: 8,
+    name: "Lanza",
+    grant: { kind: "weapon", item: { id: "spear", name: "Lanza" } },
+  },
   { id: 9, name: "12 Coronas de Oro", grant: { kind: "gold", amount: 12 } },
 ];
 
@@ -110,7 +129,9 @@ export interface StartingCharacterParams {
  * Construye el personaje inicial del Libro 1: equipo fijo + el objeto elegido
  * del almacén, aplicando sus efectos (Resistencia, oro, comidas...).
  */
-export function createStartingCharacter(params: StartingCharacterParams): Character {
+export function createStartingCharacter(
+  params: StartingCharacterParams,
+): Character {
   const choice = STOREROOM.find((c) => c.id === params.storeroomChoiceId);
   if (!choice) {
     throw new Error(`Objeto de almacén inválido: ${params.storeroomChoiceId}.`);
@@ -118,7 +139,9 @@ export function createStartingCharacter(params: StartingCharacterParams): Charac
 
   // Equipo fijo del Libro 1.
   const weapons: InventoryItem[] = [{ id: "axe", name: "Hacha" }];
-  const backpack: InventoryItem[] = [{ id: "meal-0", name: "Comida", kind: "meal" }];
+  const backpack: InventoryItem[] = [
+    { id: "meal-0", name: "Comida", kind: "meal" },
+  ];
   const specialItems: InventoryItem[] = [
     { id: "map", name: "Mapa de Sommerlund" },
   ];

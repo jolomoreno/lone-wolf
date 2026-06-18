@@ -7,8 +7,8 @@
  * de test envolviendo el árbol con otro Provider.
  */
 
-import { createContext, useContext, type ReactNode } from "react";
-import { container, type Container } from "../config/composition-root";
+import { createContext, type ReactNode, useContext } from "react";
+import { type Container, container } from "../config/composition-root";
 
 const ContainerContext = createContext<Container>(container);
 

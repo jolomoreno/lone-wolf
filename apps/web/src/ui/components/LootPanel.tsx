@@ -54,7 +54,9 @@ export function LootPanel({ character, items, onTake }: Props) {
                 type="button"
                 className="use-item-btn"
                 disabled={!able}
-                title={able ? "Coger" : "No tienes espacio (suelta algo primero)"}
+                title={
+                  able ? "Coger" : "No tienes espacio (suelta algo primero)"
+                }
                 onClick={() => onTake(item)}
               >
                 Coger

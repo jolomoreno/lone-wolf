@@ -9,14 +9,17 @@
  */
 
 import { useState } from "react";
-import { hasWeaponskillBonus, type Character } from "../../domain/character/character";
-import type { Damage } from "../../domain/combat/combat-results-table";
+import {
+  type Character,
+  hasWeaponskillBonus,
+} from "../../domain/character/character";
 import {
   type CombatState,
   type Enemy,
   fightRound,
   startCombat,
 } from "../../domain/combat/combat";
+import type { Damage } from "../../domain/combat/combat-results-table";
 import type { SectionCombatRules } from "../../domain/game/section-rules";
 
 interface Props {
@@ -38,7 +41,6 @@ interface Props {
   onEvade?: (targetId: string) => void;
 }
 
-
 function formatLoss(loss: Damage): string {
   return loss === "K" ? "¡muerte!" : `−${loss}`;
 }
@@ -58,13 +60,17 @@ export function CombatPanel({
     // Modificador de CS por ataque psíquico del enemigo (p.ej. Vordak −2).
     // Si mindshieldProtects y el jugador tiene Defensa Psíquica, se anula.
     let csBonus = rules?.playerCSModifier ?? 0;
-    if (rules?.mindshieldProtects && character.disciplines.includes("mindshield")) {
+    if (
+      rules?.mindshieldProtects &&
+      character.disciplines.includes("mindshield")
+    ) {
       csBonus = 0;
     }
 
     return {
       weaponskill: hasWeaponskillBonus(character),
-      mindblast: !mindblastImmune && character.disciplines.includes("mindblast"),
+      mindblast:
+        !mindblastImmune && character.disciplines.includes("mindblast"),
       bonus: csBonus,
       unarmed: character.weapons.length === 0,
       mindblastImmune,
@@ -110,7 +116,8 @@ export function CombatPanel({
     combat.status === "ongoing";
 
   const lwPct = Math.round(
-    (combat.loneWolfEndurance / Math.max(1, character.stats.enduranceMax)) * 100,
+    (combat.loneWolfEndurance / Math.max(1, character.stats.enduranceMax)) *
+      100,
   );
   const enemyPct = Math.round(
     (combat.enemyEndurance / Math.max(1, enemy.endurance)) * 100,
@@ -175,11 +182,14 @@ export function CombatPanel({
               Eludir combate
             </button>
           )}
-          {rules?.evasion && !canEvade && combat.status === "ongoing" && rules.evasion.afterRound > 0 && (
-            <button type="button" className="ghost" disabled>
-              Eludir (desde asalto {rules.evasion.afterRound + 1})
-            </button>
-          )}
+          {rules?.evasion &&
+            !canEvade &&
+            combat.status === "ongoing" &&
+            rules.evasion.afterRound > 0 && (
+              <button type="button" className="ghost" disabled>
+                Eludir (desde asalto {rules.evasion.afterRound + 1})
+              </button>
+            )}
         </div>
       )}
 
@@ -199,7 +209,8 @@ export function CombatPanel({
           {combat.rounds.map((r) => (
             <li key={r.round}>
               Asalto {r.round}: sacas <strong>{r.randomNumber}</strong> →{" "}
-              {enemy.name} {formatLoss(r.enemyLoss)}, tú {formatLoss(r.loneWolfLoss)}
+              {enemy.name} {formatLoss(r.enemyLoss)}, tú{" "}
+              {formatLoss(r.loneWolfLoss)}
             </li>
           ))}
         </ul>

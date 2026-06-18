@@ -6,11 +6,7 @@
  * explícito nos protege si algún día divergen.
  */
 
-import type {
-  ChoiceDTO,
-  ContentBlockDTO,
-  SectionDTO,
-} from "@lone-wolf/shared";
+import type { ChoiceDTO, ContentBlockDTO, SectionDTO } from "@lone-wolf/shared";
 import type { ContentBlock, Section } from "../../domain/section/section";
 
 function toBlockDTO(block: ContentBlock): ContentBlockDTO {

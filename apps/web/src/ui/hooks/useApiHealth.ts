@@ -6,8 +6,8 @@
  */
 
 import { useEffect, useState } from "react";
-import { useContainer } from "../DependencyProvider";
 import type { ApiHealth } from "../../application/ports/health.port";
+import { useContainer } from "../DependencyProvider";
 
 export type ApiHealthState =
   | { status: "loading" }

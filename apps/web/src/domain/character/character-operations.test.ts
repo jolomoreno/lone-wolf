@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCharacter } from "./create-character";
+import { type Character, isDead, MAX_BACKPACK_ITEMS } from "./character";
 import {
   addSpecialItem,
   addToBackpack,
@@ -12,7 +12,7 @@ import {
   removeWeapon,
   setEnduranceCurrent,
 } from "./character-operations";
-import { type Character, isDead, MAX_BACKPACK_ITEMS } from "./character";
+import { createCharacter } from "./create-character";
 import type { KaiDiscipline } from "./kai-discipline";
 
 const disciplines: KaiDiscipline[] = [
@@ -60,7 +60,10 @@ describe("inventario", () => {
   it("respeta el límite de la mochila", () => {
     let character = baseCharacter();
     for (let i = 0; i < MAX_BACKPACK_ITEMS; i++) {
-      character = addToBackpack(character, { id: `item${i}`, name: `Objeto ${i}` });
+      character = addToBackpack(character, {
+        id: `item${i}`,
+        name: `Objeto ${i}`,
+      });
     }
     expect(character.backpack).toHaveLength(MAX_BACKPACK_ITEMS);
     expect(() =>
@@ -69,7 +72,10 @@ describe("inventario", () => {
   });
 
   it("quita objetos de la mochila por id", () => {
-    const character = addToBackpack(baseCharacter(), { id: "map", name: "Mapa" });
+    const character = addToBackpack(baseCharacter(), {
+      id: "map",
+      name: "Mapa",
+    });
     const without = removeFromBackpack(character, "map");
     expect(without.backpack).toHaveLength(0);
   });
@@ -77,9 +83,9 @@ describe("inventario", () => {
   it("no deja llevar más de 2 armas", () => {
     let character = addWeapon(baseCharacter(), { id: "sword", name: "Espada" });
     character = addWeapon(character, { id: "axe", name: "Hacha" });
-    expect(() =>
-      addWeapon(character, { id: "dagger", name: "Daga" }),
-    ).toThrow(/armas/);
+    expect(() => addWeapon(character, { id: "dagger", name: "Daga" })).toThrow(
+      /armas/,
+    );
   });
 
   it("mantiene el oro entre 0 y el máximo", () => {
@@ -96,14 +102,21 @@ describe("inventario", () => {
   });
 
   it("añade Objetos Especiales sin límite", () => {
-    let character = addSpecialItem(baseCharacter(), { id: "key", name: "Llave" });
+    let character = addSpecialItem(baseCharacter(), {
+      id: "key",
+      name: "Llave",
+    });
     character = addSpecialItem(character, { id: "soap", name: "Jabón" });
     expect(character.specialItems).toHaveLength(2);
   });
 
   it("pierde todo el equipo portable conservando especiales", () => {
     let character = addWeapon(baseCharacter(), { id: "axe", name: "Hacha" });
-    character = addToBackpack(character, { id: "meal", name: "Comida", kind: "meal" });
+    character = addToBackpack(character, {
+      id: "meal",
+      name: "Comida",
+      kind: "meal",
+    });
     character = addSpecialItem(character, { id: "map", name: "Mapa" });
     character = changeGold(character, 20);
     const stripped = loseAllEquipment(character);

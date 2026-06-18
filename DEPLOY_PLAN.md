@@ -54,37 +54,22 @@ la variable, en vez de fallar en la primera query con un error de Mongoose críp
 
 ### P2 · Biome — lint + formato (~45 min)
 
-- [ ] Instalar:
+- [x] Instalar: `pnpm add -Dw @biomejs/biome` (se instaló v2.5.0)
 
-```bash
-pnpm add -Dw @biomejs/biome
-pnpm biome init
-```
+- [x] Crear `biome.json` en raíz (esquema v2.5.0, `biome migrate` aplicado):
+  - `files.includes` con exclusiones `!**/dist` y `!**/node_modules`
+  - `formatter`: spaces 2, comillas dobles en JS
+  - `linter`: enabled; a11y/useKeyWithClickEvents, noStaticElementInteractions,
+    noSvgWithoutTitle desactivados (accesibilidad pendiente en nice-to-have)
+  - `noNonNullAssertion` suprimido con biome-ignore en 3 tests (uso intencional)
 
-- [ ] Reemplazar el `biome.json` generado con esta configuración mínima:
+- [x] Script `lint` en `package.json` raíz: `"biome ci ."` (sustituye `pnpm -r lint`)
 
-```json
-{
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": { "ignore": ["**/dist/**", "**/node_modules/**"] },
-  "formatter": { "indentStyle": "space", "indentWidth": 2 },
-  "linter": { "enabled": true, "rules": { "recommended": true } },
-  "javascript": { "formatter": { "quoteStyle": "double" } }
-}
-```
+- [x] `pnpm biome check --write .` — auto-fix aplicado; correcciones manuales:
+  - `usePotion` renombrado a `applyPotion` en `CharacterSheet.tsx` (no era hook)
+  - `key={msg}` en `App.tsx` entry messages (en vez del índice)
 
-- [ ] Añadir script `lint` al `package.json` raíz:
-
-```json
-"lint": "biome ci ."
-```
-
-`biome ci` (sin `--write`) es el modo CI: no modifica ficheros, devuelve exit code ≠ 0
-si hay cualquier problema. En local se usa `pnpm biome check --write .` para auto-fix.
-
-- [ ] Ejecutar `pnpm biome check --write .` y corregir los warnings restantes.
-- [ ] Verificar que `pnpm lint` pasa en verde.
+- [x] `pnpm lint` pasa en verde (82 ficheros, 0 errores, 0 warnings)
 
 ---
 

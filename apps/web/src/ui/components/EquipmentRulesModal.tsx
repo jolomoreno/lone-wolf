@@ -28,24 +28,48 @@ export function EquipmentRulesModal({ onClose }: Props) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Equipo</h2>
-          <button type="button" className="modal-close" onClick={onClose}>✕</button>
+          <button type="button" className="modal-close" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <Section title="Cómo llevar el equipo">
           <p className="rules-intro">
-            Una vez que tienes tu equipo completo, esta lista te indica cómo has de llevarlo.
+            Una vez que tienes tu equipo completo, esta lista te indica cómo has
+            de llevarlo.
           </p>
           <ul className="rules-list">
-            <li><strong>Espada</strong> — se lleva en la mano.</li>
-            <li><strong>Casco</strong> — se lleva puesto en la cabeza.</li>
-            <li><strong>Comida</strong> — va guardada en la mochila.</li>
-            <li><strong>Cota de Malla</strong> — se lleva puesta alrededor del pecho.</li>
-            <li><strong>Maza</strong> — se lleva en la mano.</li>
-            <li><strong>Poción Curativa</strong> — va guardada en la mochila.</li>
-            <li><strong>Estaca</strong> — se lleva en la mano.</li>
-            <li><strong>Lanza</strong> — se lleva en la mano.</li>
-            <li><strong>Coronas de Oro</strong> — se guardan en la bolsa.</li>
-            <li><strong>Espadón</strong> — se lleva en la mano.</li>
+            <li>
+              <strong>Espada</strong> — se lleva en la mano.
+            </li>
+            <li>
+              <strong>Casco</strong> — se lleva puesto en la cabeza.
+            </li>
+            <li>
+              <strong>Comida</strong> — va guardada en la mochila.
+            </li>
+            <li>
+              <strong>Cota de Malla</strong> — se lleva puesta alrededor del
+              pecho.
+            </li>
+            <li>
+              <strong>Maza</strong> — se lleva en la mano.
+            </li>
+            <li>
+              <strong>Poción Curativa</strong> — va guardada en la mochila.
+            </li>
+            <li>
+              <strong>Estaca</strong> — se lleva en la mano.
+            </li>
+            <li>
+              <strong>Lanza</strong> — se lleva en la mano.
+            </li>
+            <li>
+              <strong>Coronas de Oro</strong> — se guardan en la bolsa.
+            </li>
+            <li>
+              <strong>Espadón</strong> — se lleva en la mano.
+            </li>
           </ul>
         </Section>
 
@@ -71,7 +95,9 @@ export function EquipmentRulesModal({ onClose }: Props) {
             dd="La comida se guarda en la mochila. Cada comida cuenta como 1 objeto."
           />
           <p className="rules-intro" style={{ marginTop: "0.75rem" }}>
-            Cualquier objeto útil que puedas apoderarte durante la aventura aparecerá en el texto con la inicial en mayúscula. Salvo que se indique que es especial, irá en la mochila.
+            Cualquier objeto útil que puedas apoderarte durante la aventura
+            aparecerá en el texto con la inicial en mayúscula. Salvo que se
+            indique que es especial, irá en la mochila.
           </p>
         </Section>
 

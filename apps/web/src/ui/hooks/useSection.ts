@@ -3,8 +3,8 @@
  * (cargando / ok / error) a la UI. Recarga cuando cambia el número.
  */
 
-import { useEffect, useState } from "react";
 import type { SectionDTO } from "@lone-wolf/shared";
+import { useEffect, useState } from "react";
 import { useContainer } from "../DependencyProvider";
 
 export type SectionState =

@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import type { Character } from "../character/character";
+import { createCharacter } from "../character/create-character";
+import type { KaiDiscipline } from "../character/kai-discipline";
 import {
   applyEntryEffect,
   applyRollOutcome,
@@ -11,9 +14,6 @@ import {
   SECTION_LOOT,
   SECTION_ROLL_TABLES,
 } from "./section-rules";
-import { createCharacter } from "../character/create-character";
-import type { KaiDiscipline } from "../character/kai-discipline";
-import type { Character } from "../character/character";
 
 const baseDisciplines: KaiDiscipline[] = [
   "camouflage",
@@ -38,16 +38,26 @@ function character(overrides: Partial<Character> = {}): Character {
 describe("evaluateCondition", () => {
   it("discipline: true si el personaje la tiene", () => {
     expect(
-      evaluateCondition({ type: "discipline", discipline: "tracking" }, character()),
+      evaluateCondition(
+        { type: "discipline", discipline: "tracking" },
+        character(),
+      ),
     ).toBe(true);
     expect(
-      evaluateCondition({ type: "discipline", discipline: "healing" }, character()),
+      evaluateCondition(
+        { type: "discipline", discipline: "healing" },
+        character(),
+      ),
     ).toBe(false);
   });
 
   it("gold: compara contra el oro actual", () => {
-    expect(evaluateCondition({ type: "gold", minGold: 10 }, character())).toBe(true);
-    expect(evaluateCondition({ type: "gold", minGold: 11 }, character())).toBe(false);
+    expect(evaluateCondition({ type: "gold", minGold: 10 }, character())).toBe(
+      true,
+    );
+    expect(evaluateCondition({ type: "gold", minGold: 11 }, character())).toBe(
+      false,
+    );
   });
 
   it("endurance: compara según el operador", () => {
@@ -61,8 +71,12 @@ describe("evaluateCondition", () => {
   });
 
   it("item: busca en armas, mochila y especiales", () => {
-    expect(evaluateCondition({ type: "item", itemId: "meal-0" }, character())).toBe(true);
-    expect(evaluateCondition({ type: "item", itemId: "nope" }, character())).toBe(false);
+    expect(
+      evaluateCondition({ type: "item", itemId: "meal-0" }, character()),
+    ).toBe(true);
+    expect(
+      evaluateCondition({ type: "item", itemId: "nope" }, character()),
+    ).toBe(false);
   });
 });
 
@@ -78,7 +92,9 @@ describe("applyEntryEffect — daño narrativo", () => {
   it("nunca baja de 0", () => {
     const c = character();
     const hurt = { ...c, stats: { ...c.stats, enduranceCurrent: 3 } };
-    const { character: result } = applyEntryEffect(hurt, { enduranceDelta: -10 });
+    const { character: result } = applyEntryEffect(hurt, {
+      enduranceDelta: -10,
+    });
     expect(result.stats.enduranceCurrent).toBe(0);
   });
 });
@@ -95,17 +111,27 @@ describe("applyEntryEffect — comidas", () => {
 
   it("pierde 3 de Resistencia si no tiene Comida", () => {
     const noMeal = character({ backpack: [] });
-    const { character: c, messages } = applyEntryEffect(noMeal, { requiresMeal: true });
+    const { character: c, messages } = applyEntryEffect(noMeal, {
+      requiresMeal: true,
+    });
     expect(c.stats.enduranceCurrent).toBe(22);
     expect(messages[0]).toMatch(/pierdes 3/);
   });
 
   it("Caza evita comer y no penaliza", () => {
     const hunter = character({
-      disciplines: ["hunting", "camouflage", "tracking", "sixthSense", "mindblast"],
+      disciplines: [
+        "hunting",
+        "camouflage",
+        "tracking",
+        "sixthSense",
+        "mindblast",
+      ],
       backpack: [],
     });
-    const { character: c, messages } = applyEntryEffect(hunter, { requiresMeal: true });
+    const { character: c, messages } = applyEntryEffect(hunter, {
+      requiresMeal: true,
+    });
     expect(c.stats.enduranceCurrent).toBe(25);
     expect(messages[0]).toMatch(/Caza/);
   });
@@ -136,7 +162,14 @@ describe("tablas de datos curados", () => {
   });
 
   it("hay efectos de entrada para las secciones de comida conocidas", () => {
-    for (const id of ["sect130", "sect147", "sect168", "sect184", "sect235", "sect300"]) {
+    for (const id of [
+      "sect130",
+      "sect147",
+      "sect168",
+      "sect184",
+      "sect235",
+      "sect300",
+    ]) {
       expect(SECTION_ENTRY_EFFECTS[id]?.requiresMeal).toBe(true);
     }
   });
@@ -169,6 +202,7 @@ describe("resolveRoll", () => {
 
 describe("applyRollOutcome", () => {
   it("aplica el daño de la rama (sect36, 0-4)", () => {
+    // biome-ignore lint/style/noNonNullAssertion: resolveRoll devuelve non-null para índices dentro del rango
     const out = resolveRoll(SECTION_ROLL_TABLES.sect36, 3)!;
     const { character: c, messages } = applyRollOutcome(character(), out);
     expect(c.stats.enduranceCurrent).toBe(23);
@@ -176,6 +210,7 @@ describe("applyRollOutcome", () => {
   });
 
   it("la rama segura no cambia nada (sect36, 5-9)", () => {
+    // biome-ignore lint/style/noNonNullAssertion: resolveRoll devuelve non-null para índices dentro del rango
     const out = resolveRoll(SECTION_ROLL_TABLES.sect36, 8)!;
     const { character: c } = applyRollOutcome(character(), out);
     expect(c.stats.enduranceCurrent).toBe(25);
@@ -188,6 +223,7 @@ describe("applyRollOutcome", () => {
       specialItems: [{ id: "map", name: "Mapa de Sommerlund" }],
       gold: 12,
     });
+    // biome-ignore lint/style/noNonNullAssertion: resolveRoll devuelve non-null para índices dentro del rango
     const out = resolveRoll(SECTION_ROLL_TABLES.sect188, 3)!;
     const { character: c } = applyRollOutcome(c0, out);
     expect(c.weapons).toHaveLength(0);

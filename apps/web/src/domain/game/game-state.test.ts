@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { applyDamage } from "../character/character-operations";
+import { createCharacter } from "../character/create-character";
+import type { KaiDiscipline } from "../character/kai-discipline";
 import {
   createGameState,
   getFlag,
@@ -8,9 +11,6 @@ import {
   setPendingCombat,
   updateCharacter,
 } from "./game-state";
-import { createCharacter } from "../character/create-character";
-import { applyDamage } from "../character/character-operations";
-import type { KaiDiscipline } from "../character/kai-discipline";
 
 const disciplines: KaiDiscipline[] = [
   "camouflage",
@@ -67,7 +67,11 @@ describe("updateCharacter", () => {
 
 describe("flags", () => {
   it("fija y lee banderas", () => {
-    const state = setFlag(createGameState(character(), "sect1"), "tieneMapa", true);
+    const state = setFlag(
+      createGameState(character(), "sect1"),
+      "tieneMapa",
+      true,
+    );
     expect(getFlag(state, "tieneMapa")).toBe(true);
     expect(getFlag(state, "noExiste")).toBeUndefined();
   });
@@ -92,7 +96,10 @@ describe("setPendingCombat", () => {
   });
 
   it("borra el combate al pasar null", () => {
-    const state = setPendingCombat(createGameState(character(), "sect1"), mockCombat);
+    const state = setPendingCombat(
+      createGameState(character(), "sect1"),
+      mockCombat,
+    );
     const cleared = setPendingCombat(state, null);
     expect(cleared.pendingCombat).toBeNull();
   });

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { countMeals } from "./character";
 import {
-  STOREROOM,
   createStartingCharacter,
   rollStoreroomChoiceId,
+  STOREROOM,
 } from "./equipment";
-import { countMeals } from "./character";
 import type { KaiDiscipline } from "./kai-discipline";
 
 const disciplines: KaiDiscipline[] = [
@@ -41,41 +41,63 @@ describe("rollStoreroomChoiceId", () => {
 
 describe("createStartingCharacter", () => {
   it("siempre incluye el equipo fijo: Hacha, 1 Comida y Mapa de Sommerlund", () => {
-    const character = createStartingCharacter({ ...base, storeroomChoiceId: 1 });
+    const character = createStartingCharacter({
+      ...base,
+      storeroomChoiceId: 1,
+    });
     expect(character.weapons.some((w) => w.id === "axe")).toBe(true);
     expect(character.specialItems.some((s) => s.id === "map")).toBe(true);
     expect(countMeals(character)).toBe(1);
   });
 
   it("objeto 1 (Espada): se convierte en la 2ª arma", () => {
-    const character = createStartingCharacter({ ...base, storeroomChoiceId: 1 });
+    const character = createStartingCharacter({
+      ...base,
+      storeroomChoiceId: 1,
+    });
     expect(character.weapons).toHaveLength(2);
     expect(character.weapons.some((w) => w.id === "sword")).toBe(true);
   });
 
   it("objeto 2 (Casco): suma +2 a la Resistencia", () => {
-    const character = createStartingCharacter({ ...base, storeroomChoiceId: 2 });
+    const character = createStartingCharacter({
+      ...base,
+      storeroomChoiceId: 2,
+    });
     expect(character.stats.enduranceMax).toBe(27);
     expect(character.stats.enduranceCurrent).toBe(27);
   });
 
   it("objeto 3 (Dos Comidas): deja 3 comidas en total", () => {
-    const character = createStartingCharacter({ ...base, storeroomChoiceId: 3 });
+    const character = createStartingCharacter({
+      ...base,
+      storeroomChoiceId: 3,
+    });
     expect(countMeals(character)).toBe(3);
   });
 
   it("objeto 4 (Cota de Malla): suma +4 a la Resistencia", () => {
-    const character = createStartingCharacter({ ...base, storeroomChoiceId: 4 });
+    const character = createStartingCharacter({
+      ...base,
+      storeroomChoiceId: 4,
+    });
     expect(character.stats.enduranceMax).toBe(29);
   });
 
   it("objeto 6 (Poción): va a la mochila como objeto de poción", () => {
-    const character = createStartingCharacter({ ...base, storeroomChoiceId: 6 });
+    const character = createStartingCharacter({
+      ...base,
+      storeroomChoiceId: 6,
+    });
     expect(character.backpack.some((i) => i.kind === "potion")).toBe(true);
   });
 
   it("objeto 9 (12 Coronas): suma 12 al oro tirado", () => {
-    const character = createStartingCharacter({ ...base, gold: 5, storeroomChoiceId: 9 });
+    const character = createStartingCharacter({
+      ...base,
+      gold: 5,
+      storeroomChoiceId: 9,
+    });
     expect(character.gold).toBe(17);
   });
 
@@ -93,7 +115,12 @@ const disciplinesWeaponskill: KaiDiscipline[] = [
   "tracking",
   "weaponskill",
 ];
-const baseWs = { combatSkill: 15, enduranceMax: 25, gold: 5, disciplines: disciplinesWeaponskill };
+const baseWs = {
+  combatSkill: 15,
+  enduranceMax: 25,
+  gold: 5,
+  disciplines: disciplinesWeaponskill,
+};
 
 describe("createStartingCharacter — Dominio de las Armas", () => {
   it("añade el arma de dominio si el almacén no dio arma (hueco libre)", () => {
@@ -126,8 +153,12 @@ describe("createStartingCharacter — Dominio de las Armas", () => {
       storeroomChoiceId: 5,
     });
     expect(character.weapons).toHaveLength(2);
-    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "mace")).toBe(true);
-    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(false);
+    expect(
+      character.weapons.some((w) => (w.weaponType ?? w.id) === "mace"),
+    ).toBe(true);
+    expect(
+      character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger"),
+    ).toBe(false);
   });
 });
 
@@ -141,7 +172,9 @@ describe("createStartingCharacter — conflicto de armas", () => {
       weaponConflictResolution: "weaponskill",
     });
     expect(character.weapons).toHaveLength(2);
-    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(true);
+    expect(
+      character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger"),
+    ).toBe(true);
     expect(character.weapons.some((w) => w.id === "stake")).toBe(false);
   });
 
@@ -155,6 +188,8 @@ describe("createStartingCharacter — conflicto de armas", () => {
     });
     expect(character.weapons).toHaveLength(2);
     expect(character.weapons.some((w) => w.id === "stake")).toBe(true);
-    expect(character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger")).toBe(false);
+    expect(
+      character.weapons.some((w) => (w.weaponType ?? w.id) === "dagger"),
+    ).toBe(false);
   });
 });

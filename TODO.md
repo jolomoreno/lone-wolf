@@ -391,8 +391,8 @@
 
 - [x] **P1 · Validación env vars** — añadir guard en `apps/api/src/config/env.ts`:
       lanza error si `MONGODB_URI` está vacía en producción (~15 min)
-- [ ] **P2 · Biome** — `pnpm add -Dw @biomejs/biome`, `biome.json` en raíz,
-      script `"lint": "biome ci ."` en `package.json` raíz (~45 min)
+- [x] **P2 · Biome** — `@biomejs/biome` v2.5.0 instalado, `biome.json` en raíz,
+      script `"lint": "biome ci ."` en `package.json` raíz. `pnpm lint` verde.
 
 ### Fase 1 — Cambios serverless
 

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { createCharacter } from "../../domain/character/create-character";
+import type { KaiDiscipline } from "../../domain/character/kai-discipline";
+import { createGameState } from "../../domain/game/game-state";
 import {
   type KeyValueStorage,
   LocalStorageSaveAdapter,
 } from "./local-storage-save.adapter";
-import { createGameState } from "../../domain/game/game-state";
-import { createCharacter } from "../../domain/character/create-character";
-import type { KaiDiscipline } from "../../domain/character/kai-discipline";
 
 /** Almacén en memoria para los tests. */
 class MemoryStorage implements KeyValueStorage {
@@ -58,7 +58,10 @@ describe("LocalStorageSaveAdapter", () => {
 
   it("descarta un guardado de versión incompatible", () => {
     const storage = new MemoryStorage();
-    storage.setItem("lone-wolf:save", JSON.stringify({ ...newState(), version: 999 }));
+    storage.setItem(
+      "lone-wolf:save",
+      JSON.stringify({ ...newState(), version: 999 }),
+    );
     expect(new LocalStorageSaveAdapter(storage).load()).toBeNull();
   });
 

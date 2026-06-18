@@ -9,7 +9,11 @@
  * Fuente: texto completo de la edición Project Aon Español (01hdlo.xml).
  */
 
-import type { Character, InventoryItem, ItemKind } from "../character/character";
+import type {
+  Character,
+  InventoryItem,
+  ItemKind,
+} from "../character/character";
 import {
   applyDamage,
   changeGold,
@@ -65,46 +69,213 @@ export function evaluateCondition(
  * Extraídas del texto de Project Aon Español (01hdlo.xml).
  */
 export const SECTION_CHOICE_CONDITIONS: Record<string, SectionChoiceRule[]> = {
-  sect1: [{ target: "sect141", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect4: [{ target: "sect218", condition: { type: "discipline", discipline: "sixthSense" } }],
+  sect1: [
+    {
+      target: "sect141",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect4: [
+    {
+      target: "sect218",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
   sect12: [{ target: "sect262", condition: { type: "gold", minGold: 10 } }],
-  sect18: [{ target: "sect114", condition: { type: "discipline", discipline: "camouflage" } }],
-  sect19: [{ target: "sect69", condition: { type: "discipline", discipline: "tracking" } }],
-  sect23: [{ target: "sect151", condition: { type: "discipline", discipline: "mindOverMatter" } }],
-  sect37: [{ target: "sect282", condition: { type: "discipline", discipline: "camouflage" } }],
-  sect46: [{ target: "sect296", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect52: [{ target: "sect225", condition: { type: "discipline", discipline: "animalKinship" } }],
-  sect70: [{ target: "sect8", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect71: [{ target: "sect65", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect83: [{ target: "sect45", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect88: [{ target: "sect216", condition: { type: "discipline", discipline: "healing" } }],
-  sect91: [{ target: "sect198", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect105: [{ target: "sect298", condition: { type: "discipline", discipline: "animalKinship" } }],
-  sect125: [{ target: "sect301", condition: { type: "discipline", discipline: "tracking" } }],
-  sect128: [{ target: "sect297", condition: { type: "discipline", discipline: "hunting" } }],
-  sect151: [{ target: "sect87", condition: { type: "discipline", discipline: "mindOverMatter" } }],
-  sect162: [{ target: "sect258", condition: { type: "discipline", discipline: "mindOverMatter" } }],
-  sect167: [{ target: "sect178", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect172: [{ target: "sect114", condition: { type: "discipline", discipline: "camouflage" } }],
-  sect175: [{ target: "sect182", condition: { type: "discipline", discipline: "camouflage" } }],
-  sect200: [{ target: "sect168", condition: { type: "discipline", discipline: "camouflage" } }],
+  sect18: [
+    {
+      target: "sect114",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
+  sect19: [
+    {
+      target: "sect69",
+      condition: { type: "discipline", discipline: "tracking" },
+    },
+  ],
+  sect23: [
+    {
+      target: "sect151",
+      condition: { type: "discipline", discipline: "mindOverMatter" },
+    },
+  ],
+  sect37: [
+    {
+      target: "sect282",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
+  sect46: [
+    {
+      target: "sect296",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect52: [
+    {
+      target: "sect225",
+      condition: { type: "discipline", discipline: "animalKinship" },
+    },
+  ],
+  sect70: [
+    {
+      target: "sect8",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect71: [
+    {
+      target: "sect65",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect83: [
+    {
+      target: "sect45",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect88: [
+    {
+      target: "sect216",
+      condition: { type: "discipline", discipline: "healing" },
+    },
+  ],
+  sect91: [
+    {
+      target: "sect198",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect105: [
+    {
+      target: "sect298",
+      condition: { type: "discipline", discipline: "animalKinship" },
+    },
+  ],
+  sect125: [
+    {
+      target: "sect301",
+      condition: { type: "discipline", discipline: "tracking" },
+    },
+  ],
+  sect128: [
+    {
+      target: "sect297",
+      condition: { type: "discipline", discipline: "hunting" },
+    },
+  ],
+  sect151: [
+    {
+      target: "sect87",
+      condition: { type: "discipline", discipline: "mindOverMatter" },
+    },
+  ],
+  sect162: [
+    {
+      target: "sect258",
+      condition: { type: "discipline", discipline: "mindOverMatter" },
+    },
+  ],
+  sect167: [
+    {
+      target: "sect178",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect172: [
+    {
+      target: "sect114",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
+  sect175: [
+    {
+      target: "sect182",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
+  sect200: [
+    {
+      target: "sect168",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
   sect203: [
-    { target: "sect80", condition: { type: "endurance", comparison: ">=", value: 10 } },
-    { target: "sect344", condition: { type: "endurance", comparison: "<", value: 10 } },
+    {
+      target: "sect80",
+      condition: { type: "endurance", comparison: ">=", value: 10 },
+    },
+    {
+      target: "sect344",
+      condition: { type: "endurance", comparison: "<", value: 10 },
+    },
   ],
-  sect211: [{ target: "sect244", condition: { type: "discipline", discipline: "sixthSense" } }],
-  sect222: [{ target: "sect67", condition: { type: "discipline", discipline: "tracking" } }],
-  sect235: [{ target: "sect254", condition: { type: "discipline", discipline: "tracking" } }],
-  sect242: [{ target: "sect166", condition: { type: "discipline", discipline: "mindshield" } }],
-  sect272: [{ target: "sect134", condition: { type: "discipline", discipline: "tracking" } }],
-  sect303: [{ target: "sect237", condition: { type: "discipline", discipline: "camouflage" } }],
-  sect308: [{ target: "sect122", condition: { type: "discipline", discipline: "animalKinship" } }],
-  sect311: [{ target: "sect324", condition: { type: "discipline", discipline: "camouflage" } }],
+  sect211: [
+    {
+      target: "sect244",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+  ],
+  sect222: [
+    {
+      target: "sect67",
+      condition: { type: "discipline", discipline: "tracking" },
+    },
+  ],
+  sect235: [
+    {
+      target: "sect254",
+      condition: { type: "discipline", discipline: "tracking" },
+    },
+  ],
+  sect242: [
+    {
+      target: "sect166",
+      condition: { type: "discipline", discipline: "mindshield" },
+    },
+  ],
+  sect272: [
+    {
+      target: "sect134",
+      condition: { type: "discipline", discipline: "tracking" },
+    },
+  ],
+  sect303: [
+    {
+      target: "sect237",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
+  sect308: [
+    {
+      target: "sect122",
+      condition: { type: "discipline", discipline: "animalKinship" },
+    },
+  ],
+  sect311: [
+    {
+      target: "sect324",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
+  ],
   sect334: [
-    { target: "sect48", condition: { type: "discipline", discipline: "sixthSense" } },
-    { target: "sect73", condition: { type: "discipline", discipline: "camouflage" } },
+    {
+      target: "sect48",
+      condition: { type: "discipline", discipline: "sixthSense" },
+    },
+    {
+      target: "sect73",
+      condition: { type: "discipline", discipline: "camouflage" },
+    },
   ],
-  sect341: [{ target: "sect310", condition: { type: "discipline", discipline: "tracking" } }],
+  sect341: [
+    {
+      target: "sect310",
+      condition: { type: "discipline", discipline: "tracking" },
+    },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -141,14 +312,18 @@ export const SECTION_COMBAT_RULES: Record<string, SectionCombatRules> = {
   sect29: { playerCSModifier: -2, mindshieldProtects: true },
   sect34: { playerCSModifier: -2, mindshieldProtects: true },
   sect283: { playerCSModifier: -2, mindshieldProtects: true },
-  sect342: { mindblastImmune: true, playerCSModifier: -2, mindshieldProtects: true },
+  sect342: {
+    mindblastImmune: true,
+    playerCSModifier: -2,
+    mindshieldProtects: true,
+  },
   // Kraan — penalización por polvo / batir de alas
   sect17: { playerCSModifier: -1 },
   sect229: { playerCSModifier: -1 },
   // Inmunidades explícitas al Mindblast
-  sect133: { mindblastImmune: true },  // Serpiente alada
-  sect170: { mindblastImmune: true },  // Alacrán zapador
-  sect255: { mindblastImmune: true },  // Gourgaz
+  sect133: { mindblastImmune: true }, // Serpiente alada
+  sect170: { mindblastImmune: true }, // Alacrán zapador
+  sect255: { mindblastImmune: true }, // Gourgaz
   // Elusión durante el combate
   sect169: { evasion: { target: "sect23", afterRound: 1 } },
   sect180: { evasion: { target: "sect22", afterRound: 0 } },
@@ -181,18 +356,18 @@ const DEFAULT_MEAL_PENALTY = 3;
  */
 export const SECTION_ENTRY_EFFECTS: Record<string, SectionEntryEffect> = {
   // Daño narrativo fuera de combate (incondicional)
-  sect76: { enduranceDelta: -2 },   // te quemas la mano
-  sect119: { enduranceDelta: -2 },  // resta 2 de los que tengas
-  sect144: { enduranceDelta: -2 },  // quedas aturdido
-  sect146: { enduranceDelta: -3 },  // proyectil
-  sect158: { enduranceDelta: -6 },  // primer rayo (el 2º depende de tirada → SECTION_ROLL_TABLES)
+  sect76: { enduranceDelta: -2 }, // te quemas la mano
+  sect119: { enduranceDelta: -2 }, // resta 2 de los que tengas
+  sect144: { enduranceDelta: -2 }, // quedas aturdido
+  sect146: { enduranceDelta: -3 }, // proyectil
+  sect158: { enduranceDelta: -6 }, // primer rayo (el 2º depende de tirada → SECTION_ROLL_TABLES)
   sect166: { enduranceDelta: -4 },
   // sect188: el daño depende de una tirada (0-6 pierdes equipo, 7-9 -3) → SECTION_ROLL_TABLES
   sect203: { enduranceDelta: -10 }, // explosión de chispas
-  sect236: { enduranceDelta: -6 },  // gema vordak (la pérdida de DC es aparte)
+  sect236: { enduranceDelta: -6 }, // gema vordak (la pérdida de DC es aparte)
   sect276: { enduranceDelta: -1 },
-  sect304: { enduranceDelta: -2 },  // te quema la mano
-  sect308: { enduranceDelta: -1 },  // empujón al suelo
+  sect304: { enduranceDelta: -2 }, // te quema la mano
+  sect308: { enduranceDelta: -1 }, // empujón al suelo
   sect343: { enduranceDelta: -2 },
   // Comidas obligatorias
   sect130: { requiresMeal: true },
@@ -234,7 +409,9 @@ export function applyEntryEffect(
 
   if (effect.requiresMeal) {
     if (result.disciplines.includes("hunting")) {
-      messages.push("Te alimentas con la disciplina de Caza (no gastas Comida).");
+      messages.push(
+        "Te alimentas con la disciplina de Caza (no gastas Comida).",
+      );
     } else {
       const meal = result.backpack.find((item) => item.kind === "meal");
       if (meal) {
@@ -320,7 +497,12 @@ export const SECTION_ROLL_TABLES: Record<string, RollOutcome[]> = {
   ],
   // Segundo rayo del druida: misma salida (106), distinto daño.
   sect158: [
-    { min: 0, max: 5, target: "sect106", message: "El rayo falla y se estrella en la pared." },
+    {
+      min: 0,
+      max: 5,
+      target: "sect106",
+      message: "El rayo falla y se estrella en la pared.",
+    },
     {
       min: 6,
       max: 9,
@@ -456,7 +638,14 @@ export const SECTION_LOOT: Record<string, SectionLoot> = {
   },
   sect197: {
     gold: 6,
-    items: [{ id: "short-sword", name: "Espada corta", slot: "weapon", weaponType: "shortSword" }],
+    items: [
+      {
+        id: "short-sword",
+        name: "Espada corta",
+        slot: "weapon",
+        weaponType: "shortSword",
+      },
+    ],
   },
   sect291: {
     gold: 6,
@@ -484,7 +673,10 @@ export function lootToInventoryItem(item: LootItem): InventoryItem {
 }
 
 /** Cobra el oro de una sección (acotado al máximo de la bolsa). */
-export function collectGold(character: Character, gold: number): EntryEffectResult {
+export function collectGold(
+  character: Character,
+  gold: number,
+): EntryEffectResult {
   const before = character.gold;
   const result = changeGold(character, gold);
   const gained = result.gold - before;

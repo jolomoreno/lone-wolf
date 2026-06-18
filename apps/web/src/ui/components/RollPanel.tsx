@@ -8,8 +8,8 @@
  */
 
 import { useRef, useState } from "react";
+import { type RollOutcome, resolveRoll } from "../../domain/game/section-rules";
 import { defaultRandomNumber } from "../../domain/random/random-number";
-import { resolveRoll, type RollOutcome } from "../../domain/game/section-rules";
 import { DiceRoll, type DiceRollHandle } from "./DiceRoll";
 
 interface Props {

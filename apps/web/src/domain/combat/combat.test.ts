@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  combatRatio,
-  type Enemy,
-  fightRound,
-  startCombat,
-} from "./combat";
+import { combatRatio, type Enemy, fightRound, startCombat } from "./combat";
 
 const enemy: Enemy = { name: "Kraan", combatSkill: 13, endurance: 25 };
 const fixed = (n: number) => () => n;
@@ -81,7 +76,10 @@ describe("fightRound", () => {
   });
 
   it("ignora asaltos si el combate ya terminó", () => {
-    const won = fightRound(startCombat(25, 25, { name: "x", combatSkill: 10, endurance: 5 }), fixed(0));
+    const won = fightRound(
+      startCombat(25, 25, { name: "x", combatSkill: 10, endurance: 5 }),
+      fixed(0),
+    );
     const after = fightRound(won, fixed(0));
     expect(after).toBe(won);
   });

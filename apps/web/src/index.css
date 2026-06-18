@@ -191,7 +191,9 @@ body {
   border-radius: 8px;
   padding: 0.9rem 1.1rem;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.05s;
+  transition:
+    border-color 0.15s,
+    transform 0.05s;
 }
 
 .choice:hover:not(:disabled) {
@@ -352,8 +354,14 @@ body {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(2px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ghost {
@@ -491,7 +499,6 @@ body {
   cursor: not-allowed;
 }
 
-
 .rolled-item {
   display: flex;
   flex-direction: column;
@@ -541,8 +548,14 @@ body {
   perspective: 420px;
 }
 
-.die-wrap-sm { width: 62px; height: 62px; }
-.die-wrap-lg { width: 90px; height: 90px; }
+.die-wrap-sm {
+  width: 62px;
+  height: 62px;
+}
+.die-wrap-lg {
+  width: 90px;
+  height: 90px;
+}
 
 .die {
   width: 100%;
@@ -562,8 +575,14 @@ body {
   will-change: transform;
 }
 
-.die-sm { font-size: 28px; border-radius: 10px; }
-.die-lg { font-size: 42px; border-radius: 14px; }
+.die-sm {
+  font-size: 28px;
+  border-radius: 10px;
+}
+.die-lg {
+  font-size: 42px;
+  border-radius: 14px;
+}
 
 .die--rolling {
   animation: die-tumble 0.5s linear infinite;
@@ -576,20 +595,34 @@ body {
 /* Inclina como máximo 35° en X/Y para no quedar nunca de canto (que parecería
    un parpadeo), y completa una vuelta entera en Z para empalmar sin saltos. */
 @keyframes die-tumble {
-  0%   { transform: rotateZ(0deg) scale(1); }
-  25%  { transform: rotateZ(90deg) rotateX(35deg) scale(0.9); }
-  50%  { transform: rotateZ(180deg) rotateY(35deg) scale(1.05); }
-  75%  { transform: rotateZ(270deg) rotateX(-35deg) scale(0.9); }
-  100% { transform: rotateZ(360deg) scale(1); }
+  0% {
+    transform: rotateZ(0deg) scale(1);
+  }
+  25% {
+    transform: rotateZ(90deg) rotateX(35deg) scale(0.9);
+  }
+  50% {
+    transform: rotateZ(180deg) rotateY(35deg) scale(1.05);
+  }
+  75% {
+    transform: rotateZ(270deg) rotateX(-35deg) scale(0.9);
+  }
+  100% {
+    transform: rotateZ(360deg) scale(1);
+  }
 }
 
 @keyframes die-land {
   0% {
     transform: scale(1.35);
     border-color: #ffe0a0;
-    box-shadow: 0 0 14px rgba(255, 224, 160, 0.7), 0 4px 10px rgba(0, 0, 0, 0.45);
+    box-shadow:
+      0 0 14px rgba(255, 224, 160, 0.7),
+      0 4px 10px rgba(0, 0, 0, 0.45);
   }
-  60% { transform: scale(0.94); }
+  60% {
+    transform: scale(0.94);
+  }
   100% {
     transform: scale(1);
     border-color: var(--accent);
@@ -941,7 +974,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .map-zoom-btn:hover:not(:disabled) {

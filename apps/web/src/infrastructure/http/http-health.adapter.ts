@@ -5,7 +5,10 @@
  * `/health`. Si mañana cambiáramos de mecanismo, solo tocaríamos aquí.
  */
 
-import type { ApiHealth, HealthPort } from "../../application/ports/health.port";
+import type {
+  ApiHealth,
+  HealthPort,
+} from "../../application/ports/health.port";
 
 export class HttpHealthAdapter implements HealthPort {
   constructor(private readonly baseUrl: string) {}

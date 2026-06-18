@@ -6,6 +6,7 @@
  * de dependencias está en un único sitio.
  */
 
+import cors from "cors";
 import express, {
   type Express,
   type NextFunction,
@@ -13,7 +14,6 @@ import express, {
   type Response,
   type Router,
 } from "express";
-import cors from "cors";
 import helmet from "helmet";
 import { env } from "../../config/env";
 
@@ -25,8 +25,12 @@ export function createHttpServer(routers: Router[]): Express {
   const corsOrigin =
     env.nodeEnv === "production"
       ? env.corsOrigin
-      : (origin: string | undefined, cb: (e: Error | null, ok?: boolean) => void) => {
-          if (!origin || /^https?:\/\/localhost(:\d+)?$/.test(origin)) cb(null, true);
+      : (
+          origin: string | undefined,
+          cb: (e: Error | null, ok?: boolean) => void,
+        ) => {
+          if (!origin || /^https?:\/\/localhost(:\d+)?$/.test(origin))
+            cb(null, true);
           else cb(new Error(`CORS: origen no permitido → ${origin}`));
         };
   app.use(helmet()); // Cabeceras de seguridad HTTP

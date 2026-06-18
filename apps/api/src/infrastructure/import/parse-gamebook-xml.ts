@@ -100,11 +100,12 @@ function normalize(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
-
 function parseCombat(node: XmlNode): Combat {
   const children = kids(node);
   const enemyNode = children.find((c) => tagOf(c) === "enemy");
-  const enemy = enemyNode ? normalize(flattenChildren(kids(enemyNode))) : "Enemigo";
+  const enemy = enemyNode
+    ? normalize(flattenChildren(kids(enemyNode)))
+    : "Enemigo";
 
   let combatSkill = 0;
   let endurance = 0;
@@ -130,7 +131,9 @@ function parseIllustration(node: XmlNode): ContentBlock | null {
     }
   }
   if (!src) return null;
-  return alt ? { type: "illustration", src, alt } : { type: "illustration", src };
+  return alt
+    ? { type: "illustration", src, alt }
+    : { type: "illustration", src };
 }
 
 /**
@@ -190,7 +193,10 @@ function parseData(dataChildren: XmlNode[]): {
       case "choice": {
         const target = attrOf(node, "idref");
         if (target) {
-          choices.push({ text: normalize(flattenChildren(kids(node))), target });
+          choices.push({
+            text: normalize(flattenChildren(kids(node))),
+            target,
+          });
         } else {
           // <choice> sin idref = declaración de fin de partida en el libro.
           // Se convierte en párrafo para que el jugador vea el texto, y la
@@ -213,7 +219,11 @@ function parseData(dataChildren: XmlNode[]): {
         for (const child of kids(node)) {
           if (tagOf(child) === "choice") {
             const target = attrOf(child, "idref");
-            if (target) choices.push({ text: normalize(flattenChildren(kids(child))), target });
+            if (target)
+              choices.push({
+                text: normalize(flattenChildren(kids(child))),
+                target,
+              });
           }
         }
         const text = normalize(flattenChildren(kids(node)));

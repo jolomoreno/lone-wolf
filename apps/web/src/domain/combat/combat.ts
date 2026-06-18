@@ -6,7 +6,10 @@
  * daño a ambos) y actualiza el estado (en curso / victoria / derrota).
  */
 
-import { defaultRandomNumber, type RandomNumber } from "../random/random-number";
+import {
+  defaultRandomNumber,
+  type RandomNumber,
+} from "../random/random-number";
 import { type Damage, lookupRound } from "./combat-results-table";
 
 export interface Enemy {

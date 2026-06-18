@@ -80,7 +80,9 @@ async function main(): Promise<void> {
   const repository = new MongoSectionRepository();
   await repository.clear();
   await repository.saveMany(sections);
-  console.log(`[import] Importadas ${await repository.count()} secciones a MongoDB.`);
+  console.log(
+    `[import] Importadas ${await repository.count()} secciones a MongoDB.`,
+  );
   await mongoose.disconnect();
 }
 
