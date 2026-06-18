@@ -171,6 +171,31 @@ Vercel Functions ejecutan desde IPs dinámicas de AWS; sin este paso Atlas recha
 todas las conexiones desde producción. La única protección real es el `MONGODB_URI`
 (que incluye usuario y contraseña y nunca se expone en el cliente).
 
+### M2 · Importar datos en la base de datos de producción
+
+- [x] Ejecutar `import:book` apuntando a `lonewolf-prod` (solo la primera vez, o si
+  el XML de Project Aon cambia):
+
+```bash
+# 1. Editar apps/api/.env — cambiar MONGODB_URI para apuntar a lonewolf-prod:
+#    MONGODB_URI=mongodb+srv://<usuario>:<password>@<cluster>.mongodb.net/lonewolf-prod
+
+# 2. Importar (desde la raíz del repo):
+pnpm --filter @lone-wolf/api import:book
+
+# 3. Restaurar apps/api/.env a lonewolf-dev cuando termine.
+```
+
+**¿Con qué frecuencia?** El XML de Project Aon es el contenido de un libro de 1984;
+cambia de forma excepcional. En la práctica esta operación es puntual: una vez al
+desplegar por primera vez, y solo si Project Aon publicara una corrección al texto.
+No requiere automatización.
+
+**Si algún día cambia el XML:** re-importar en `lonewolf-dev` primero (verificar que
+las secciones se ven bien en local), y luego repetir el proceso apuntando a
+`lonewolf-prod`. Las 388 secciones se sobrescriben — no hay estado de usuario en esa
+colección.
+
 ---
 
 ## Fase 3 — Primer deploy en Vercel
