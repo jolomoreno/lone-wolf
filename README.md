@@ -34,13 +34,21 @@ lone-wolf/
 ├── apps/
 │   ├── web/          # Frontend: React + Vite + TypeScript
 │   └── api/          # Backend: Express 5 + TypeScript + Mongoose (MongoDB)
-│       └── handler.ts  # Serverless entry point (esbuild lo empaqueta en api/handler.js)
+│       └── handler.ts  # Serverless entry point (esbuild lo empaqueta en la función)
 ├── packages/
 │   └── shared/       # DTOs/contratos entre web y api (solo tipos de red)
-├── api/              # Destino del bundle serverless (generado en build, no se versiona)
+├── scripts/
+│   └── build-vercel.mjs  # Monta .vercel/output/ (Build Output API) en el deploy
+├── api/              # Bundle suelto de esbuild para uso local (gitignored)
 ├── data/             # XML de Project Aon + script de importación a Mongo
-└── vercel.json       # Build config: esbuild (API) + Vite (web) + rewrites
+└── vercel.json       # Build config: buildCommand (pnpm build:vercel) + installCommand
 ```
+
+> El despliegue usa la **Build Output API v3** de Vercel: `pnpm build:vercel`
+> genera `.vercel/output/` con la SPA estática, la función serverless y el
+> enrutado (`/sections/*` y `/health` → función). Vercel lo sirve tal cual, sin
+> depender de la autodetección del directorio `/api` (que no recoge ficheros
+> generados durante el build).
 
 ### apps/web — frontend
 
@@ -252,7 +260,8 @@ La integración automática de Vercel con GitHub está desconectada; el deploy l
 ```bash
 pnpm dev                       # arranca web + api en paralelo
 pnpm build                     # build de producción de todos los paquetes
-pnpm build:api                 # genera api/handler.js (bundle serverless para Vercel)
+pnpm build:api                 # genera api/handler.js suelto (bundle esbuild, uso local)
+pnpm build:vercel              # monta .vercel/output/ (Build Output API) — lo que usa el deploy
 pnpm typecheck                 # comprobación de tipos de todo el monorepo (3 proyectos)
 pnpm lint                      # Biome CI (lint + formato, sin modificar ficheros)
 pnpm biome check --write .     # Biome con auto-fix (usar antes de commit)

@@ -30,7 +30,8 @@ Demo en producción: **https://lone-wolf-five.vercel.app**
 | Contratos | `packages/shared` — solo DTOs, sin lógica |
 | Base de datos | MongoDB Atlas (dev: `lonewolf-dev`, prod: `lonewolf-prod`) |
 | Hosting | Vercel único — web estático + API serverless (mismo origen, sin CORS) |
-| Bundler API | esbuild — empaqueta `apps/api/handler.ts` → `api/handler.js` (~4 MB CJS) |
+| Bundler API | esbuild — empaqueta `apps/api/handler.ts` → función serverless (~4 MB CJS) |
+| Empaquetado deploy | **Build Output API v3** de Vercel — `scripts/build-vercel.mjs` monta `.vercel/output/` (estático + función + rutas) |
 | Gestor de paquetes | pnpm 11 workspaces |
 | Node | 22.17.0 (nvm) — **usar `nvm use 22` antes de cualquier comando** |
 | Lint | Biome (`pnpm lint` → `biome ci .`) |
@@ -48,17 +49,22 @@ apps/
   web/          React SPA
 packages/
   shared/       DTOs compartidos (SectionDTO, etc.)
-api/            handler.js — bundle generado por esbuild (gitignored)
+scripts/
+  build-vercel.mjs  Monta .vercel/output/ (Build Output API v3) en el deploy
+api/            handler.js — bundle suelto de esbuild para uso local (gitignored)
 data/           01hdlo.xml — XML de Project Aon (gitignored por licencia)
 .github/
   workflows/
     ci.yml      CI gate (typecheck+lint+test) + deploy condicional a Vercel
-vercel.json     Build + rewrites /sections/* y /health → api/handler
+vercel.json     Solo buildCommand (pnpm build:vercel) + installCommand
 .vercelignore   Excluye .env del upload (evita localhost en bundle prod)
 biome.json      Config lint + formato
 DEPLOY_PLAN.md  Plan completo de despliegue con todas las decisiones
 TODO.md         Backlog completo paso a paso
 ```
+
+> **Enrutado en prod**: las rewrites `/sections/*` y `/health` → función ya NO viven en
+> `vercel.json`, sino en `.vercel/output/config.json` (lo genera `build-vercel.mjs`).
 
 ---
 
@@ -81,14 +87,21 @@ TODO.md         Backlog completo paso a paso
 ### Paso 14 — estado
 
 - [x] Fase 0: Biome + validación env vars
-- [x] Fase 1: handler serverless + vercel.json + esbuild
+- [x] Fase 1: handler serverless + Build Output API (`scripts/build-vercel.mjs`)
 - [x] Fase 2: MongoDB Atlas Network Access
-- [x] Fase 3: primer deploy Vercel (app jugable en prod)
+- [x] Fase 3: deploy Vercel — **API serverless realmente operativa desde 2026-06-19** (ver nota abajo)
 - [x] **Fase 4: GitHub Actions** — pipeline operativo desde 2026-06-19
   - CI1: `.github/workflows/ci.yml` — jobs `ci` (typecheck+lint+test) y `deploy` (`needs: ci`)
   - CI2: secrets configurados en GitHub (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`)
   - CI3: integración automática de GitHub desconectada en Vercel dashboard
 - [ ] **Fase 5: Smoke test E2E manual** — personaje → combate → guardar → recargar → muerte/victoria
+  - Ya es realizable: la app es jugable de extremo a extremo en prod por primera vez (commit `56f81c3`).
+
+> **Nota histórica (2026-06-19)**: hasta el commit `56f81c3`, la API en producción estaba
+> **muerta**. esbuild generaba la función pero Vercel no la registraba (autodetección de `/api`
+> no recoge ficheros generados) → todo `/sections/*` daba 404 del edge. La SPA cargaba el
+> personaje desde `localStorage`, lo que enmascaraba el fallo. Solucionado migrando a la
+> **Build Output API** (`.vercel/output/` montado por `scripts/build-vercel.mjs`).
 
 ### Pipeline CI/CD (activo)
 
@@ -98,7 +111,10 @@ git push → GitHub Actions
               ├── pnpm lint  (Biome)
               └── pnpm test  (88 tests Vitest)
                       ↓ solo si los tres pasan
-              npx vercel@latest --prod → https://lone-wolf-five.vercel.app
+              npx vercel@latest --prod
+                 → build remoto: pnpm build:vercel monta .vercel/output/
+                 → Vercel sirve estático + función desde ahí
+                 → https://lone-wolf-five.vercel.app
 ```
 
 Secrets en GitHub repo → Settings → Secrets and variables → Actions:
@@ -109,7 +125,10 @@ Secrets en GitHub repo → Settings → Secrets and variables → Actions:
 - **`pnpm add -g vercel` no funciona en GitHub Actions**: el bin global de pnpm no está en PATH. Usar `npx vercel@latest` directamente.
 - **`pnpm/action-setup@v4` + `packageManager` en package.json**: no especificar `version:` en el YAML — la action lo lee del campo `packageManager` automáticamente.
 - **Biome en CI es estricto**: ejecutar `pnpm biome check --write .` localmente antes de cada commit para evitar errores de formato en CI. Sin esto, ediciones manuales en JSX complejo (ternarios anidados en `&&`) pueden fallar.
-- **Node local puede ser distinto**: si `node --version` devuelve algo distinto a v22, ejecutar `nvm install 22 && nvm use 22` antes de cualquier comando del proyecto.
+- **Node local puede ser distinto**: si `node --version` devuelve algo distinto a v22, ejecutar `nvm install 22 && nvm use 22` antes de cualquier comando del proyecto. Con Node 10, `npx vercel` falla con "await is only valid in async function".
+- **La autodetección de `/api` de Vercel NO recoge ficheros generados en el build**: con `buildCommand`/`outputDirectory` custom, esbuild creaba `api/handler.js` pero Vercel desplegaba **cero funciones** → 404 `x-vercel-error: NOT_FOUND` en `/sections/*` y `/health`. Por eso se usa la **Build Output API** (`scripts/build-vercel.mjs` → `.vercel/output/`), que Vercel consume tal cual. No volver a confiar en la autodetección.
+- **Distinguir el 404 del edge del 404 de la API**: edge = `text/plain` + `x-vercel-error: NOT_FOUND`; nuestra API = `application/json` + `{"error":"No existe..."}`. Si ves el primero, la función no está desplegada.
+- **Validar el deploy sin tocar prod**: `nvm use 22` → `npx vercel deploy --prebuilt` (preview) y luego `npx vercel curl <url>/health` (atraviesa la Vercel Authentication). El preview NO tiene `MONGODB_URI` (solo Production), así que dará `FUNCTION_INVOCATION_FAILED` con "[config] MONGODB_URI es obligatoria" → eso CONFIRMA que la función carga y solo falta el env.
 
 ---
 

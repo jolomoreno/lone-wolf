@@ -3,6 +3,15 @@
 > Creado: 2026-06-18. Ejecutar en sesiones separadas, fase por fase.
 > Progreso: marcar cada tarea con `[x]` al completarla.
 
+> ⚠️ **Actualización 2026-06-19 (post-mortem).** El enfoque original (esbuild →
+> `api/handler.js` + `rewrites` en `vercel.json`, apoyándose en la autodetección de
+> `/api`) **no funcionaba en producción**: Vercel no registra funciones generadas durante
+> el build, así que desplegaba cero funciones y todo `/sections/*` daba 404 del edge.
+> Se migró a la **Build Output API v3**: `scripts/build-vercel.mjs` (vía `pnpm build:vercel`)
+> monta `.vercel/output/` con estático + función + enrutado, y `vercel.json` queda solo con
+> `buildCommand` + `installCommand`. Las secciones S2 de abajo reflejan el plan original;
+> la realidad operativa es la Build Output API.
+
 ## Decisiones tomadas
 
 | Decisión | Elección |
@@ -21,8 +30,9 @@ git push → GitHub → GitHub Actions ──(CI ✓)──> vercel --prod
                      biome ci                        ▼
                      vitest 88 tests          Vercel (lone-wolf.vercel.app)
                                                ├── /          → web estático (React + Vite)
-                                               ├── /sections/* → api/handler.js (serverless bundle)
-                                               └── /health     → api/handler.js (serverless bundle)
+                                               ├── /sections/* → función serverless (handler.func)
+                                               └── /health     → función serverless (handler.func)
+                          (todo servido desde .vercel/output/ — Build Output API v3)
                                                         │
                                                         ▼
                                                   MongoDB Atlas
