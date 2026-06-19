@@ -415,9 +415,9 @@
 
 ### Fase 4 — GitHub Actions
 
-- [ ] **CI1** · Crear `.github/workflows/ci.yml` — jobs `ci` (typecheck+lint+test) y `deploy` (needs: ci) (~30 min)
-- [ ] **CI2** · Secrets en GitHub: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (~5 min)
-- [ ] **CI3** · Desactivar auto-deploy en Vercel dashboard (el deploy lo controla el YAML) (~2 min)
+- [x] **CI1** · Crear `.github/workflows/ci.yml` — jobs `ci` (typecheck+lint+test) y `deploy` (needs: ci) (~30 min)
+- [x] **CI2** · Secrets en GitHub: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (~5 min)
+- [x] **CI3** · Desactivar auto-deploy en Vercel dashboard (el deploy lo controla el YAML) (~2 min)
 
 ### Fase 5 — Smoke test
 

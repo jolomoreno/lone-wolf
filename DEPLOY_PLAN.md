@@ -251,7 +251,7 @@ explícitamente todos los `.env`.
 
 ### CI1 · Crear `.github/workflows/ci.yml` (~30 min)
 
-- [ ] Crear el directorio y el fichero:
+- [x] Crear el directorio y el fichero:
 
 ```yaml
 name: CI / Deploy
@@ -310,7 +310,7 @@ no se ejecuta y Vercel no despliega.
 
 ### CI2 · Secrets en GitHub (~5 min)
 
-- [ ] En GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
+- [x] En GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
 
 | Secret | Cómo obtenerlo |
 |---|---|
@@ -320,7 +320,7 @@ no se ejecuta y Vercel no despliega.
 
 ### CI3 · Desactivar auto-deploy en Vercel (~2 min)
 
-- [ ] En Vercel dashboard → Settings → Git → desconectar la integración automática de GitHub
+- [x] En Vercel dashboard → Settings → Git → desconectar la integración automática de GitHub
   (o desactivar el auto-deploy en la rama `main`).
 
 El deploy ahora lo dispara exclusivamente el job `deploy` del YAML, después de que
