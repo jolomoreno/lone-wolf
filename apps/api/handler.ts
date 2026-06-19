@@ -7,5 +7,6 @@ let app: ReturnType<typeof buildApp> | undefined;
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   await connectToDatabase(); // sin-op si readyState >= 1
   app ??= buildApp(); // se reutiliza en invocaciones calientes
+  // biome-ignore lint/suspicious/noExplicitAny: bridging Vercel and Express types
   app(req as any, res as any);
 }

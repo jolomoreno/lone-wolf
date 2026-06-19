@@ -449,6 +449,36 @@ function Adventure({
       ? section.data.number
       : sectionLabel(sectionId);
 
+  const noChoicesPanel =
+    section.status === "ok" &&
+    section.data.choices.length === 0 &&
+    !rollTable &&
+    !enemy ? (
+      sectionId === FINAL_SECTION ? (
+        <div style={{ marginTop: "1.5rem" }}>
+          <p>
+            <strong>
+              🐺 Has completado el Libro 1 — Huida de la Oscuridad.
+            </strong>
+          </p>
+          <p className="muted small">
+            El Maestro de las Tinieblas conocerá tu nombre.
+          </p>
+          <div className="start-actions" style={{ marginTop: "1rem" }}>
+            <button type="button" className="primary" onClick={onGameOver}>
+              Nueva partida
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="start-actions" style={{ marginTop: "1.5rem" }}>
+          <button type="button" className="primary" onClick={onGameOver}>
+            Nueva partida
+          </button>
+        </div>
+      )
+    ) : null;
+
   return (
     <main className="game">
       <header className="game-header">
@@ -527,37 +557,7 @@ function Adventure({
                 />
               )}
 
-              {section.data.choices.length === 0 && !rollTable && !enemy && (
-                sectionId === FINAL_SECTION ? (
-                  <div style={{ marginTop: "1.5rem" }}>
-                    <p>
-                      <strong>🐺 Has completado el Libro 1 — Huida de la Oscuridad.</strong>
-                    </p>
-                    <p className="muted small">
-                      El Maestro de las Tinieblas conocerá tu nombre.
-                    </p>
-                    <div className="start-actions" style={{ marginTop: "1rem" }}>
-                      <button
-                        type="button"
-                        className="primary"
-                        onClick={onGameOver}
-                      >
-                        Nueva partida
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="start-actions" style={{ marginTop: "1.5rem" }}>
-                    <button
-                      type="button"
-                      className="primary"
-                      onClick={onGameOver}
-                    >
-                      Nueva partida
-                    </button>
-                  </div>
-                )
-              )}
+              {noChoicesPanel}
             </>
           )}
         </div>
