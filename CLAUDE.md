@@ -70,7 +70,7 @@ TODO.md         Backlog completo paso a paso
 
 ## Estado actual del proyecto
 
-**Pasos 1–14 completados excepto el smoke test final.**
+**Pasos 1–14 completados.** Proyecto desplegado y verificado E2E en producción (2026-06-19).
 
 | Paso | Estado |
 |---|---|
@@ -82,7 +82,7 @@ TODO.md         Backlog completo paso a paso
 | 11 Fidelidad (weaponskill, curación, reglas por sección, ilustraciones) | ✅ |
 | 12 Tiradas animadas (dado 3D, revelación progresiva) | ✅ |
 | 13 Refactors / deuda técnica | ✅ |
-| 14 Despliegue + CI/CD | ✅ (pendiente Fase 5: smoke test) |
+| 14 Despliegue + CI/CD (incl. smoke test E2E) | ✅ |
 
 ### Paso 14 — estado
 
@@ -94,8 +94,13 @@ TODO.md         Backlog completo paso a paso
   - CI1: `.github/workflows/ci.yml` — jobs `ci` (typecheck+lint+test) y `deploy` (`needs: ci`)
   - CI2: secrets configurados en GitHub (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`)
   - CI3: integración automática de GitHub desconectada en Vercel dashboard
-- [ ] **Fase 5: Smoke test E2E manual** — personaje → combate → guardar → recargar → muerte/victoria
-  - Ya es realizable: la app es jugable de extremo a extremo en prod por primera vez (commit `56f81c3`).
+- [x] **Fase 5: Smoke test E2E** — verificado en producción el 2026-06-19 con navegador real:
+  personaje → combate (victoria sobre Kraan) → guardar mid-combate → recargar (persistencia íntegra
+  de `pendingCombat`) → victoria. Las 5 navegaciones golpearon la API serverless
+  (`GET /sections/sect*` → `200`), confirmando que prod ya no se enmascara con `localStorage`.
+  Evidencias en [SMOKE_TEST.md](SMOKE_TEST.md).
+  - **Pendiente menor (nice-to-have)**: la API emite en prod `access-control-allow-origin: http://localhost:5173`
+    (cabecera CORS de dev). Sin impacto funcional (mismo origen), pero conviene condicionarla por entorno.
 
 > **Nota histórica (2026-06-19)**: hasta el commit `56f81c3`, la API en producción estaba
 > **muerta**. esbuild generaba la función pero Vercel no la registraba (autodetección de `/api`

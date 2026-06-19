@@ -1,7 +1,8 @@
 # TODO / Backlog — Lobo Solitario
 
-> Última actualización: 2026-06-18. Pasos 1-13 completados.
-> Pendiente: paso 14 (despliegue). Plan detallado en [DEPLOY_PLAN.md](DEPLOY_PLAN.md).
+> Última actualización: 2026-06-19. Pasos 1-14 completados.
+> Proyecto desplegado y verificado E2E en producción. Plan de despliegue en
+> [DEPLOY_PLAN.md](DEPLOY_PLAN.md); evidencias del smoke test en [SMOKE_TEST.md](SMOKE_TEST.md).
 
 ## Roadmap principal
 
@@ -24,7 +25,7 @@
       progresiva y animación.
 - [x] **13. Refactors / deuda técnica** — 13.1 a 13.2-D completados: bugs gameplay,
       fidelidad de reglas, contenido/UX (favicon, modales, mapa), deuda técnica (R1-R3).
-- [~] **14. Despliegue + CI/CD** — Vercel ✅ + GitHub Actions ✅ operativos (2026-06-19); pendiente Fase 5: smoke test E2E manual. Ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md).
+- [x] **14. Despliegue + CI/CD** — Vercel ✅ + GitHub Actions ✅ operativos (2026-06-19); smoke test E2E ✅ superado en producción. Ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md) y [SMOKE_TEST.md](SMOKE_TEST.md).
 
 ---
 
@@ -419,20 +420,27 @@
 - [x] **CI2** · Secrets en GitHub: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (~5 min)
 - [x] **CI3** · Desactivar auto-deploy en Vercel dashboard (el deploy lo controla el YAML) (~2 min)
 
-### Fase 5 — Smoke test
+### Fase 5 — Smoke test ✓
 
-- [ ] **T1** · Test manual E2E: personaje → combate → guardar → recargar → muerte/victoria (~20 min)
-
-### Nice-to-have (sin fase asignada)
-
-- [ ] Tests del backend: `parse-gamebook-xml.ts`, `section.mapper.ts`, caso de uso `GetSection`
-- [ ] Responsive/móvil y accesibilidad básica
-- [ ] Error Boundary en React (evitar pantalla en blanco si algo falla)
-- [ ] Cumplir **Project Aon License** al publicar: atribución visible en el pie + enlace a projectaon.org (ya hecho en dev, verificar en producción)
+- [x] **T1** · Test E2E en producción (2026-06-19, navegador real): personaje → combate
+      (victoria sobre Kraan) → guardar mid-combate → recargar (persistencia íntegra de
+      `pendingCombat`) → victoria. Las 5 navegaciones golpearon la API serverless
+      (`GET /sections/sect*` → `200`), confirmando que prod ya no se enmascara con `localStorage`.
+      De paso quedó verificada en producción la atribución de **Project Aon License** (pie +
+      enlace a projectaon.org). Evidencias en [SMOKE_TEST.md](SMOKE_TEST.md).
 
 ---
 
 ## Calidad / nice-to-have (sin paso asignado)
 
-- [ ] Responsive/móvil y accesibilidad (lector y panel de combate).
-- [ ] Error boundary en React (evitar pantalla en blanco si algo peta).
+> Fusión de los antiguos bloques "Nice-to-have (sin fase asignada)" y "Calidad / nice-to-have".
+
+- [ ] **Tests del backend** — `parse-gamebook-xml.ts`, `section.mapper.ts` y caso de uso
+      `GetSection` (es el mismo pendiente que figura en el grupo D del Paso 13).
+- [ ] **Responsive / móvil y accesibilidad básica** — lector y panel de combate.
+- [ ] **Error Boundary en React** — evitar la pantalla en blanco si algo falla en runtime.
+- [ ] **Limpiar la cabecera CORS de desarrollo en producción** — la API en prod responde con
+      `access-control-allow-origin: http://localhost:5173` (valor de dev). Sin impacto funcional
+      (web y API comparten origen, CORS no aplica), pero conviene no emitir el header de CORS en
+      producción —o condicionarlo por entorno. Detectado en el smoke test
+      ([SMOKE_TEST.md](SMOKE_TEST.md)).

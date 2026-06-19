@@ -13,7 +13,7 @@ inventario y guardado de la partida.
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
 | 13 | Refactors / deuda técnica — bugs gameplay, fidelidad de reglas, contenido/UX, deuda técnica | ✅ Hecho |
-| **14** | **Despliegue + CI/CD** — Vercel ✅ · GitHub Actions ✅ · Smoke test pendiente | 🔄 |
+| **14** | **Despliegue + CI/CD** — Vercel ✅ · GitHub Actions ✅ · Smoke test E2E ✅ ([SMOKE_TEST.md](SMOKE_TEST.md)) | ✅ Hecho |
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
 

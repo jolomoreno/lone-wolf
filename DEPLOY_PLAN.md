@@ -2,6 +2,9 @@
 
 > Creado: 2026-06-18. Ejecutar en sesiones separadas, fase por fase.
 > Progreso: marcar cada tarea con `[x]` al completarla.
+>
+> ✅ **Estado 2026-06-19: plan completado.** Fases 0–4 operativas y Fase 5 (smoke test E2E)
+> superada en producción. Evidencias en [SMOKE_TEST.md](SMOKE_TEST.md).
 
 > ⚠️ **Actualización 2026-06-19 (post-mortem).** El enfoque original (esbuild →
 > `api/handler.js` + `rewrites` en `vercel.json`, apoyándose en la autodetección de
@@ -339,16 +342,27 @@ en ejecutarse.
 
 ---
 
-## Fase 5 — Smoke test E2E
+## Fase 5 — Smoke test E2E ✅
 
-### T1 · Test manual completo (~20 min)
+### T1 · Test completo — **HECHO** (2026-06-19, navegador real sobre producción)
 
-- [ ] Crear personaje: animaciones de dado, selección de 5 disciplinas, equipo inicial correcto.
-- [ ] Navegar 5+ secciones: textos, ilustraciones hotlinked, opciones con/sin 🔒.
-- [ ] Combate: tabla de resultados, barras de Resistencia, registro de asaltos.
-- [ ] Guardar → cerrar pestaña → reabrir → partida restaurada exactamente.
-- [ ] Sección de muerte: pantalla de fin + "Nueva partida" funciona.
-- [ ] DevTools → Network: llamadas a `/sections/:id` devuelven 200, sin errores CORS.
+Recorrido verificado de extremo a extremo. Evidencias completas en
+[SMOKE_TEST.md](SMOKE_TEST.md).
+
+- [x] Crear personaje: animaciones de dado, selección de 5 disciplinas, equipo inicial correcto
+      (incl. resolución del conflicto de armas Hacha/Maza/Daga del weaponskill).
+- [x] Navegar 5+ secciones: textos, ilustraciones hotlinked (kraan), opciones con/sin 🔒.
+- [x] Combate: tabla de resultados canónica, barras de Resistencia, registro de 6 asaltos,
+      victoria sobre el Kraan.
+- [x] Guardar (mid-combate) → recargar → partida restaurada exactamente, incluido el
+      `pendingCombat` en curso.
+- [x] Estado terminal: victoria ("¡Has vencido a Kraan!"). Curación verificada (heal-on-pass-through).
+- [x] Network: las 5 llamadas a `/sections/:id` devuelven **200 `application/json`** desde la
+      función serverless (prod ya no se enmascara con `localStorage`).
+
+> **Hallazgo (nice-to-have, no bloqueante)**: la API en producción emite
+> `access-control-allow-origin: http://localhost:5173` (cabecera CORS de dev). Sin impacto
+> funcional (web y API comparten origen). Anotado en TODO.md → "Calidad / nice-to-have".
 
 ---
 
@@ -380,7 +394,7 @@ Fase 4
   CI3 Desactivar auto-deploy Vercel          ~2 min
 
 Fase 5
-  T1  Smoke test E2E manual                ~20 min
+  T1  Smoke test E2E (HECHO 2026-06-19)    ~20 min  ✅
 ────────────────────────────────────────────────────
                                   Total  ~3 h 10 min
 ```
