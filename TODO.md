@@ -24,7 +24,7 @@
       progresiva y animación.
 - [x] **13. Refactors / deuda técnica** — 13.1 a 13.2-D completados: bugs gameplay,
       fidelidad de reglas, contenido/UX (favicon, modales, mapa), deuda técnica (R1-R3).
-- [~] **14. Despliegue + CI/CD** — deploy Vercel operativo (https://lone-wolf-five.vercel.app); pendiente CI/CD GitHub Actions. Ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md).
+- [~] **14. Despliegue + CI/CD** — Vercel ✅ + GitHub Actions ✅ operativos (2026-06-19); pendiente Fase 5: smoke test E2E manual. Ver [DEPLOY_PLAN.md](DEPLOY_PLAN.md).
 
 ---
 

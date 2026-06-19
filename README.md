@@ -13,7 +13,7 @@ inventario y guardado de la partida.
 | 11 | Fidelidad del juego — reglas por sección, ilustraciones, tiradas, botín | ✅ Hecho |
 | 12 | Tiradas animadas — animación CSS del dado, revelación progresiva, pulido UX | ✅ Hecho |
 | 13 | Refactors / deuda técnica — bugs gameplay, fidelidad de reglas, contenido/UX, deuda técnica | ✅ Hecho |
-| **14** | **Despliegue + CI/CD** — deploy Vercel ✅ · CI/CD GitHub Actions 🔄 | 🔄 |
+| **14** | **Despliegue + CI/CD** — Vercel ✅ · GitHub Actions ✅ · Smoke test pendiente | 🔄 |
 
 > Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
 
@@ -236,15 +236,27 @@ pnpm --filter @lone-wolf/web dev
   que estás arrancando con `pnpm dev` (composition root correcto) y no con un proceso de API antiguo
   aún vivo en el puerto 4000 (`lsof -ti:4000 | xargs kill`).
 
+## CI/CD
+
+El pipeline de GitHub Actions (`.github/workflows/ci.yml`) se dispara en cada push a `main`:
+
+1. **ci** — `pnpm typecheck` + `pnpm lint` + `pnpm test`
+2. **deploy** — `npx vercel@latest --prod` (solo si `ci` pasa)
+
+La integración automática de Vercel con GitHub está desconectada; el deploy lo controla exclusivamente el YAML.
+
+> Antes de hacer push, ejecuta `pnpm biome check --write .` para que el formatter no rechace el commit en CI.
+
 ## Scripts útiles
 
 ```bash
-pnpm dev                  # arranca web + api en paralelo
-pnpm build                # build de producción de todos los paquetes
-pnpm build:api            # genera api/handler.js (bundle serverless para Vercel)
-pnpm typecheck            # comprobación de tipos de todo el monorepo (3 proyectos)
-pnpm lint                 # Biome CI (lint + formato, sin modificar ficheros)
-pnpm test                 # ejecuta todos los tests (vitest)
+pnpm dev                       # arranca web + api en paralelo
+pnpm build                     # build de producción de todos los paquetes
+pnpm build:api                 # genera api/handler.js (bundle serverless para Vercel)
+pnpm typecheck                 # comprobación de tipos de todo el monorepo (3 proyectos)
+pnpm lint                      # Biome CI (lint + formato, sin modificar ficheros)
+pnpm biome check --write .     # Biome con auto-fix (usar antes de commit)
+pnpm test                      # ejecuta todos los tests (vitest)
 pnpm --filter @lone-wolf/api import:book -- --dry-run   # parsea el XML sin tocar Mongo
 ```
 

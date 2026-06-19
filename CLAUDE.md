@@ -50,6 +50,9 @@ packages/
   shared/       DTOs compartidos (SectionDTO, etc.)
 api/            handler.js — bundle generado por esbuild (gitignored)
 data/           01hdlo.xml — XML de Project Aon (gitignored por licencia)
+.github/
+  workflows/
+    ci.yml      CI gate (typecheck+lint+test) + deploy condicional a Vercel
 vercel.json     Build + rewrites /sections/* y /health → api/handler
 .vercelignore   Excluye .env del upload (evita localhost en bundle prod)
 biome.json      Config lint + formato
@@ -61,7 +64,7 @@ TODO.md         Backlog completo paso a paso
 
 ## Estado actual del proyecto
 
-**Pasos 1–13 completados.** Paso 14 en progreso.
+**Pasos 1–14 completados excepto el smoke test final.**
 
 | Paso | Estado |
 |---|---|
@@ -73,21 +76,40 @@ TODO.md         Backlog completo paso a paso
 | 11 Fidelidad (weaponskill, curación, reglas por sección, ilustraciones) | ✅ |
 | 12 Tiradas animadas (dado 3D, revelación progresiva) | ✅ |
 | 13 Refactors / deuda técnica | ✅ |
-| 14 Despliegue + CI/CD | 🔄 en progreso |
+| 14 Despliegue + CI/CD | ✅ (pendiente Fase 5: smoke test) |
 
-### Paso 14 — pendiente
-
-Ver **`DEPLOY_PLAN.md`** para el plan completo con código y comandos.
+### Paso 14 — estado
 
 - [x] Fase 0: Biome + validación env vars
 - [x] Fase 1: handler serverless + vercel.json + esbuild
 - [x] Fase 2: MongoDB Atlas Network Access
 - [x] Fase 3: primer deploy Vercel (app jugable en prod)
-- [ ] **Fase 4: GitHub Actions** — CI gate real (`needs: ci` bloquea el deploy)
-  - CI1: `.github/workflows/ci.yml` (typecheck + lint + test + deploy condicional)
-  - CI2: secrets en GitHub (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`)
-  - CI3: desactivar auto-deploy en Vercel dashboard
+- [x] **Fase 4: GitHub Actions** — pipeline operativo desde 2026-06-19
+  - CI1: `.github/workflows/ci.yml` — jobs `ci` (typecheck+lint+test) y `deploy` (`needs: ci`)
+  - CI2: secrets configurados en GitHub (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`)
+  - CI3: integración automática de GitHub desconectada en Vercel dashboard
 - [ ] **Fase 5: Smoke test E2E manual** — personaje → combate → guardar → recargar → muerte/victoria
+
+### Pipeline CI/CD (activo)
+
+```
+git push → GitHub Actions
+              ├── pnpm typecheck
+              ├── pnpm lint  (Biome)
+              └── pnpm test  (88 tests Vitest)
+                      ↓ solo si los tres pasan
+              npx vercel@latest --prod → https://lone-wolf-five.vercel.app
+```
+
+Secrets en GitHub repo → Settings → Secrets and variables → Actions:
+`VERCEL_TOKEN`, `VERCEL_ORG_ID` (`team_ixbQs0t1lxD7ADx5Ys6QXsRL`), `VERCEL_PROJECT_ID` (`prj_lJ4FkS6VKZqkFrVPN48MXewLytQL`).
+
+### Gotchas CI/CD (lecciones aprendidas)
+
+- **`pnpm add -g vercel` no funciona en GitHub Actions**: el bin global de pnpm no está en PATH. Usar `npx vercel@latest` directamente.
+- **`pnpm/action-setup@v4` + `packageManager` en package.json**: no especificar `version:` en el YAML — la action lo lee del campo `packageManager` automáticamente.
+- **Biome en CI es estricto**: ejecutar `pnpm biome check --write .` localmente antes de cada commit para evitar errores de formato en CI. Sin esto, ediciones manuales en JSX complejo (ternarios anidados en `&&`) pueden fallar.
+- **Node local puede ser distinto**: si `node --version` devuelve algo distinto a v22, ejecutar `nvm install 22 && nvm use 22` antes de cualquier comando del proyecto.
 
 ---
 
