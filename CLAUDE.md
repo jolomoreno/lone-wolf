@@ -142,7 +142,7 @@ git push → GitHub Actions
 ```
 
 Secrets en GitHub repo → Settings → Secrets and variables → Actions:
-`VERCEL_TOKEN`, `VERCEL_ORG_ID` (`team_ixbQs0t1lxD7ADx5Ys6QXsRL`), `VERCEL_PROJECT_ID` (`prj_lJ4FkS6VKZqkFrVPN48MXewLytQL`).
+`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
 
 ### Gotchas CI/CD (lecciones aprendidas)
 

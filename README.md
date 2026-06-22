@@ -350,11 +350,24 @@ Detalle en [ROADMAP.md](ROADMAP.md) (paso 13.2-D). En resumen:
 
 ## Créditos y licencia del contenido
 
-El texto e ilustraciones de *Lobo Solitario* pertenecen a sus autores y se distribuyen
-a través de [Project Aon](https://www.projectaon.org) bajo la **Project Aon License**
-(uso no comercial, con condiciones de atribución y distribución).
+### Contenido del juego
 
-Este proyecto es un trabajo personal **no comercial** y está publicado en
-https://lone-wolf-five.vercel.app cumpliendo los términos de la Project Aon License
-(atribución visible en el pie de página, enlace a Project Aon, sin uso comercial).
-El código de esta aplicación es independiente del contenido del libro.
+*Lobo Solitario, Libro 1: Huida de la Oscuridad* es obra de **Joe Dever** (autor) y
+**Gary Chalk** (ilustrador). Los derechos pertenecen a Joe Dever y su legado.
+
+El texto digital está disponible gracias al trabajo de
+[**Project Aon**](https://www.projectaon.org), que lleva décadas preservando la saga
+Lobo Solitario en formato digital con licencia no comercial y con atribución. Este
+proyecto utiliza el XML de Project Aon y enlaza sus ilustraciones mediante hotlink
+(sin redistribuirlas), cumpliendo los términos de la
+[Project Aon License](https://www.projectaon.org/en/Main/License).
+
+- El repositorio **no incluye** el XML del libro ni las ilustraciones.
+- La atribución y el enlace a Project Aon son visibles en el pie de página de la aplicación.
+- Este es un proyecto personal **sin fines comerciales**.
+
+### Código de la aplicación
+
+El código fuente de esta aplicación está publicado bajo la licencia **MIT** (ver
+[LICENSE](LICENSE)). La licencia MIT aplica exclusivamente al código; no al contenido
+del juego descrito arriba.
