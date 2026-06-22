@@ -231,7 +231,7 @@ function Adventure({
 }: AdventureProps) {
   const character: Character = game.character;
   const sectionId = game.currentSection;
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(
     () => {
       // Restaura el estado "ganado" si el jugador recargó tras vencer pero antes de navegar.
@@ -489,6 +489,14 @@ function Adventure({
   return (
     <main className="game">
       <header className="game-header">
+        <button
+          type="button"
+          className="menu-btn"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Abrir ficha"
+        >
+          <i className="ti ti-menu-2" aria-hidden="true" />
+        </button>
         <div>
           <h1>🐺 Lobo Solitario</h1>
           <p className="muted small">Libro 1 — Huida de la Oscuridad</p>
@@ -501,7 +509,8 @@ function Adventure({
       {/* Stats bar compacta — visible solo en móvil vía CSS */}
       <div className="stats-bar">
         <span className="stats-bar-stat">
-          <span className="stats-bar-label">Dez</span>
+          <i className="ti ti-sword stats-bar-icon" aria-hidden="true" />
+          <span className="stats-bar-label">Dex</span>
           <span className="stats-bar-value">
             {character.stats.combatSkill +
               (hasWeaponskillBonus(character) ? 2 : 0)}
@@ -509,6 +518,7 @@ function Adventure({
         </span>
         <span className="stats-bar-sep">·</span>
         <span className="stats-bar-stat">
+          <i className="ti ti-heart stats-bar-icon" aria-hidden="true" />
           <span className="stats-bar-label">Res</span>
           <span className="stats-bar-value">
             {character.stats.enduranceCurrent}/{character.stats.enduranceMax}
@@ -516,24 +526,18 @@ function Adventure({
         </span>
         <span className="stats-bar-sep">·</span>
         <span className="stats-bar-stat">
+          <i className="ti ti-coin stats-bar-icon" aria-hidden="true" />
           <span className="stats-bar-label">Oro</span>
           <span className="stats-bar-value">{character.gold}</span>
         </span>
-        <button
-          type="button"
-          className="stats-bar-toggle"
-          onClick={() => setSheetOpen(true)}
-        >
-          ↑ Ficha
-        </button>
       </div>
 
       <div className="layout">
-        {/* Overlay del drawer — visible solo en móvil cuando la ficha está abierta */}
-        {sheetOpen && (
+        {/* Overlay del drawer — visible solo en móvil cuando el menú está abierto */}
+        {menuOpen && (
           <div
             className="sheet-overlay"
-            onClick={() => setSheetOpen(false)}
+            onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           />
         )}
@@ -543,8 +547,11 @@ function Adventure({
           onCharacterChange={(updated) =>
             onChange(updateCharacter(game, updated))
           }
-          isOpen={sheetOpen}
-          onClose={() => setSheetOpen(false)}
+          isOpen={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          onSave={handleSave}
+          savedAt={savedAt}
+          onReturnToMenu={onReturnToMenu}
         />
 
         <div className="reader">
@@ -609,20 +616,6 @@ function Adventure({
           )}
         </div>
       </div>
-
-      <footer className="game-footer">
-        <button type="button" className="ghost" onClick={onReturnToMenu}>
-          ← Inicio
-        </button>
-        <div className="save-controls">
-          {savedAt && (
-            <span className="save-indicator">✓ Guardado {savedAt}</span>
-          )}
-          <button type="button" className="ghost" onClick={handleSave}>
-            Guardar partida
-          </button>
-        </div>
-      </footer>
 
       <p className="attribution muted small">
         {PROJECT_AON_ATTRIBUTION}{" "}

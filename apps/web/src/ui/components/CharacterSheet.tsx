@@ -28,8 +28,14 @@ interface Props {
   combatActive?: boolean;
   /** Controla si el drawer está abierto en móvil. */
   isOpen?: boolean;
-  /** Llamado al tocar el handle o el área exterior del drawer. */
+  /** Llamado al tocar el botón de cierre o el overlay. */
   onClose?: () => void;
+  /** Guarda la partida y muestra el indicador de guardado. */
+  onSave?: () => void;
+  /** Timestamp del último guardado (desaparece a los 3s). */
+  savedAt?: string | null;
+  /** Vuelve al menú principal. */
+  onReturnToMenu?: () => void;
 }
 
 const POTION_HEAL = 4;
@@ -40,6 +46,9 @@ export function CharacterSheet({
   combatActive,
   isOpen,
   onClose,
+  onSave,
+  savedAt,
+  onReturnToMenu,
 }: Props) {
   const [showRules, setShowRules] = useState(false);
   const [showDisciplines, setShowDisciplines] = useState(false);
@@ -77,17 +86,23 @@ export function CharacterSheet({
         />
       )}
       <aside className={`sheet${isOpen ? " sheet--open" : ""}`}>
-        {/* Handle visible solo en móvil; toca para cerrar el drawer */}
-        <button
-          type="button"
-          className="sheet-drawer-handle"
-          onClick={onClose}
-          aria-label="Cerrar ficha"
-        />
-        <h2>Lobo Solitario</h2>
+        <div className="sheet-header-row">
+          <h2>Lobo Solitario</h2>
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label="Cerrar ficha"
+          >
+            <i className="ti ti-x" aria-hidden="true" />
+          </button>
+        </div>
 
         <div className="stat-row">
-          <span>Destreza</span>
+          <span>
+            <i className="ti ti-sword stat-row-icon" aria-hidden="true" />
+            Destreza
+          </span>
           <strong>
             {stats.combatSkill + (hasWeaponskillBonus(character) ? 2 : 0)}
             {hasWeaponskillBonus(character) && (
@@ -96,7 +111,10 @@ export function CharacterSheet({
           </strong>
         </div>
         <div className="stat-row">
-          <span>Resistencia</span>
+          <span>
+            <i className="ti ti-heart stat-row-icon" aria-hidden="true" />
+            Resistencia
+          </span>
           <strong data-testid="sheet-endurance">
             {stats.enduranceCurrent}/{stats.enduranceMax}
           </strong>
@@ -186,7 +204,10 @@ export function CharacterSheet({
         </ul>
 
         <div className="stat-row">
-          <span>Oro</span>
+          <span>
+            <i className="ti ti-coin stat-row-icon" aria-hidden="true" />
+            Oro
+          </span>
           <strong>{character.gold}</strong>
         </div>
 
@@ -236,6 +257,34 @@ export function CharacterSheet({
             Reglas de combate
           </button>
         </div>
+
+        {(onReturnToMenu || onSave) && (
+          <div className="sheet-actions">
+            <div className="sheet-actions-row">
+              {onReturnToMenu && (
+                <button
+                  type="button"
+                  className="sheet-action-btn"
+                  onClick={onReturnToMenu}
+                >
+                  ← Inicio
+                </button>
+              )}
+              {onSave && (
+                <button
+                  type="button"
+                  className="sheet-action-btn sheet-action-btn--primary"
+                  onClick={onSave}
+                >
+                  Guardar
+                </button>
+              )}
+            </div>
+            {savedAt && (
+              <span className="sheet-save-indicator">✓ Guardado {savedAt}</span>
+            )}
+          </div>
+        )}
       </aside>
     </>
   );
