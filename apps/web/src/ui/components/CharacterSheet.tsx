@@ -101,6 +101,14 @@ export function CharacterSheet({
             {stats.enduranceCurrent}/{stats.enduranceMax}
           </strong>
         </div>
+        <div className="bar sheet-endurance-bar">
+          <div
+            className={`bar-fill lw${stats.enduranceCurrent / stats.enduranceMax <= 0.25 ? " bar-fill--critical" : ""}`}
+            style={{
+              width: `${Math.round((stats.enduranceCurrent / stats.enduranceMax) * 100)}%`,
+            }}
+          />
+        </div>
         <h3>Disciplinas</h3>
         <ul className="sheet-list sheet-list--disciplines">
           {character.disciplines.map((discipline) => (

@@ -80,7 +80,7 @@ TODO.md         Backlog completo paso a paso
 | Error Boundary en React | ✅ `ErrorBoundary.tsx` envuelve toda la app en `main.tsx` |
 | sect21 — tirada encadenada con muerte | ✅ `RollOutcome.nextTable` + `kills`; `RollPanel` gestiona la cascada |
 | Tests del backend (parser XML, mapper, `GetSection`) | ✅ 45 tests en `apps/api`; total: **133 tests** |
-| Responsive / móvil y accesibilidad básica | 🔄 en curso — móvil ✅, tablet y desktop ⬜ |
+| Responsive / móvil y accesibilidad básica | ✅ completado — móvil, tablet y desktop |
 
 #### Responsive — estado (sesión 2026-06-22)
 
@@ -88,7 +88,7 @@ TODO.md         Backlog completo paso a paso
 |---|---|
 | Móvil: stats bar + drawer + touch targets | ✅ implementado y verificado en preview |
 | Tablet: ficha más ancha (18rem) + disciplinas en grid 2 col | ✅ implementado y verificado en preview |
-| Desktop: ficha a 20rem + barra de Resistencia visual | ⬜ pendiente |
+| Desktop: ficha a 20rem + barra de Resistencia visual | ✅ implementado y verificado en preview |
 
 | Paso | Estado |
 |---|---|

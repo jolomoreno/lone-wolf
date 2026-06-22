@@ -667,6 +667,22 @@ body {
   }
 }
 
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: 20rem 1fr;
+  }
+}
+
+/* ── Barra visual de Resistencia en la ficha ─────────────────── */
+.sheet-endurance-bar {
+  margin: 0.2rem 0 0.6rem;
+  height: 5px;
+}
+
+.bar-fill--critical {
+  background: var(--bad);
+}
+
 .sheet {
   background: var(--panel);
   border: 1px solid var(--border);
