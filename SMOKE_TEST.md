@@ -167,10 +167,10 @@ Tras el asalto 1 se pulsó "Guardar partida". Volcado de `localStorage` (`lone-w
 
 ## Observaciones (no bloqueantes)
 
-1. **Cabecera CORS de dev en prod.** Las respuestas de la API incluyen
-   `access-control-allow-origin: http://localhost:5173`. En producción no afecta (web y API
-   comparten origen, sin CORS), pero es un valor de desarrollo colado en la configuración de prod.
-   Conviene limpiarlo / condicionarlo por entorno.
+1. ~~**Cabecera CORS de dev en prod.**~~ **Corregido el 2026-06-22.** Las respuestas de la API
+   incluían `access-control-allow-origin: http://localhost:5173`. El middleware `cors` ya no se
+   registra en producción (`isProduction` en `server.ts`); web y API comparten origen en Vercel,
+   por lo que CORS no aplica y ninguna cabecera `access-control-*` se emite en prod.
 
 ---
 

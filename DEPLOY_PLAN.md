@@ -31,7 +31,7 @@
 git push → GitHub → GitHub Actions ──(CI ✓)──> vercel --prod
                      typecheck                       │
                      biome ci                        ▼
-                     vitest 88 tests          Vercel (lone-wolf.vercel.app)
+                     vitest 133 tests         Vercel (lone-wolf.vercel.app)
                                                ├── /          → web estático (React + Vite)
                                                ├── /sections/* → función serverless (handler.func)
                                                └── /health     → función serverless (handler.func)

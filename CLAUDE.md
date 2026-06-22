@@ -70,7 +70,9 @@ TODO.md         Backlog completo paso a paso
 
 ## Estado actual del proyecto
 
-**Pasos 1–14 completados.** Proyecto desplegado y verificado E2E en producción (2026-06-19). Nice-to-haves trabajados en sesión 2026-06-22 (ver detalle abajo).
+**Pasos 1–14 completados. Todos los nice-to-haves cerrados a 2026-06-22.** Proyecto desplegado y verificado E2E en producción (2026-06-19).
+
+**Nuevo backlog de funcionalidades evaluado en sesión 2026-06-22** — ver [TODO.md](TODO.md) § «Backlog de nuevas funcionalidades». Grupos: expansión a libros 2–28, mejoras de UX (múltiples slots de guardado, pantalla de fin de partida, confirmación al soltar objetos, sonido, logros), internacionalización (i18n UI + contenido) y autenticación/guardado en la nube.
 
 ### Nice-to-haves — estado (2026-06-22 → 2026-06-22)
 

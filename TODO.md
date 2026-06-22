@@ -1,6 +1,6 @@
 # TODO / Backlog — Lobo Solitario
 
-> Última actualización: 2026-06-19. Pasos 1-14 completados.
+> Última actualización: 2026-06-22. Pasos 1-14 completados + nice-to-haves cerrados.
 > Proyecto desplegado y verificado E2E en producción. Plan de despliegue en
 > [DEPLOY_PLAN.md](DEPLOY_PLAN.md); evidencias del smoke test en [SMOKE_TEST.md](SMOKE_TEST.md).
 
@@ -451,7 +451,9 @@
         listas `<ul>` y `<dl>` (pares, dd huérfano, dt colgante), fallback de tags desconocidos,
         parseNumber, stripDoctype, recolección multinivel y secciones sin id.
       Total del proyecto: **133 tests** (45 api + 88 web).
-- [ ] **Responsive / móvil y accesibilidad básica** — lector y panel de combate.
+- [x] **Responsive / móvil y accesibilidad básica** — stats bar compacta en móvil, drawer de ficha,
+      touch targets ≥ 48 px, ficha 18 rem en tablet y 20 rem sticky en desktop con barra visual de
+      Resistencia. Completado en sesión 2026-06-22.
 - [x] **sect21 — tirada encadenada** — ver detalle en Paso 11 › Pendiente (arriba).
 - [x] **Error Boundary en React** — `ErrorBoundary.tsx` (componente de clase) envuelve toda la
       app en `main.tsx`. Si un componente lanza un error en runtime, muestra una pantalla de
@@ -462,3 +464,79 @@
       aplica y no se emite ninguna cabecera `access-control-*`. En dev sigue aceptando cualquier
       `localhost:*`. Detectado en el smoke test ([SMOKE_TEST.md](SMOKE_TEST.md)).
       Fichero: [server.ts](apps/api/src/infrastructure/http/server.ts)
+
+---
+
+## Backlog de nuevas funcionalidades (2026-06-22)
+
+> Ideas evaluadas en sesión 2026-06-22. Ordenadas de mayor a menor impacto de producto.
+> Ninguna es prerequisito de otra salvo donde se indica.
+
+### A · Expansión de contenido
+
+- [ ] **Libros 2–28** — importar el resto de la serie desde Project Aon (XML bajo la misma licencia).
+      Requiere: selector de libro en la pantalla de inicio, migración del personaje entre libros
+      (disciplinas y equipamiento acumulados), colección `books` en MongoDB, rutas `/sections/:bookId/:sectionId`.
+      La arquitectura hexagonal existente soporta el cambio con modificaciones menores en el parser
+      y en la composition root. Esfuerzo alto; es la feature de mayor impacto a largo plazo.
+
+### B · Mejoras de experiencia de juego
+
+- [ ] **Múltiples slots de guardado** — ampliar de 1 a 3-5 slots en localStorage.
+      Cambio mínimo: guardar un array `lone-wolf:saves` en vez de un objeto único; añadir
+      selector de slot en la pantalla de inicio. Sin cambios en el dominio.
+      Esfuerzo bajo (~2 h).
+
+- [ ] **Pantalla de fin de partida con recap** — al ganar o morir, mostrar un resumen del recorrido:
+      secciones visitadas (`history.length`), combates ganados y perdidos (flags existentes),
+      Resistencia y oro finales, tiempo de partida. El `GameState` ya contiene todos los datos
+      necesarios; solo falta el componente de presentación.
+      Esfuerzo bajo (~2-3 h).
+
+- [ ] **Confirmación al soltar objetos** — el botón ✕ de la ficha descarta el ítem inmediatamente.
+      Soltar el arma de dominio o la única arma antes de un combate es un misclick con consecuencias
+      graves (−4 Destreza). Añadir un `confirm()` o un gesto "mantén pulsado para soltar".
+      Esfuerzo muy bajo (~30 min).
+
+- [ ] **Indicador de progreso durante la partida** — mostrar en el header "34 secciones visitadas"
+      o una barra de progreso aproximada (`history.length / 350`). El dato ya existe en `GameState.history`.
+      Esfuerzo muy bajo (~1 h).
+
+- [ ] **Sonido / música ambiental** — efectos para el dado, impactos de combate y música de fondo
+      atmosférica. Librería sugerida: Howler.js (15 kB gzip). Esfuerzo medio (~1 día).
+
+- [ ] **Logros / hitos** — "Primera victoria", "Completado sin morir en combate", "Inventario lleno".
+      Almacenar en `GameState.flags`; mostrar en la pantalla de fin de partida.
+      Esfuerzo bajo (~3-4 h).
+
+### C · Internacionalización (i18n)
+
+- [ ] **Multilenguaje — UI** — traducir cadenas de interfaz (botones, labels, mensajes) al inglés
+      con `react-i18next`. Esfuerzo bajo (~1 día). No requiere cambios en el backend.
+
+- [ ] **Multilenguaje — contenido del libro** — importar el XML en inglés
+      (`01fftd.xml` de `en/xml/` en Project Aon) como colección paralela en MongoDB.
+      Enrutar peticiones por idioma (`/sections/:lang/:id`). Prerequisito: la UI en inglés (ítem anterior).
+      Esfuerzo medio-alto (~2-3 días). Solo tiene sentido si hay audiencia anglófona concreta.
+
+### D · Autenticación y guardado en la nube
+
+> Evaluado en sesión 2026-06-22. Tres opciones de menor a mayor complejidad; se describen para
+> decidir el enfoque cuando se aborde.
+
+- [ ] **Opción A — ID anónimo de dispositivo** (sin login) — generar un UUID al primer inicio,
+      guardarlo en localStorage como `lone-wolf:device-id` y usarlo como clave en una colección
+      `saves` de MongoDB. El guardado sobrevive a recargas y es accesible desde cualquier navegador
+      que tenga el ID. Si se borra localStorage, el guardado queda huérfano.
+      Esfuerzo bajo (~1-2 días). Sin datos personales ni GDPR.
+
+- [ ] **Opción B — Email + magic link** (login ligero, recomendado si se quiere cross-device real) —
+      el jugador introduce su email, recibe un enlace de un clic y queda autenticado con JWT.
+      El guardado se asocia al email y es recuperable desde cualquier dispositivo.
+      Requiere: servicio de email (Resend/SendGrid, plan gratuito suficiente), middleware JWT en
+      Express, sesión en el cliente. Esfuerzo medio (~3-4 días).
+
+- [ ] **Opción C — Login completo** (email + contraseña u OAuth "Continuar con Google") —
+      mayor familiaridad para algunos usuarios; base para funcionalidades sociales futuras.
+      Requiere gestión de contraseñas (bcrypt) o configuración de OAuth app. GDPR más exigente.
+      Esfuerzo alto (~5-7 días).

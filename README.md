@@ -272,20 +272,23 @@ pnpm --filter @lone-wolf/api import:book -- --dry-run   # parsea el XML sin toca
 ## Tests
 
 ```bash
-pnpm test          # todos (88 tests)
+pnpm test          # todos (133 tests)
 pnpm test --watch  # modo watch
 ```
 
-Los tests cubren el dominio del frontend: creación de personaje, equipo inicial, combate
-(tabla de resultados, asaltos, modificadores), `GameState` (navegación, flags, guardado)
-y `section-rules` (condiciones de elección, efectos de entrada, tablas de tirada, botín).
-Se usan dobles inyectables (`RandomNumber`, `KeyValueStorage`) para evitar dependencias
-de DOM o aleatoriedad real.
+Los tests cubren:
+
+- **Frontend (88 tests):** creación de personaje, equipo inicial, combate (tabla de
+  resultados, asaltos, modificadores), `GameState` (navegación, flags, guardado) y
+  `section-rules` (condiciones de elección, efectos de entrada, tablas de tirada, botín).
+  Se usan dobles inyectables (`RandomNumber`, `KeyValueStorage`) para evitar dependencias
+  de DOM o aleatoriedad real.
+- **Backend (45 tests):** `parse-gamebook-xml.ts` (párrafos, CHAR_MAP, choices, combate,
+  ilustraciones, listas ul/dl), `section.mapper.ts` (todos los tipos de bloque, contrato
+  de tipos) y caso de uso `GetSection`.
 
 Un test específico valida que **cada tabla de tirada en `SECTION_ROLL_TABLES` cubre
 exactamente los 10 valores (0–9) sin huecos ni solapamientos**.
-
-Pendiente (paso 14): tests del backend (parser XML, mapper, caso de uso `GetSection`).
 
 ## API REST
 
@@ -340,12 +343,10 @@ anterior se descartan automáticamente al cargar. v2 → ids de sección como st
 
 ## Limitaciones conocidas y desviaciones de las reglas
 
-Detalle y plan de corrección en [TODO.md](TODO.md) (paso 13.2-D). En resumen:
+Detalle en [TODO.md](TODO.md) (paso 13.2-D). En resumen:
 
 - **Objeto del almacén por tirada**, no por elección del jugador (decisión de diseño;
   en las reglas oficiales el jugador elige).
-- **sect21 (tirada encadenada)**: la cascada de tiradas con posibilidad de muerte no está
-  modelada; la sección queda como elección libre.
 
 ## Créditos y licencia del contenido
 
