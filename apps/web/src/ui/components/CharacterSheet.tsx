@@ -26,6 +26,10 @@ interface Props {
   onCharacterChange?: (character: Character) => void;
   /** Deshabilita el uso de la Poción Curativa mientras haya un combate activo. */
   combatActive?: boolean;
+  /** Controla si el drawer está abierto en móvil. */
+  isOpen?: boolean;
+  /** Llamado al tocar el handle o el área exterior del drawer. */
+  onClose?: () => void;
 }
 
 const POTION_HEAL = 4;
@@ -34,6 +38,8 @@ export function CharacterSheet({
   character,
   onCharacterChange,
   combatActive,
+  isOpen,
+  onClose,
 }: Props) {
   const [showRules, setShowRules] = useState(false);
   const [showDisciplines, setShowDisciplines] = useState(false);
@@ -70,7 +76,14 @@ export function CharacterSheet({
           weaponskillWeapon={character.weaponskillWeapon}
         />
       )}
-      <aside className="sheet">
+      <aside className={`sheet${isOpen ? " sheet--open" : ""}`}>
+        {/* Handle visible solo en móvil; toca para cerrar el drawer */}
+        <button
+          type="button"
+          className="sheet-drawer-handle"
+          onClick={onClose}
+          aria-label="Cerrar ficha"
+        />
         <h2>Lobo Solitario</h2>
 
         <div className="stat-row">

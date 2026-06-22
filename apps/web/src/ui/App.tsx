@@ -16,7 +16,7 @@ import {
   PROJECT_AON_URL,
 } from "../config/project-aon";
 import type { Character } from "../domain/character/character";
-import { isDead } from "../domain/character/character";
+import { hasWeaponskillBonus, isDead } from "../domain/character/character";
 import {
   addSpecialItem,
   addToBackpack,
@@ -231,6 +231,7 @@ function Adventure({
 }: AdventureProps) {
   const character: Character = game.character;
   const sectionId = game.currentSection;
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [combatOutcome, setCombatOutcome] = useState<CombatStatus | null>(
     () => {
       // Restaura el estado "ganado" si el jugador recargó tras vencer pero antes de navegar.
@@ -497,13 +498,53 @@ function Adventure({
         </span>
       </header>
 
+      {/* Stats bar compacta — visible solo en móvil vía CSS */}
+      <div className="stats-bar">
+        <span className="stats-bar-stat">
+          <span className="stats-bar-label">Dez</span>
+          <span className="stats-bar-value">
+            {character.stats.combatSkill +
+              (hasWeaponskillBonus(character) ? 2 : 0)}
+          </span>
+        </span>
+        <span className="stats-bar-sep">·</span>
+        <span className="stats-bar-stat">
+          <span className="stats-bar-label">Res</span>
+          <span className="stats-bar-value">
+            {character.stats.enduranceCurrent}/{character.stats.enduranceMax}
+          </span>
+        </span>
+        <span className="stats-bar-sep">·</span>
+        <span className="stats-bar-stat">
+          <span className="stats-bar-label">Oro</span>
+          <span className="stats-bar-value">{character.gold}</span>
+        </span>
+        <button
+          type="button"
+          className="stats-bar-toggle"
+          onClick={() => setSheetOpen(true)}
+        >
+          ↑ Ficha
+        </button>
+      </div>
+
       <div className="layout">
+        {/* Overlay del drawer — visible solo en móvil cuando la ficha está abierta */}
+        {sheetOpen && (
+          <div
+            className="sheet-overlay"
+            onClick={() => setSheetOpen(false)}
+            aria-hidden="true"
+          />
+        )}
         <CharacterSheet
           character={character}
           combatActive={!!enemy && combatOutcome === null}
           onCharacterChange={(updated) =>
             onChange(updateCharacter(game, updated))
           }
+          isOpen={sheetOpen}
+          onClose={() => setSheetOpen(false)}
         />
 
         <div className="reader">

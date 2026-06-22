@@ -72,7 +72,7 @@ TODO.md         Backlog completo paso a paso
 
 **Pasos 1–14 completados.** Proyecto desplegado y verificado E2E en producción (2026-06-19). Nice-to-haves trabajados en sesión 2026-06-22 (ver detalle abajo).
 
-### Nice-to-haves — estado (2026-06-22)
+### Nice-to-haves — estado (2026-06-22 → 2026-06-22)
 
 | Ítem | Estado |
 |---|---|
@@ -80,7 +80,15 @@ TODO.md         Backlog completo paso a paso
 | Error Boundary en React | ✅ `ErrorBoundary.tsx` envuelve toda la app en `main.tsx` |
 | sect21 — tirada encadenada con muerte | ✅ `RollOutcome.nextTable` + `kills`; `RollPanel` gestiona la cascada |
 | Tests del backend (parser XML, mapper, `GetSection`) | ✅ 45 tests en `apps/api`; total: **133 tests** |
-| Responsive / móvil y accesibilidad básica | ⬜ pendiente |
+| Responsive / móvil y accesibilidad básica | 🔄 en curso — móvil ✅, tablet y desktop ⬜ |
+
+#### Responsive — estado (sesión 2026-06-22)
+
+| Sub-paso | Estado |
+|---|---|
+| Móvil: stats bar + drawer + touch targets | ✅ implementado y verificado en preview |
+| Tablet: ficha más ancha (18rem) + disciplinas en grid 2 col | ⬜ pendiente |
+| Desktop: ficha a 20rem + barra de Resistencia visual | ⬜ pendiente |
 
 | Paso | Estado |
 |---|---|
@@ -143,6 +151,35 @@ Secrets en GitHub repo → Settings → Secrets and variables → Actions:
 - **La autodetección de `/api` de Vercel NO recoge ficheros generados en el build**: con `buildCommand`/`outputDirectory` custom, esbuild creaba `api/handler.js` pero Vercel desplegaba **cero funciones** → 404 `x-vercel-error: NOT_FOUND` en `/sections/*` y `/health`. Por eso se usa la **Build Output API** (`scripts/build-vercel.mjs` → `.vercel/output/`), que Vercel consume tal cual. No volver a confiar en la autodetección.
 - **Distinguir el 404 del edge del 404 de la API**: edge = `text/plain` + `x-vercel-error: NOT_FOUND`; nuestra API = `application/json` + `{"error":"No existe..."}`. Si ves el primero, la función no está desplegada.
 - **Validar el deploy sin tocar prod**: `nvm use 22` → `npx vercel deploy --prebuilt` (preview) y luego `npx vercel curl <url>/health` (atraviesa la Vercel Authentication). El preview NO tiene `MONGODB_URI` (solo Production), así que dará `FUNCTION_INVOCATION_FAILED` con "[config] MONGODB_URI es obligatoria" → eso CONFIRMA que la función carga y solo falta el env.
+
+---
+
+## Diseño responsive — decisiones clave
+
+El responsive se implementa en tres breakpoints usando **solo CSS + un mínimo de estado React** (sin librerías de media-query). El único breakpoint de corte es `760px` (ya existía para el grid de dos columnas).
+
+### Estrategia por dispositivo
+
+| Dispositivo | Ancho | Ficha de personaje | Stats |
+|---|---|---|---|
+| Móvil | < 760px | Drawer desde el fondo (`position: fixed`, `translateY`) | Stats bar compacta siempre visible |
+| Tablet | 760px–1023px | Columna izquierda del grid, `18rem` | Oculta en stats bar |
+| Desktop | ≥ 1024px | Columna izquierda del grid, `20rem`, `position: sticky` | Oculta en stats bar |
+
+### Decisiones de diseño (móvil)
+
+- **Stats bar (`Dez / Res / Oro`)** siempre visible debajo del header — evita el scroll para conocer el estado vital durante el juego.
+- **Ficha como drawer** (no sidebar ni acordeón) porque permite ver el contenido de la sección a pantalla completa y consultar la ficha bajo demanda sin cambiar de página.
+- **`position: fixed` + `translateY(100%)`** para el `.sheet` en móvil: saca la ficha del flujo del grid automáticamente (el `.reader` pasa a ocupar el 100% del ancho) sin necesidad de condicionantes en React. La clase `.sheet--open` aplica `translateY(0)`.
+- **Handle + overlay** para cerrar el drawer: el handle (barra gris en la cima) es el patrón estándar de bottom-sheet; el overlay oscuro cierra al tocar fuera.
+- **Touch targets**: `.choice` tiene `min-height: 48px` (recomendación WCAG/Material).
+- **Stats bar y handle** son `display: none` por defecto (en desktop/tablet no aparecen) y solo se activan dentro del bloque `@media (max-width: 759px)`.
+
+### Dónde vive el código
+
+- Estilos: todo en `apps/web/src/index.css`, bloque final `@media (max-width: 759px)`.
+- Estado `sheetOpen` y stats bar JSX: componente `Adventure` en `apps/web/src/ui/App.tsx`.
+- Clase `sheet--open` y handle: `apps/web/src/ui/components/CharacterSheet.tsx` (props `isOpen`/`onClose`).
 
 ---
 
