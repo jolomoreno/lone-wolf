@@ -70,7 +70,17 @@ TODO.md         Backlog completo paso a paso
 
 ## Estado actual del proyecto
 
-**Pasos 1–14 completados.** Proyecto desplegado y verificado E2E en producción (2026-06-19).
+**Pasos 1–14 completados.** Proyecto desplegado y verificado E2E en producción (2026-06-19). Nice-to-haves trabajados en sesión 2026-06-22 (ver detalle abajo).
+
+### Nice-to-haves — estado (2026-06-22)
+
+| Ítem | Estado |
+|---|---|
+| CORS de dev emitido en producción | ✅ corregido — middleware `cors` omitido en prod |
+| Error Boundary en React | ✅ `ErrorBoundary.tsx` envuelve toda la app en `main.tsx` |
+| sect21 — tirada encadenada con muerte | ✅ `RollOutcome.nextTable` + `kills`; `RollPanel` gestiona la cascada |
+| Tests del backend (parser XML, mapper, `GetSection`) | ✅ 45 tests en `apps/api`; total: **133 tests** |
+| Responsive / móvil y accesibilidad básica | ⬜ pendiente |
 
 | Paso | Estado |
 |---|---|
@@ -113,7 +123,7 @@ TODO.md         Backlog completo paso a paso
 git push → GitHub Actions
               ├── pnpm typecheck
               ├── pnpm lint  (Biome)
-              └── pnpm test  (88 tests Vitest)
+              └── pnpm test  (133 tests Vitest: 88 web + 45 api)
                       ↓ solo si los tres pasan
               npx vercel@latest --prod
                  → build remoto: pnpm build:vercel monta .vercel/output/
