@@ -15,26 +15,30 @@ import express, {
   type Router,
 } from "express";
 import helmet from "helmet";
-import { env } from "../../config/env";
+import { isProduction } from "../../config/env";
 
 export function createHttpServer(routers: Router[]): Express {
   const app = express();
 
-  // En desarrollo acepta cualquier localhost (el puerto puede variar según la
-  // herramienta de preview). En producción usa el origen exacto de CORS_ORIGIN.
-  const corsOrigin =
-    env.nodeEnv === "production"
-      ? env.corsOrigin
-      : (
+  app.use(helmet()); // Cabeceras de seguridad HTTP
+
+  // En producción, web y API comparten origen → CORS no aplica y no se emite
+  // ninguna cabecera access-control-*. En desarrollo acepta cualquier localhost.
+  if (!isProduction) {
+    app.use(
+      cors({
+        origin: (
           origin: string | undefined,
           cb: (e: Error | null, ok?: boolean) => void,
         ) => {
           if (!origin || /^https?:\/\/localhost(:\d+)?$/.test(origin))
             cb(null, true);
           else cb(new Error(`CORS: origen no permitido → ${origin}`));
-        };
-  app.use(helmet()); // Cabeceras de seguridad HTTP
-  app.use(cors({ origin: corsOrigin }));
+        },
+      }),
+    );
+  }
+
   app.use(express.json());
 
   // Monta todos los routers que nos pasa el composition root.

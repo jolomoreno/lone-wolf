@@ -99,8 +99,7 @@ TODO.md         Backlog completo paso a paso
   de `pendingCombat`) → victoria. Las 5 navegaciones golpearon la API serverless
   (`GET /sections/sect*` → `200`), confirmando que prod ya no se enmascara con `localStorage`.
   Evidencias en [SMOKE_TEST.md](SMOKE_TEST.md).
-  - **Pendiente menor (nice-to-have)**: la API emite en prod `access-control-allow-origin: http://localhost:5173`
-    (cabecera CORS de dev). Sin impacto funcional (mismo origen), pero conviene condicionarla por entorno.
+  - ~~Pendiente menor~~: cabecera CORS de dev corregida el 2026-06-22 — el middleware `cors` ya no se registra en producción.
 
 > **Nota histórica (2026-06-19)**: hasta el commit `56f81c3`, la API en producción estaba
 > **muerta**. esbuild generaba la función pero Vercel no la registraba (autodetección de `/api`

@@ -6,6 +6,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./ui/App";
+import { ErrorBoundary } from "./ui/components/ErrorBoundary";
 import { DependencyProvider } from "./ui/DependencyProvider";
 import "./index.css";
 
@@ -16,8 +17,10 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <DependencyProvider>
-      <App />
-    </DependencyProvider>
+    <ErrorBoundary>
+      <DependencyProvider>
+        <App />
+      </DependencyProvider>
+    </ErrorBoundary>
   </StrictMode>,
 );

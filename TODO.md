@@ -438,9 +438,12 @@
 - [ ] **Tests del backend** — `parse-gamebook-xml.ts`, `section.mapper.ts` y caso de uso
       `GetSection` (es el mismo pendiente que figura en el grupo D del Paso 13).
 - [ ] **Responsive / móvil y accesibilidad básica** — lector y panel de combate.
-- [ ] **Error Boundary en React** — evitar la pantalla en blanco si algo falla en runtime.
-- [ ] **Limpiar la cabecera CORS de desarrollo en producción** — la API en prod responde con
-      `access-control-allow-origin: http://localhost:5173` (valor de dev). Sin impacto funcional
-      (web y API comparten origen, CORS no aplica), pero conviene no emitir el header de CORS en
-      producción —o condicionarlo por entorno. Detectado en el smoke test
-      ([SMOKE_TEST.md](SMOKE_TEST.md)).
+- [x] **Error Boundary en React** — `ErrorBoundary.tsx` (componente de clase) envuelve toda la
+      app en `main.tsx`. Si un componente lanza un error en runtime, muestra una pantalla de
+      "Algo salió mal" con botón "Recargar" en lugar de la pantalla en blanco de React.
+      Fichero: [ErrorBoundary.tsx](apps/web/src/ui/components/ErrorBoundary.tsx)
+- [x] **Limpiar la cabecera CORS de desarrollo en producción** — el middleware `cors` ya no se
+      registra en producción (`isProduction`). Web y API comparten origen en Vercel → CORS no
+      aplica y no se emite ninguna cabecera `access-control-*`. En dev sigue aceptando cualquier
+      `localhost:*`. Detectado en el smoke test ([SMOKE_TEST.md](SMOKE_TEST.md)).
+      Fichero: [server.ts](apps/api/src/infrastructure/http/server.ts)
