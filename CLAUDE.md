@@ -35,7 +35,7 @@ Demo en producción: **https://lone-wolf-five.vercel.app**
 | Gestor de paquetes | pnpm 11 workspaces |
 | Node | 22.17.0 (nvm) — **usar `nvm use 22` antes de cualquier comando** |
 | Lint | Biome (`pnpm lint` → `biome ci .`) |
-| Tests | Vitest (88 tests de dominio en `apps/web`) |
+| Tests | Vitest — 133 tests: 88 dominio en `apps/web`, 45 backend en `apps/api` |
 
 Arquitectura **hexagonal** en ambas apps: `domain / application / infrastructure + composition-root`.
 

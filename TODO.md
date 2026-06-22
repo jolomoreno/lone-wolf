@@ -442,8 +442,15 @@
 
 > Fusión de los antiguos bloques "Nice-to-have (sin fase asignada)" y "Calidad / nice-to-have".
 
-- [ ] **Tests del backend** — `parse-gamebook-xml.ts`, `section.mapper.ts` y caso de uso
-      `GetSection` (es el mismo pendiente que figura en el grupo D del Paso 13).
+- [x] **Tests del backend** — Vitest configurado en `apps/api`. 45 tests nuevos:
+      - `get-section.use-case.test.ts` (3) — delega en el repositorio, devuelve sección o null.
+      - `section.mapper.test.ts` (8) — todos los tipos de bloque, copia superficial de arrays/objetos,
+        ausencia explícita de `alt` cuando no está definido.
+      - `parse-gamebook-xml.test.ts` (34) — párrafos, normalización, CHAR_MAP (ch.ellips/endash/apos/br),
+        choices con/sin idref y anidados en `<p>`, combate, ilustraciones (con alt, sin alt, sin src),
+        listas `<ul>` y `<dl>` (pares, dd huérfano, dt colgante), fallback de tags desconocidos,
+        parseNumber, stripDoctype, recolección multinivel y secciones sin id.
+      Total del proyecto: **133 tests** (45 api + 88 web).
 - [ ] **Responsive / móvil y accesibilidad básica** — lector y panel de combate.
 - [x] **sect21 — tirada encadenada** — ver detalle en Paso 11 › Pendiente (arriba).
 - [x] **Error Boundary en React** — `ErrorBoundary.tsx` (componente de clase) envuelve toda la
