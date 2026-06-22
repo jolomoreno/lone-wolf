@@ -437,8 +437,12 @@ export interface RollOutcome {
   min: number;
   /** Límite superior del rango (0-9, inclusive). */
   max: number;
-  /** Sección a la que se va con este resultado. */
-  target: string;
+  /** Sección destino. Ausente en ramas con nextTable o kills. */
+  target?: string;
+  /** Encadena otra tirada en vez de navegar directamente. */
+  nextTable?: RollOutcome[];
+  /** Muerte narrativa: la sección mata al jugador sin reducción explícita de PR. */
+  kills?: true;
   /** Cambio de Resistencia aplicado en esta rama (negativo = daño). */
   enduranceDelta?: number;
   /** Si true, pierdes todo el equipo portable (armas, mochila, oro). */
@@ -451,10 +455,53 @@ export interface RollOutcome {
  * Secciones con tirada obligatoria en la Tabla de la Suerte. El número (0-9)
  * decide la rama; el jugador NO elige. Fuente: texto de Project Aon (01hdlo.xml).
  *
- * Excluida sect21 (cascada de tiradas encadenadas con muerte): se deja como
- * elección libre por ahora.
+ * Las ramas con `nextTable` encadenan otra tirada. Las ramas con `kills: true`
+ * causan muerte narrativa (Resistencia → 0) sin sección destino.
  */
 export const SECTION_ROLL_TABLES: Record<string, RollOutcome[]> = {
+  sect21: [
+    {
+      min: 0,
+      max: 4,
+      message: "El caballo se hunde en el espeso fango hasta el vientre.",
+      nextTable: [
+        {
+          min: 0,
+          max: 7,
+          message:
+            "Te sumerges en el lodo hasta los sobacos. El caballo lanza un último relincho desesperado antes de perecer.",
+          nextTable: [
+            {
+              min: 0,
+              max: 8,
+              kills: true,
+              message:
+                "La ciénaga putrefacta te engulle por completo. Tu misión acaba aquí.",
+            },
+            {
+              min: 9,
+              max: 9,
+              target: "sect312",
+              message:
+                "Con un último esfuerzo desesperado logras llegar a terreno firme.",
+            },
+          ],
+        },
+        {
+          min: 8,
+          max: 9,
+          target: "sect189",
+          message: "Logras librarte del lodo y pisar terreno firme.",
+        },
+      ],
+    },
+    {
+      min: 5,
+      max: 9,
+      target: "sect189",
+      message: "Logras salir del pantano.",
+    },
+  ],
   sect2: [
     { min: 0, max: 4, target: "sect343" },
     { min: 5, max: 9, target: "sect276" },

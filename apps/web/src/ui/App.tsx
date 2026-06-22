@@ -41,7 +41,7 @@ import {
   evaluateCondition,
   type LootItem,
   lootToInventoryItem,
-  resolveRoll,
+  type RollOutcome,
   SECTION_CHOICE_CONDITIONS,
   SECTION_COMBAT_RULES,
   SECTION_ENTRY_EFFECTS,
@@ -377,21 +377,27 @@ function Adventure({
     onChange(next);
   }
 
-  /** Resuelve una tirada: aplica el efecto de la rama y navega a su destino. */
-  function handleRoll(roll: number) {
-    if (!rollTable) return;
-    const outcome = resolveRoll(rollTable, roll);
-    if (!outcome) return;
+  /** Resuelve la tirada final de la Tabla de la Suerte (simple o encadenada). */
+  function handleRoll(outcome: RollOutcome, rolls: number[]) {
+    const rollLabels =
+      rolls.length === 1
+        ? [`🎲 Sacas un ${rolls[0]}.`]
+        : rolls.map((r, i) => `🎲 Tirada ${i + 1}: sacas un ${r}.`);
+
+    if (outcome.kills) {
+      // Muerte narrativa: Resistencia → 0, la pantalla de muerte aparece sola
+      const killed = setEnduranceCurrent(game.character, 0);
+      const fromGame = updateCharacter(game, killed);
+      setEntryMessages([...rollLabels, outcome.message ?? "Has muerto."]);
+      onChange(fromGame);
+      return;
+    }
 
     const applied = applyRollOutcome(game.character, outcome);
     const fromGame = updateCharacter(game, applied.character);
-    const { game: next, messages } = navigateTo(fromGame, outcome.target);
-
-    setEntryMessages([
-      `🎲 Sacas un ${roll}.`,
-      ...applied.messages,
-      ...messages,
-    ]);
+    // biome-ignore lint/style/noNonNullAssertion: target presente cuando !kills y !nextTable
+    const { game: next, messages } = navigateTo(fromGame, outcome.target!);
+    setEntryMessages([...rollLabels, ...applied.messages, ...messages]);
     onChange(next);
   }
 

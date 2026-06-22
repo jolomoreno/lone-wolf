@@ -7,6 +7,7 @@ import {
   applyRollOutcome,
   collectGold,
   evaluateCondition,
+  type RollOutcome,
   resolveRoll,
   SECTION_CHOICE_CONDITIONS,
   SECTION_COMBAT_RULES,
@@ -185,17 +186,31 @@ describe("resolveRoll", () => {
   });
 
   it("toda tabla cubre los 10 resultados (0-9) sin huecos ni solapes", () => {
-    for (const [id, table] of Object.entries(SECTION_ROLL_TABLES)) {
+    function checkTable(id: string, table: RollOutcome[]) {
       for (let n = 0; n <= 9; n++) {
         const matches = table.filter((o) => n >= o.min && n <= o.max);
         expect(matches.length, `${id} con tirada ${n}`).toBe(1);
       }
+      for (const o of table) {
+        if (o.nextTable) checkTable(`${id}[cadena]`, o.nextTable);
+      }
+    }
+    for (const [id, table] of Object.entries(SECTION_ROLL_TABLES)) {
+      checkTable(id, table);
     }
   });
 
-  it("las ramas apuntan a secciones reales", () => {
+  it("las ramas hoja apuntan a secciones reales o son muerte narrativa", () => {
+    function* leaves(table: RollOutcome[]): Iterable<RollOutcome> {
+      for (const o of table) {
+        if (o.nextTable) yield* leaves(o.nextTable);
+        else yield o;
+      }
+    }
     for (const table of Object.values(SECTION_ROLL_TABLES)) {
-      for (const o of table) expect(o.target).toMatch(/^sect\d+$/);
+      for (const o of leaves(table)) {
+        if (!o.kills) expect(o.target).toMatch(/^sect\d+$/);
+      }
     }
   });
 });

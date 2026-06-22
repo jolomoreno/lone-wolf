@@ -106,8 +106,15 @@
 
 ### Pendiente
 
-- [ ] **sect21** — tirada encadenada (cascada con muerte); excluida de
-      `SECTION_ROLL_TABLES`, sigue como elección libre. Modelar tiradas múltiples.
+- [x] **sect21** — tirada encadenada (cascada con muerte). `RollOutcome` ampliado
+      con `nextTable?: RollOutcome[]` (otra tirada) y `kills?: true` (muerte narrativa).
+      `RollPanel` gestiona la cascada internamente: acumula mensajes entre tiradas y solo
+      llama a `onResolve(outcome, rolls[])` al resolver el resultado final. En `App.tsx`,
+      `kills: true` reduce la Resistencia a 0 (dispara el `isDead` ya existente).
+      Tests actualizados para validar tablas encadenadas y ramas sin destino.
+      Ficheros: [section-rules.ts](apps/web/src/domain/game/section-rules.ts) ·
+      [RollPanel.tsx](apps/web/src/ui/components/RollPanel.tsx) ·
+      [App.tsx](apps/web/src/ui/App.tsx)
 - [~] **`tssf.png`** — 404 en todas las rutas de Project Aon. Sin impacto: `IntroScreen`
       muestra solo texto, no carga imágenes desde la API. No hay acción pendiente.
 
@@ -438,6 +445,7 @@
 - [ ] **Tests del backend** — `parse-gamebook-xml.ts`, `section.mapper.ts` y caso de uso
       `GetSection` (es el mismo pendiente que figura en el grupo D del Paso 13).
 - [ ] **Responsive / móvil y accesibilidad básica** — lector y panel de combate.
+- [x] **sect21 — tirada encadenada** — ver detalle en Paso 11 › Pendiente (arriba).
 - [x] **Error Boundary en React** — `ErrorBoundary.tsx` (componente de clase) envuelve toda la
       app en `main.tsx`. Si un componente lanza un error en runtime, muestra una pantalla de
       "Algo salió mal" con botón "Recargar" en lugar de la pantalla en blanco de React.
