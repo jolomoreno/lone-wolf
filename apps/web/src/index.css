@@ -653,8 +653,17 @@ body {
 
 @media (min-width: 760px) {
   .layout {
-    grid-template-columns: 15rem 1fr;
+    grid-template-columns: 18rem 1fr;
     align-items: start;
+  }
+}
+
+@media (min-width: 760px) {
+  /* Disciplinas en grid 2 columnas aprovechando el ancho de 18rem */
+  .sheet-list--disciplines {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 0.5rem;
   }
 }
 

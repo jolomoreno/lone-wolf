@@ -102,7 +102,7 @@ export function CharacterSheet({
           </strong>
         </div>
         <h3>Disciplinas</h3>
-        <ul className="sheet-list">
+        <ul className="sheet-list sheet-list--disciplines">
           {character.disciplines.map((discipline) => (
             <li key={discipline}>
               {KAI_DISCIPLINE_NAMES[discipline]}

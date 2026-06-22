@@ -87,7 +87,7 @@ TODO.md         Backlog completo paso a paso
 | Sub-paso | Estado |
 |---|---|
 | Móvil: stats bar + drawer + touch targets | ✅ implementado y verificado en preview |
-| Tablet: ficha más ancha (18rem) + disciplinas en grid 2 col | ⬜ pendiente |
+| Tablet: ficha más ancha (18rem) + disciplinas en grid 2 col | ✅ implementado y verificado en preview |
 | Desktop: ficha a 20rem + barra de Resistencia visual | ⬜ pendiente |
 
 | Paso | Estado |
