@@ -17,7 +17,7 @@ Contexto permanente para Claude Code. Se carga automáticamente en cualquier ses
 
 Webapp interactiva del libro-juego **Lobo Solitario, Libro 1: Huida de la Oscuridad**. El jugador gestiona Resistencia, Destreza, inventario y combates sin lápiz ni papel.
 
-Demo en producción: **https://lone-wolf-five.vercel.app**
+Demo en producción: **https://lone-wolf-book1.vercel.app**
 
 ---
 
@@ -138,7 +138,7 @@ git push → GitHub Actions
               npx vercel@latest --prod
                  → build remoto: pnpm build:vercel monta .vercel/output/
                  → Vercel sirve estático + función desde ahí
-                 → https://lone-wolf-five.vercel.app
+                 → https://lone-wolf-book1.vercel.app
 ```
 
 Secrets en GitHub repo → Settings → Secrets and variables → Actions:

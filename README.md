@@ -19,13 +19,13 @@ inventario y guardado de la partida.
 
 ## Demo en producción
 
-🌐 **https://lone-wolf-five.vercel.app**
+🌐 **https://lone-wolf-book1.vercel.app**
 
 | Endpoint | URL |
 |----------|-----|
-| Web (juego) | https://lone-wolf-five.vercel.app |
-| API health | https://lone-wolf-five.vercel.app/health |
-| API sección | https://lone-wolf-five.vercel.app/sections/sect1 |
+| Web (juego) | https://lone-wolf-book1.vercel.app |
+| API health | https://lone-wolf-book1.vercel.app/health |
+| API sección | https://lone-wolf-book1.vercel.app/sections/sect1 |
 
 ## Estructura (monorepo con pnpm workspaces)
 
@@ -297,7 +297,7 @@ GET /health          → { status: "ok", db: "connected", uptime: …, timestamp
 GET /sections/:id    → SectionDTO  (id de sección del libro, ej: /sections/sect1)
 ```
 
-En producción la base URL es `https://lone-wolf-five.vercel.app`; en local, `http://localhost:4000`.
+En producción la base URL es `https://lone-wolf-book1.vercel.app`; en local, `http://localhost:4000`.
 
 El `id` de sección sigue el formato `sect<número>` (ej. `sect1`, `sect85`, `sect350`).
 Las secciones especiales (reglas, tabla de Weaponskill, equipo del almacén) tienen ids

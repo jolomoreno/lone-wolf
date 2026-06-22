@@ -1,7 +1,7 @@
 # Smoke Test E2E — Fase 5
 
 Validación de extremo a extremo de **Lobo Solitario** en producción, ejecutada con navegador
-real sobre `https://lone-wolf-five.vercel.app`.
+real sobre `https://lone-wolf-book1.vercel.app`.
 
 - **Fecha:** 2026-06-19
 - **Entorno:** Producción (Vercel + MongoDB Atlas `lonewolf-prod`)

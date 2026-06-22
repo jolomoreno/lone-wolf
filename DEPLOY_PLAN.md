@@ -245,8 +245,8 @@ vercel --prod
 ```
 
 - [x] Verificar endpoints:
-  - `https://lone-wolf-five.vercel.app/health` → `{ "status": "ok", "db": "connected" }` ✓
-  - `https://lone-wolf-five.vercel.app/sections/sect1` → JSON con el contenido de la sección 1 ✓
+  - `https://lone-wolf-book1.vercel.app/health` → `{ "status": "ok", "db": "connected" }` ✓
+  - `https://lone-wolf-book1.vercel.app/sections/sect1` → JSON con el contenido de la sección 1 ✓
 - [x] Abrir la web, crear un personaje, navegar secciones — app jugable confirmada. ✓
 - [x] **Fix post-V3 — pantalla de victoria (sect350):** el early return de `App.tsx` reemplazaba
   el contenido real de sect350 por una pantalla genérica. Eliminado: ahora se muestra el texto

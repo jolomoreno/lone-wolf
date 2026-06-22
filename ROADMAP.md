@@ -418,7 +418,7 @@
 
 - [x] **V1** · `vercel link` — vincular repo local con proyecto de Vercel; añadir `.vercel/` a `.gitignore` (~5 min)
 - [x] **V2** · Env vars en Vercel dashboard: `MONGODB_URI` + `NODE_ENV=production` (~5 min)
-- [x] **V3** · `vercel --prod` — deploy OK. `/health` y `/sections/sect1` responden. App jugable verificada en https://lone-wolf-five.vercel.app
+- [x] **V3** · `vercel --prod` — deploy OK. `/health` y `/sections/sect1` responden. App jugable verificada en https://lone-wolf-book1.vercel.app
 - [x] **Fix victoria (post-V3)** · `App.tsx` — eliminado el early return de sect350 que mostraba una pantalla genérica en vez del texto real del capítulo. Ahora se renderiza el contenido de la sección (discurso del Rey) y el panel de victoria aparece al pie. Desplegado en prod.
 
 ### Fase 4 — GitHub Actions
