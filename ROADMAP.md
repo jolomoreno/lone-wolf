@@ -472,7 +472,9 @@
 > Ideas evaluadas en sesión 2026-06-22. Ordenadas de mayor a menor impacto de producto.
 > Ninguna es prerequisito de otra salvo donde se indica.
 
-### A · Expansión de contenido
+### Funcionalidades de producto
+
+#### A · Expansión de contenido
 
 - [ ] **Libros 2–28** — importar el resto de la serie desde Project Aon (XML bajo la misma licencia).
       Requiere: selector de libro en la pantalla de inicio, migración del personaje entre libros
@@ -480,7 +482,7 @@
       La arquitectura hexagonal existente soporta el cambio con modificaciones menores en el parser
       y en la composition root. Esfuerzo alto; es la feature de mayor impacto a largo plazo.
 
-### B · Mejoras de experiencia de juego
+#### B · Mejoras de experiencia de juego
 
 - [ ] **Múltiples slots de guardado** — ampliar de 1 a 3-5 slots en localStorage.
       Cambio mínimo: guardar un array `lone-wolf:saves` en vez de un objeto único; añadir
@@ -509,7 +511,7 @@
       Almacenar en `GameState.flags`; mostrar en la pantalla de fin de partida.
       Esfuerzo bajo (~3-4 h).
 
-### C · Internacionalización (i18n)
+#### C · Internacionalización (i18n)
 
 - [ ] **Multilenguaje — UI** — traducir cadenas de interfaz (botones, labels, mensajes) al inglés
       con `react-i18next`. Esfuerzo bajo (~1 día). No requiere cambios en el backend.
@@ -519,7 +521,7 @@
       Enrutar peticiones por idioma (`/sections/:lang/:id`). Prerequisito: la UI en inglés (ítem anterior).
       Esfuerzo medio-alto (~2-3 días). Solo tiene sentido si hay audiencia anglófona concreta.
 
-### D · Autenticación y guardado en la nube
+#### D · Autenticación y guardado en la nube
 
 > Evaluado en sesión 2026-06-22. Tres opciones de menor a mayor complejidad; se describen para
 > decidir el enfoque cuando se aborde.
@@ -540,3 +542,98 @@
       mayor familiaridad para algunos usuarios; base para funcionalidades sociales futuras.
       Requiere gestión de contraseñas (bcrypt) o configuración de OAuth app. GDPR más exigente.
       Esfuerzo alto (~5-7 días).
+
+---
+
+### Seguridad
+
+> Hallazgos del análisis de seguridad realizado en sesión 2026-06-22.
+> Ordenados de mayor a menor severidad y de menor a mayor esfuerzo dentro de cada nivel.
+
+#### Alta severidad
+
+- [ ] **SEC-3 · SRI en el CDN de Tabler** — `@tabler/icons-webfont` se carga desde
+      `cdn.jsdelivr.net` en `index.html` sin atributo `integrity`. Si el CDN fuera comprometido
+      podría servir CSS malicioso. Añadir `integrity="sha384-..."` (hash del fichero publicado).
+      Fichero: [index.html](apps/web/index.html).
+      **Esfuerzo: trivial (~15 min).**
+
+- [ ] **SEC-1 · Rate limiting en la API** — la API no tiene ningún límite de peticiones por IP.
+      Cualquiera puede saturar el endpoint `/sections/:id` disparando costos en Atlas o
+      agotando el tiempo de cómputo de la función serverless. Añadir `express-rate-limit` como
+      middleware antes de los routers en `server.ts`.
+      Fichero: [server.ts](apps/api/src/infrastructure/http/server.ts).
+      **Esfuerzo: bajo (~1 h).**
+
+- [ ] **SEC-2 · Content Security Policy (CSP)** — Helmet está activo pero sin `contentSecurityPolicy`
+      configurada explícitamente. Sin CSP, un XSS puede ejecutar scripts arbitrarios. Hay que
+      enumerar los orígenes permitidos: `projectaon.org` para imágenes, `cdn.jsdelivr.net` para
+      estilos, `'self'` para el resto. La CSP se configura en el segundo argumento de `helmet()`.
+      Fichero: [server.ts](apps/api/src/infrastructure/http/server.ts).
+      **Esfuerzo: medio (~3 h).**
+
+#### Severidad media
+
+- [ ] **SEC-6 · Límite de longitud en el parámetro de sección** — el regex
+      `/^[a-zA-Z][a-zA-Z0-9_-]*$/` valida el formato pero no la longitud. Añadir
+      `id.length > 50` como guardia adicional antes de la query a MongoDB.
+      Fichero: [section.controller.ts](apps/api/src/infrastructure/http/section.controller.ts).
+      **Esfuerzo: trivial (~5 min).**
+
+- [ ] **SEC-5 · /health expone información de infraestructura** — el endpoint devuelve
+      `uptime`, estado de la conexión MongoDB y `apiContractVersion` sin autenticación.
+      Reducir la respuesta a `{ status: "ok" }` en caso nominal y a un 503 si la BD no está
+      conectada (sin exponer el estado interno).
+      Fichero: [health.controller.ts](apps/api/src/infrastructure/http/health.controller.ts).
+      **Esfuerzo: trivial (~30 min).**
+
+- [ ] **SEC-4 · Deserialización de localStorage sin validación de schema** — `JSON.parse(raw) as GameState`
+      es solo un cast TypeScript sin validación en runtime. Un jugador puede manipular el localStorage
+      para inyectar un estado malformado (Resistencia 9999, armas ilegales, flags falsos). Añadir
+      validación con Zod o un validador casero que compruebe los campos críticos antes de aceptar
+      el guardado.
+      Fichero: [local-storage-save.adapter.ts](apps/web/src/infrastructure/storage/local-storage-save.adapter.ts).
+      **Esfuerzo: medio (~4 h).**
+
+- [ ] **SEC-7 · Hotlink a imágenes de projectaon.org (privacidad)** — cada ilustración vista por el
+      jugador genera una petición directa a `projectaon.org` con su IP real. Además, si ese servidor
+      cambia el contenido puede servir imágenes arbitrarias. La alternativa (proxy o copia local)
+      entra en conflicto con la Project Aon License, que exige no redistribuir los ficheros. Evaluar
+      si proxy transparente en la función serverless de Vercel es viable bajo la licencia.
+      **Esfuerzo: alto (~1-2 días); requiere decisión de licencia.**
+
+#### Severidad baja
+
+- [ ] **SEC-8 · Timeouts en la conexión MongoDB** — `mongoose.connect()` no configura
+      `serverSelectionTimeoutMS` ni `socketTimeoutMS`. Si Atlas responde lento, las peticiones
+      HTTP quedan colgadas bloqueando el event loop de la función serverless. Añadir
+      `{ serverSelectionTimeoutMS: 5000, socketTimeoutMS: 10000 }` como segundo argumento.
+      Fichero: [mongoose.ts](apps/api/src/infrastructure/persistence/mongoose.ts).
+      **Esfuerzo: trivial (~15 min).**
+
+- [ ] **SEC-9 · Smoke test automático post-deploy en CI** — el pipeline despliega a producción sin
+      verificar que el deploy funcionó. Añadir un paso `curl`/`fetch` en `ci.yml` que golpee
+      `/health` de la URL de producción y falle el job si devuelve un código distinto de 200.
+      Fichero: [ci.yml](.github/workflows/ci.yml).
+      **Esfuerzo: bajo (~2 h).**
+
+- [ ] **SEC-10 · Blocks almacenados como `Mixed` en MongoDB** — el campo `blocks` usa
+      `Schema.Types.Mixed` (unión discriminada sin schema Mongoose). Si el proceso de import
+      fuera comprometido, podrían insertarse documentos arbitrarios sin validación. Modelar el
+      discriminador explícitamente en el schema de Mongoose.
+      Fichero: [section.schema.ts](apps/api/src/infrastructure/persistence/section.schema.ts).
+      **Esfuerzo: medio (~3 h).**
+
+#### Informativa
+
+- [ ] **SEC-11 · VITE_ILLUSTRATION_BASE_URL sin validación** — permite apuntar imágenes a cualquier
+      URL vía variable de entorno. Solo relevante si el entorno de desarrollo está comprometido.
+      Añadir una guardia que valide que la URL es un origen de confianza conocido antes de usarla.
+      Fichero: [project-aon.ts](apps/web/src/config/project-aon.ts).
+      **Esfuerzo: trivial (~15 min).**
+
+- [ ] **SEC-12 · API completamente pública** — cualquiera puede consultar cualquier sección del libro
+      sin autenticación. Intencional para un libro-juego de uso personal, pero expone el contenido
+      con copyright de Joe Dever sin control de acceso. Si en el futuro se añaden los libros 2–28
+      (ver SEC-A), valorar proteger la API con autenticación ligera (ver grupo D, Opción B).
+      **Esfuerzo: alto (~3-5 días); vinculado a la decisión de autenticación del grupo D.**
