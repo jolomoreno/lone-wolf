@@ -15,7 +15,7 @@ inventario y guardado de la partida.
 | 13 | Refactors / deuda técnica — bugs gameplay, fidelidad de reglas, contenido/UX, deuda técnica | ✅ Hecho |
 | **14** | **Despliegue + CI/CD** — Vercel ✅ · GitHub Actions ✅ · Smoke test E2E ✅ ([SMOKE_TEST.md](SMOKE_TEST.md)) | ✅ Hecho |
 
-> Detalle completo, prerequisitos y subtareas en [TODO.md](TODO.md).
+> Detalle completo, prerequisitos y subtareas en [ROADMAP.md](ROADMAP.md).
 
 ## Demo en producción
 
@@ -343,7 +343,7 @@ anterior se descartan automáticamente al cargar. v2 → ids de sección como st
 
 ## Limitaciones conocidas y desviaciones de las reglas
 
-Detalle en [TODO.md](TODO.md) (paso 13.2-D). En resumen:
+Detalle en [ROADMAP.md](ROADMAP.md) (paso 13.2-D). En resumen:
 
 - **Objeto del almacén por tirada**, no por elección del jugador (decisión de diseño;
   en las reglas oficiales el jugador elige).

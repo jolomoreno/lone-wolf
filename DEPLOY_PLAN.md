@@ -362,7 +362,7 @@ Recorrido verificado de extremo a extremo. Evidencias completas en
 
 > **Hallazgo (nice-to-have, no bloqueante)**: la API en producción emite
 > `access-control-allow-origin: http://localhost:5173` (cabecera CORS de dev). Sin impacto
-> funcional (web y API comparten origen). Anotado en TODO.md → "Calidad / nice-to-have".
+> funcional (web y API comparten origen). Anotado en ROADMAP.md → "Calidad / nice-to-have".
 
 ---
 

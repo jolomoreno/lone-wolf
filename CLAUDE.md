@@ -60,7 +60,7 @@ vercel.json     Solo buildCommand (pnpm build:vercel) + installCommand
 .vercelignore   Excluye .env del upload (evita localhost en bundle prod)
 biome.json      Config lint + formato
 DEPLOY_PLAN.md  Plan completo de despliegue con todas las decisiones
-TODO.md         Backlog completo paso a paso
+ROADMAP.md      Roadmap completo: pasos 1-14 + backlog de nuevas funcionalidades
 ```
 
 > **Enrutado en prod**: las rewrites `/sections/*` y `/health` → función ya NO viven en
@@ -72,7 +72,7 @@ TODO.md         Backlog completo paso a paso
 
 **Pasos 1–14 completados. Todos los nice-to-haves cerrados a 2026-06-22.** Proyecto desplegado y verificado E2E en producción (2026-06-19).
 
-**Nuevo backlog de funcionalidades evaluado en sesión 2026-06-22** — ver [TODO.md](TODO.md) § «Backlog de nuevas funcionalidades». Grupos: expansión a libros 2–28, mejoras de UX (múltiples slots de guardado, pantalla de fin de partida, confirmación al soltar objetos, sonido, logros), internacionalización (i18n UI + contenido) y autenticación/guardado en la nube.
+**Nuevo backlog de funcionalidades evaluado en sesión 2026-06-22** — ver [ROADMAP.md](ROADMAP.md) § «Backlog de nuevas funcionalidades». Grupos: expansión a libros 2–28, mejoras de UX (múltiples slots de guardado, pantalla de fin de partida, confirmación al soltar objetos, sonido, logros), internacionalización (i18n UI + contenido) y autenticación/guardado en la nube.
 
 ### Nice-to-haves — estado (2026-06-22 → 2026-06-22)
 
