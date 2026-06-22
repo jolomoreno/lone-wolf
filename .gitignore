@@ -1,3 +1,6 @@
+# Ficheros locales no versionados
+*.txt
+
 # Dependencias
 node_modules/
 .pnpm-store/
